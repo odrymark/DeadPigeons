@@ -293,5 +293,19 @@ export class Api<
         type: ContentType.Json,
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetMe
+     * @request GET:/pigeon/auth/me
+     */
+    mainGetMe: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/auth/me`,
+        method: "GET",
+        ...params,
+      }),
   };
 }

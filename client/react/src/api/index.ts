@@ -3,7 +3,6 @@ import {Api} from "./Api.ts";
 export type User = {
     id: number;
     isAdmin: boolean;
-    token: string;
     username: string;
 }
 
@@ -18,12 +17,25 @@ export const defApi = new Api({
 
 export async function handleUserLogin(user: UserLoginPost): Promise<User | null> {
     try {
-        const res = await defApi.pigeon.mainLogin(user);
-        const data = await res.json() as User;
-        return data as User;
+        const res = await defApi.pigeon.mainLogin(user, {credentials:"include"});
+        return await res.json() as User;
     }
     catch (error) {
         console.log("Failed to login with provided credentials: "+error);
+        return null;
+    }
+}
+
+export async function handleUserAuth() : Promise<User | null> {
+    try {
+        const res = await defApi.pigeon.mainGetMe({credentials:"include"});
+        if(!res.ok)
+            return null;
+
+        return await res.json() as User;
+    }
+    catch (error) {
+        console.log("Failed to authenticate user: "+error);
         return null;
     }
 }

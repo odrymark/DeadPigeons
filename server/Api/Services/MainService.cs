@@ -15,7 +15,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext pigeonsDbCo
         if (user == null || user.password != userLoginReqDTO.password)
             throw new Exception("Invalid login credentials");
 
-        string token = tokenService.GenerateToken(user);
+        var token = tokenService.GenerateToken(user);
         
         user.lastLogin = DateTime.UtcNow;
         await pigeonsDbContext.SaveChangesAsync();
