@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-public class MainService(TokenService tokenService, PigeonsDbContext pigeonsDbContext)
+public class MainService(TokenService tokenService, PigeonsDbContext _context)
 {
     public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDTO)
     {
-        var user = await pigeonsDbContext.Users
+        var user = await _context.Users
             .FirstOrDefaultAsync(u => u.username == userLoginReqDTO.username);
 
         if (user == null || user.password != userLoginReqDTO.password)
@@ -18,7 +18,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext pigeonsDbCo
         var token = tokenService.GenerateToken(user);
         
         user.lastLogin = DateTime.UtcNow;
-        await pigeonsDbContext.SaveChangesAsync();
+        await _context.SaveChangesAsync();
 
         return new UserLoginResDTO
         {
@@ -27,5 +27,19 @@ public class MainService(TokenService tokenService, PigeonsDbContext pigeonsDbCo
             isAdmin = user.isAdmin,
             token = token
         };
+    }
+
+    public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid id)
+    {
+        return await _context.Boards
+            .Where(b => b.userId == id)
+            .Select(b => new BoardResDTO
+            {
+                id = b.id,
+                numbers = b.numbers,
+                createdAt = b.createdAt,
+                isWinner = b.isWinner,
+            })
+            .ToListAsync();
     }
 }

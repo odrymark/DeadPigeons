@@ -1,14 +1,25 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
-import { handleUserLogin} from "../api";
+import {handleUserAuth, handleUserLogin} from "../api";
 import { useAtom } from "jotai";
 import { userAtom } from "../atoms/userAtom.ts";
 
-export default function LoginPage() {
+export default function Login() {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [, setUser] = useAtom(userAtom);
+
+    useEffect(() => {
+        (async () => {
+            const u = await handleUserAuth();
+            if (u)
+            {
+                setUser(u);
+                navigate("/dashboard");
+            }
+        })();
+    }, []);
 
     return (
         <div className="hero min-h-screen min-w-screen bg-base-200">

@@ -307,5 +307,33 @@ export class Api<
         method: "GET",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetBoards
+     * @request GET:/pigeon/getBoards
+     */
+    mainGetBoards: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getBoards`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainLogout
+     * @request POST:/pigeon/logout
+     */
+    mainLogout: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/logout`,
+        method: "POST",
+        ...params,
+      }),
   };
 }

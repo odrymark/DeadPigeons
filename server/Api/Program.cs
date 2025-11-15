@@ -67,9 +67,11 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<PigeonsDbContext>();
     db.Database.EnsureCreated();
 
-    if (!db.Users.Any(u => u.username == "testuser"))
+    var testUser = db.Users.FirstOrDefault(u => u.username == "testuser");
+
+    if (testUser == null)
     {
-        db.Users.Add(new User
+        testUser = new User
         {
             id = Guid.NewGuid(),
             username = "testuser",
@@ -78,7 +80,23 @@ using (var scope = app.Services.CreateScope())
             isActive = true,
             createdAt = DateTime.UtcNow,
             lastLogin = DateTime.UtcNow
+        };
+
+        db.Users.Add(testUser);
+        db.SaveChanges();
+    }
+    
+    if (!db.Boards.Any(b => b.userId == testUser.id))
+    {
+        db.Boards.Add(new Board
+        {
+            id = Guid.NewGuid(),
+            userId = testUser.id,
+            numbers = [1, 5, 12, 19, 23],
+            createdAt = DateTime.UtcNow,
+            isWinner = false
         });
+
         db.SaveChanges();
     }
 }
