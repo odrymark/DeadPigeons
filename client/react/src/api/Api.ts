@@ -298,6 +298,20 @@ export class Api<
      * No description
      *
      * @tags Main
+     * @name MainLogout
+     * @request POST:/pigeon/logout
+     */
+    mainLogout: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/logout`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
      * @name MainGetMe
      * @request GET:/pigeon/auth/me
      */
@@ -326,13 +340,27 @@ export class Api<
      * No description
      *
      * @tags Main
-     * @name MainLogout
-     * @request POST:/pigeon/logout
+     * @name MainGetPayments
+     * @request GET:/pigeon/getPayments
      */
-    mainLogout: (params: RequestParams = {}) =>
+    mainGetPayments: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/logout`,
-        method: "POST",
+        path: `/pigeon/getPayments`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetBalance
+     * @request GET:/pigeon/getBalance
+     */
+    mainGetBalance: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getBalance`,
+        method: "GET",
         ...params,
       }),
   };

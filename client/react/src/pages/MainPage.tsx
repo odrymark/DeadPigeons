@@ -9,6 +9,7 @@ export default function MainPage() {
                 <div className="flex flex-col items-center gap-6">
                     <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("buyBoard")}>Buy Board</button>
                     <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("prevBoards")}>Previous Boards</button>
+                    <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("prevPay")}>Previous Payments</button>
                 </div>
             </div>
         </>

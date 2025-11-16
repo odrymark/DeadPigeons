@@ -42,4 +42,25 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
             })
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid id)
+    {
+        return await _context.Payments
+            .Where(p => p.userId == id)
+            .Select(p => new PaymentResDTO
+            {
+                id = p.id,
+                createdAt = p.createdAt,
+                amount = p.amount,
+                paymentNumber = p.paymentNumber
+            })
+            .ToListAsync();
+    }
+
+    public async Task<int> GetBalance(Guid id)
+    {
+        return await _context.Payments
+            .Where(p => p.userId == id)
+            .SumAsync(p => p.amount);
+    }
 }

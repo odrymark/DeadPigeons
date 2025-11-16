@@ -9,14 +9,14 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("pigeon")]
-public class MainController(MainService service) : ControllerBase
+public class MainController(MainService _service) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] UserLoginReqDTO loginReqDto)
     {
         try
         {
-            UserLoginResDTO response = await service.AuthenticateUser(loginReqDto);
+            UserLoginResDTO response = await _service.AuthenticateUser(loginReqDto);
 
             Response.Cookies.Append("jwt", response.token, new CookieOptions
             {
@@ -65,12 +65,50 @@ public class MainController(MainService service) : ControllerBase
     {
         try
         {
-            var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
-            Guid id = Guid.Parse(sub!);
+            Guid id = Guid.Parse(idStr!);
             
-            var boards = await service.GetBoards(id);
+            var boards = await _service.GetBoards(id);
             return Ok(boards);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getPayments")]
+    [Authorize]
+    public async Task<ActionResult> GetPayments()
+    {
+        try
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            Guid id = Guid.Parse(idStr!);
+            
+            var payments = await _service.GetPayments(id);
+            return Ok(payments);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getBalance")]
+    [Authorize]
+    public async Task<ActionResult> GetBalance()
+    {
+        try
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            Guid id = Guid.Parse(idStr!);
+
+            int bal = await _service.GetBalance(id);
+            return Ok(bal);
         }
         catch (Exception ex)
         {

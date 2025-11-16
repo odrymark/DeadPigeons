@@ -85,7 +85,7 @@ using (var scope = app.Services.CreateScope())
         db.Users.Add(testUser);
         db.SaveChanges();
     }
-    
+
     if (!db.Boards.Any(b => b.userId == testUser.id))
     {
         db.Boards.Add(new Board
@@ -96,6 +96,30 @@ using (var scope = app.Services.CreateScope())
             createdAt = DateTime.UtcNow,
             isWinner = false
         });
+
+        db.SaveChanges();
+    }
+
+    if (!db.Payments.Any(p => p.userId == testUser.id))
+    {
+        db.Payments.AddRange(
+            new Payment
+            {
+                id = Guid.NewGuid(),
+                userId = testUser.id,
+                amount = -50,
+                paymentNumber = null,
+                createdAt = DateTime.UtcNow
+            },
+            new Payment
+            {
+                id = Guid.NewGuid(),
+                userId = testUser.id,
+                amount = 200,
+                paymentNumber = "7439201586",
+                createdAt = DateTime.UtcNow
+            }
+        );
 
         db.SaveChanges();
     }

@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import PrevBoards from "./pages/PrevBoards.tsx";
 import BuyBoard from "./pages/BuyBoard.tsx";
 import MainPage from "./pages/MainPage.tsx";
+import PrevPay from "./pages/prevPay.tsx";
 import './style.css'
 
 const routes : RouteObject[] = [
@@ -30,6 +31,10 @@ const routes : RouteObject[] = [
             {
                 path: "prevBoards",
                 element: <PrevBoards/>
+            },
+            {
+                path: "prevPay",
+                element: <PrevPay/>
             }
         ]
     },
