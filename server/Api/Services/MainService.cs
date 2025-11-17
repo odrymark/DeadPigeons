@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-public class MainService(TokenService tokenService, PigeonsDbContext _context)
+public class MainService(TokenService tokenService, PasswordService passwordService, PigeonsDbContext context)
 {
     public static readonly Dictionary<int, int> Prices = new()
     {
@@ -16,16 +16,16 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
     };
     public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDTO)
     {
-        var user = await _context.Users
+        var user = await context.Users
             .FirstOrDefaultAsync(u => u.username == userLoginReqDTO.username);
 
-        if (user == null || user.password != userLoginReqDTO.password)
+        if (user == null || !passwordService.VerifyHashedPassword(user.password, userLoginReqDTO.password))
             throw new Exception("Invalid login credentials");
-
+        
         var token = tokenService.GenerateToken(user);
 
         user.lastLogin = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return new UserLoginResDTO
         {
@@ -38,7 +38,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
 
     public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid id)
     {
-        return await _context.Boards
+        return await context.Boards
             .Where(b => b.userId == id)
             .Select(b => new BoardResDTO
             {
@@ -52,7 +52,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
 
     public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid id)
     {
-        return await _context.Payments
+        return await context.Payments
             .Where(p => p.userId == id)
             .Select(p => new PaymentResDTO
             {
@@ -66,7 +66,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
 
     public async Task<int> GetBalance(Guid id)
     {
-        return await _context.Payments
+        return await context.Payments
             .Where(p => p.userId == id)
             .SumAsync(p => p.amount);
     }
@@ -99,10 +99,10 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
             paymentNumber = null 
         };
             
-        _context.Boards.Add(board);
-        _context.Payments.Add(payment);
+        context.Boards.Add(board);
+        context.Payments.Add(payment);
             
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
 }

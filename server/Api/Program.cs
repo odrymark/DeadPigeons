@@ -48,6 +48,7 @@ builder.Services.AddAuthentication("JwtAuth")
         };
     });
 
+builder.Services.AddSingleton<PasswordService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<MainService>();
 builder.Services.AddControllers();
@@ -71,11 +72,13 @@ using (var scope = app.Services.CreateScope())
 
     if (testUser == null)
     {
+        var passwd = new PasswordService().HashPassword("password123");
+        
         testUser = new User
         {
             id = Guid.NewGuid(),
             username = "testuser",
-            password = "password123",
+            password = passwd,
             isAdmin = true,
             isActive = true,
             createdAt = DateTime.UtcNow,

@@ -10,14 +10,14 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("pigeon")]
-public class MainController(MainService _service) : ControllerBase
+public class MainController(MainService service) : ControllerBase
 {
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] UserLoginReqDTO loginReqDto)
     {
         try
         {
-            UserLoginResDTO response = await _service.AuthenticateUser(loginReqDto);
+            UserLoginResDTO response = await service.AuthenticateUser(loginReqDto);
 
             Response.Cookies.Append("jwt", response.token, new CookieOptions
             {
@@ -70,7 +70,7 @@ public class MainController(MainService _service) : ControllerBase
             
             Guid id = Guid.Parse(idStr!);
             
-            var boards = await _service.GetBoards(id);
+            var boards = await service.GetBoards(id);
             return Ok(boards);
         }
         catch (Exception ex)
@@ -89,7 +89,7 @@ public class MainController(MainService _service) : ControllerBase
             
             Guid id = Guid.Parse(idStr!);
             
-            var payments = await _service.GetPayments(id);
+            var payments = await service.GetPayments(id);
             return Ok(payments);
         }
         catch (Exception ex)
@@ -108,7 +108,7 @@ public class MainController(MainService _service) : ControllerBase
             
             Guid id = Guid.Parse(idStr!);
 
-            int bal = await _service.GetBalance(id);
+            int bal = await service.GetBalance(id);
             return Ok(bal);
         }
         catch (Exception ex)
@@ -127,7 +127,7 @@ public class MainController(MainService _service) : ControllerBase
             var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             Guid id = Guid.Parse(idStr!);
-            await _service.AddBoard(boardReqDto, id);
+            await service.AddBoard(boardReqDto, id);
             
             return Ok();
         }

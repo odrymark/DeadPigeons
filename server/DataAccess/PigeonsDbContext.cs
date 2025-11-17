@@ -28,7 +28,7 @@ public class PigeonsDbContext : DbContext
             .HasMany(w => w.winners)
             .WithMany(u => u.winningGames)
             .UsingEntity<Dictionary<string, object>>(
-                "UserWeekWinners"
+                "UserGameWinners"
             );
     }
     
