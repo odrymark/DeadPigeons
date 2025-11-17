@@ -7,6 +7,13 @@ namespace Api.Services;
 
 public class MainService(TokenService tokenService, PigeonsDbContext _context)
 {
+    public static readonly Dictionary<int, int> Prices = new()
+    {
+        { 5, 20 },
+        { 6, 40 },
+        { 7, 80 },
+        { 8, 160 }
+    };
     public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDTO)
     {
         var user = await _context.Users
@@ -16,7 +23,7 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
             throw new Exception("Invalid login credentials");
 
         var token = tokenService.GenerateToken(user);
-        
+
         user.lastLogin = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
@@ -63,4 +70,39 @@ public class MainService(TokenService tokenService, PigeonsDbContext _context)
             .Where(p => p.userId == id)
             .SumAsync(p => p.amount);
     }
+
+    public async Task AddBoard(BoardReqDTO boardReqDTO, Guid userId)
+    {
+        if (!Prices.TryGetValue(boardReqDTO.numbers.Count, out int price))
+            throw new Exception("Amount of numbers not found in prices dictionary");
+        
+        int bal = await GetBalance(userId);
+
+        if (bal < price)
+            throw new Exception("Insufficient balance");
+        
+        var board = new Board
+        {
+            id = Guid.NewGuid(),
+            userId = userId,
+            numbers = boardReqDTO.numbers,
+            createdAt = DateTime.UtcNow,
+            isWinner = null
+        };
+
+        var payment = new Payment
+        {
+            id = Guid.NewGuid(),
+            userId = userId,
+            amount = -price,
+            createdAt = DateTime.UtcNow,
+            paymentNumber = null 
+        };
+            
+        _context.Boards.Add(board);
+        _context.Payments.Add(payment);
+            
+        await _context.SaveChangesAsync();
+    }
+
 }

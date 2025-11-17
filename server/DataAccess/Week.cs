@@ -1,6 +1,6 @@
 ﻿namespace DataAccess;
 
-public class Week
+public class Game
 {
     public Guid id { get; set; }
     public string numbers { get; set; } = null!;

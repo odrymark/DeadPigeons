@@ -15,6 +15,14 @@ export interface UserLoginReqDTO {
   password?: string;
 }
 
+export interface BoardReqDTO {
+  /**
+   * @maxItems 8
+   * @minItems 5
+   */
+  numbers?: number[];
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -361,6 +369,22 @@ export class Api<
       this.request<File, any>({
         path: `/pigeon/getBalance`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainAddBoard
+     * @request POST:/pigeon/addBoard
+     */
+    mainAddBoard: (data: BoardReqDTO, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/addBoard`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };

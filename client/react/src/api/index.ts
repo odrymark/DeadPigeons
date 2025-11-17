@@ -97,3 +97,14 @@ export async function handleGetBalance() : Promise<number> {
         return -1;
     }
 }
+
+export async function handleAddBoard(numbers: number[]) {
+    try {
+        await defApi.pigeon.mainAddBoard({numbers:numbers}, {credentials:"include"});
+        alert("Board added successfully.");
+    }
+    catch (error) {
+        console.log("Failed to add board: "+error);
+        alert("Failed to add board: "+error);
+    }
+}

@@ -24,16 +24,16 @@ public class PigeonsDbContext : DbContext
             .HasForeignKey(b => b.userId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Week>()
+        modelBuilder.Entity<Game>()
             .HasMany(w => w.winners)
-            .WithMany(u => u.winningWeeks)
+            .WithMany(u => u.winningGames)
             .UsingEntity<Dictionary<string, object>>(
                 "UserWeekWinners"
             );
     }
     
     public DbSet<User> Users { get; set; }
-    public DbSet<Week> Weeks { get; set; }
+    public DbSet<Game> Games { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<Board> Boards { get; set; }
 }

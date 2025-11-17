@@ -12,5 +12,5 @@ public class User
     
     public ICollection<Payment> payments { get; set; } = new List<Payment>();
     public ICollection<Board> boards { get; set; } = new List<Board>();
-    public ICollection<Week> winningWeeks { get; set; } = new List<Week>();
+    public ICollection<Game> winningGames { get; set; } = new List<Game>();
 }

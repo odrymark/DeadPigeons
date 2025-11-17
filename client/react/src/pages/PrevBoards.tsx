@@ -33,8 +33,8 @@ export default function PrevBoards() {
 
                         <div className="break-words">{b.numbers.join(", ")}</div>
 
-                        <div className={b.isWinner ? "text-success font-bold" : "text-error font-bold"}>
-                            {b.isWinner ? "Yes" : "No"}
+                        <div className={b.isWinner === null ? "" : b.isWinner ? "text-success font-bold" : "text-error font-bold"}>
+                            {b.isWinner === null ? "" : b.isWinner ? "Yes" : "No"}
                         </div>
                     </div>
                 ))}

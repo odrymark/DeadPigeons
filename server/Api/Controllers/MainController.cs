@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Api.DTOs;
 using Api.DTOs.Response;
 using Api.Services;
@@ -116,4 +117,23 @@ public class MainController(MainService _service) : ControllerBase
         }
     }
 
+
+    [HttpPost("addBoard")]
+    [Authorize]
+    public async Task<ActionResult> AddBoard([FromBody] BoardReqDTO boardReqDto)
+    {
+        try
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            Guid id = Guid.Parse(idStr!);
+            await _service.AddBoard(boardReqDto, id);
+            
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
