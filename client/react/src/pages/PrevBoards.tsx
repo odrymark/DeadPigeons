@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {type Board, handleGetBoards} from "../api";
+import {type BoardGet, handleGetBoards} from "../api";
 
 export default function PrevBoards() {
-    const [boards, setBoards] = useState<Board[]>([]);
+    const [boards, setBoards] = useState<BoardGet[]>([]);
 
     useEffect(() => {
         async function fetchBoards() {

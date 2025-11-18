@@ -52,7 +52,12 @@ export default function Dashboard() {
                 <div className="navbar-end pr-4 flex items-center gap-2">
                     <div className="flex flex-col items-end gap-1">
                         <span className="badge badge-primary">{user!.username}</span>
-                        <span className="badge badge-secondary">Balance: {balance} DKK</span>
+
+                        {user!.isAdmin ? (
+                            <span className="badge badge-warning">Admin</span>
+                        ) : (
+                            <span className="badge badge-secondary">Balance: {balance} DKK</span>
+                        )}
                     </div>
 
                     <button className="btn btn-error p-0 w-15 h-15 flex items-center justify-center rounded-full" onClick={async () => {

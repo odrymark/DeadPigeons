@@ -3,9 +3,10 @@ import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import PrevBoards from "./pages/PrevBoards.tsx";
 import BuyBoard from "./pages/BuyBoard.tsx";
-import MainPage from "./pages/MainPage.tsx";
 import PrevPay from "./pages/prevPay.tsx";
 import './style.css'
+import DashboardIndex from "./pages/DashboardIndex.tsx";
+import AddUser from "./pages/AddUser.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -22,7 +23,7 @@ const routes : RouteObject[] = [
         children: [
             {
                 path: "/dashboard/",
-                element: <MainPage/>
+                element: <DashboardIndex/>
             },
             {
                 path: "buyBoard",
@@ -35,6 +36,10 @@ const routes : RouteObject[] = [
             {
                 path: "prevPay",
                 element: <PrevPay/>
+            },
+            {
+                path: "addUser",
+                element: <AddUser/>
             }
         ]
     },

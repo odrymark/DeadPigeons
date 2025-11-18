@@ -1,4 +1,4 @@
 import { atom } from "jotai";
-import { type User } from "../api";
+import { type UserGet } from "../api";
 
-export const userAtom = atom<User | null>(null);
+export const userAtom = atom<UserGet | null>(null);

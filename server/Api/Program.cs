@@ -68,33 +68,35 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<PigeonsDbContext>();
     db.Database.EnsureCreated();
 
-    var testUser = db.Users.FirstOrDefault(u => u.username == "testuser");
+    var admin = db.Users.FirstOrDefault(u => u.username == "admin");
 
-    if (testUser == null)
+    if (admin == null)
     {
         var passwd = new PasswordService().HashPassword("password123");
         
-        testUser = new User
+        admin = new User
         {
             id = Guid.NewGuid(),
-            username = "testuser",
+            username = "admin",
             password = passwd,
+            email = "admin@gmail.com",
+            phoneNumber = "+4512345678",
             isAdmin = true,
             isActive = true,
             createdAt = DateTime.UtcNow,
             lastLogin = DateTime.UtcNow
         };
 
-        db.Users.Add(testUser);
+        db.Users.Add(admin);
         db.SaveChanges();
     }
 
-    if (!db.Boards.Any(b => b.userId == testUser.id))
+    if (!db.Boards.Any(b => b.userId == admin.id))
     {
         db.Boards.Add(new Board
         {
             id = Guid.NewGuid(),
-            userId = testUser.id,
+            userId = admin.id,
             numbers = [1, 5, 12, 19, 23],
             createdAt = DateTime.UtcNow,
             isWinner = false
@@ -103,13 +105,13 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
-    if (!db.Payments.Any(p => p.userId == testUser.id))
+    if (!db.Payments.Any(p => p.userId == admin.id))
     {
         db.Payments.AddRange(
             new Payment
             {
                 id = Guid.NewGuid(),
-                userId = testUser.id,
+                userId = admin.id,
                 amount = -50,
                 paymentNumber = null,
                 createdAt = DateTime.UtcNow
@@ -117,7 +119,7 @@ using (var scope = app.Services.CreateScope())
             new Payment
             {
                 id = Guid.NewGuid(),
-                userId = testUser.id,
+                userId = admin.id,
                 amount = 200,
                 paymentNumber = "7439201586",
                 createdAt = DateTime.UtcNow

@@ -1,6 +1,6 @@
 import {Api} from "./Api.ts";
 
-export type User = {
+export type UserGet = {
     id: string;
     isAdmin: boolean;
     username: string;
@@ -11,28 +11,35 @@ export type UserLoginPost = {
     password: string;
 }
 
-export type Board = {
+export type BoardGet = {
     id: string;
     numbers: number[];
     createdAt: string;
     isWinner: boolean;
 }
 
-export type Payment = {
+export type PaymentGet = {
     id: string;
     amount: number;
     createdAt: string;
     paymentNumber: string;
 }
 
+export type UserAddPost = {
+    username: string;
+    password: string;
+    email: string;
+    phoneNumber: string;
+}
+
 export const defApi = new Api({
     baseUrl: 'http://localhost:5000'
 });
 
-export async function handleUserLogin(user: UserLoginPost): Promise<User | null> {
+export async function handleUserLogin(user: UserLoginPost): Promise<UserGet | null> {
     try {
         const res = await defApi.pigeon.mainLogin(user, {credentials:"include"});
-        return await res.json() as User;
+        return await res.json() as UserGet;
     }
     catch (error) {
         console.log("Failed to login: "+error);
@@ -50,13 +57,13 @@ export async function handleLogout(): Promise<void> {
     }
 }
 
-export async function handleUserAuth() : Promise<User | null> {
+export async function handleUserAuth() : Promise<UserGet | null> {
     try {
         const res = await defApi.pigeon.mainGetMe({credentials:"include"});
         if(!res.ok)
             return null;
 
-        return await res.json() as User;
+        return await res.json() as UserGet;
     }
     catch (error) {
         console.log("Failed to authenticate user: "+error);
@@ -64,10 +71,10 @@ export async function handleUserAuth() : Promise<User | null> {
     }
 }
 
-export async function handleGetBoards() : Promise<Board[]> {
+export async function handleGetBoards() : Promise<BoardGet[]> {
     try {
         const res = await defApi.pigeon.mainGetBoards({credentials:"include"});
-        return await res.json() as Board[];
+        return await res.json() as BoardGet[];
     }
     catch (error) {
         console.log("Failed to retrieve boards: "+error);
@@ -75,11 +82,11 @@ export async function handleGetBoards() : Promise<Board[]> {
     }
 }
 
-export async function handleGetPayments() : Promise<Payment[]> {
+export async function handleGetPayments() : Promise<PaymentGet[]> {
     try
     {
         const res = await defApi.pigeon.mainGetPayments({credentials:"include"});
-        return await res.json() as Payment[];
+        return await res.json() as PaymentGet[];
     }
     catch (error) {
         console.log("Failed to retrieve payments: "+error);
@@ -106,5 +113,27 @@ export async function handleAddBoard(numbers: number[]) {
     catch (error) {
         console.log("Failed to add board: "+error);
         alert("Failed to add board: "+error);
+    }
+}
+
+export async function handleAddUser(user: UserAddPost) {
+    try {
+        await defApi.pigeon.mainAddUser(user, {credentials:"include"});
+        alert("User added successfully.");
+    }
+    catch (error) {
+        console.log("Failed to add user: "+error);
+        alert("Failed to add user: "+error);
+    }
+}
+
+export async function handleGetWeekIncome() : Promise<number> {
+    try {
+        const res = await defApi.pigeon.mainGetWeekIncome({credentials:"include"});
+        return await res.json() as number;
+    }
+    catch (error) {
+        console.log("Failed to retrieve weeks income: "+error);
+        return -1;
     }
 }

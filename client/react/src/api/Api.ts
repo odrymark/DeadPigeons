@@ -23,6 +23,13 @@ export interface BoardReqDTO {
   numbers?: number[];
 }
 
+export interface UserAddReqDTO {
+  username?: string;
+  password?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -385,6 +392,36 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainAddUser
+     * @request POST:/pigeon/addUser
+     */
+    mainAddUser: (data: UserAddReqDTO, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/addUser`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetWeekIncome
+     * @request GET:/pigeon/getWeekIncome
+     */
+    mainGetWeekIncome: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getWeekIncome`,
+        method: "GET",
         ...params,
       }),
   };

@@ -136,4 +136,35 @@ public class MainController(MainService service) : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost("addUser")]
+    [Authorize]
+    public async Task<ActionResult> AddUser([FromBody] UserAddReqDTO userReqDto)
+    {
+        try
+        {
+            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
+            await service.AddUser(userReqDto, isAdmin);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getWeekIncome")]
+    [Authorize]
+    public async Task<ActionResult> GetWeekIncome()
+    {
+        try
+        {
+            int income = await service.GetWeekIncome();
+            return Ok(income);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

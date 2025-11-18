@@ -1,5 +1,6 @@
-import { useState } from "react";
+import {useState} from "react";
 import {handleAddBoard} from "../api";
+
 
 export default function BuyBoard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -19,7 +20,7 @@ export default function BuyBoard() {
     const gridNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
 
     return (
-        <div className="min-h-screen flex flex-col items-center p-6 bg-base-200">
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
             <h1 className="text-2xl font-bold mb-4">Select Your Numbers</h1>
 
             {/* Numbers */}

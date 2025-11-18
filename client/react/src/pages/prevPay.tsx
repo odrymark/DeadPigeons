@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import {handleGetPayments, type Payment} from "../api";
+import {handleGetPayments, type PaymentGet} from "../api";
 
 export default function PrevPay() {
-    const [payments, setPayments] = useState<Payment[]>([]);
+    const [payments, setPayments] = useState<PaymentGet[]>([]);
 
     useEffect(() => {
         async function fetchBoards() {
