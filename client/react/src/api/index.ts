@@ -36,10 +36,58 @@ export const defApi = new Api({
     baseUrl: 'http://localhost:5000'
 });
 
+async function apiRequest<T>(requestFunc: (opts?: RequestInit) => Promise<Response>): Promise<T> {
+    try {
+        const res = await requestFunc({ credentials: "include" });
+
+        if (!res.ok) throw res;
+
+        return await res.json() as T;
+
+    } catch (error: any) {
+        if (error?.status === 401) {
+            console.log("Got 401, attempting token refresh...");
+
+            try {
+                await handleRefreshToken();
+
+                const retryRes = await requestFunc({ credentials: "include" });
+                if (!retryRes.ok) throw retryRes;
+
+                return await retryRes.json() as T;
+
+            } catch (retryErr) {
+                console.log("Token refresh failed:", retryErr);
+                throw new Error("Unauthorized");
+            }
+        }
+
+        console.log("Request failed:", error);
+        throw error;
+    }
+}
+
+let refreshPromise: Promise<any> | null = null;
+
+async function handleRefreshToken() : Promise<void> {
+    if (!refreshPromise) {
+        refreshPromise = defApi.pigeon
+            .mainRefresh({ credentials: "include" })
+            .catch(err => {
+                console.log("Refresh failed:", err);
+                throw err;
+            })
+            .finally(() => {
+                refreshPromise = null;
+            });
+    }
+
+    return refreshPromise;
+}
+
 export async function handleUserLogin(user: UserLoginPost): Promise<UserGet | null> {
     try {
-        const res = await defApi.pigeon.mainLogin(user, {credentials:"include"});
-        return await res.json() as UserGet;
+        return await apiRequest((opts) => defApi.pigeon.mainLogin(user, opts));
     }
     catch (error) {
         console.log("Failed to login: "+error);
@@ -50,7 +98,7 @@ export async function handleUserLogin(user: UserLoginPost): Promise<UserGet | nu
 export async function handleLogout(): Promise<void> {
     try
     {
-        await defApi.pigeon.mainLogout({credentials:"include"});
+        await defApi.pigeon.mainLogout({credentials: "include"});
     }
     catch (error) {
         console.log("Failed to logout: "+error);
@@ -59,11 +107,7 @@ export async function handleLogout(): Promise<void> {
 
 export async function handleUserAuth() : Promise<UserGet | null> {
     try {
-        const res = await defApi.pigeon.mainGetMe({credentials:"include"});
-        if(!res.ok)
-            return null;
-
-        return await res.json() as UserGet;
+        return await apiRequest((opts) => defApi.pigeon.mainGetMe(opts));
     }
     catch (error) {
         console.log("Failed to authenticate user: "+error);
@@ -73,8 +117,7 @@ export async function handleUserAuth() : Promise<UserGet | null> {
 
 export async function handleGetBoards() : Promise<BoardGet[]> {
     try {
-        const res = await defApi.pigeon.mainGetBoards({credentials:"include"});
-        return await res.json() as BoardGet[];
+        return await apiRequest((opts) => defApi.pigeon.mainGetBoards(opts));
     }
     catch (error) {
         console.log("Failed to retrieve boards: "+error);
@@ -85,8 +128,7 @@ export async function handleGetBoards() : Promise<BoardGet[]> {
 export async function handleGetPayments() : Promise<PaymentGet[]> {
     try
     {
-        const res = await defApi.pigeon.mainGetPayments({credentials:"include"});
-        return await res.json() as PaymentGet[];
+        return await apiRequest((opts) => defApi.pigeon.mainGetPayments(opts));
     }
     catch (error) {
         console.log("Failed to retrieve payments: "+error);
@@ -96,8 +138,7 @@ export async function handleGetPayments() : Promise<PaymentGet[]> {
 
 export async function handleGetBalance() : Promise<number> {
     try {
-        const res = await defApi.pigeon.mainGetBalance({credentials:"include"});
-        return await res.json() as number;
+        return await apiRequest((opts) => defApi.pigeon.mainGetBalance(opts));
     }
     catch (error) {
         console.log("Failed to retrieve balance: "+error);
@@ -107,8 +148,7 @@ export async function handleGetBalance() : Promise<number> {
 
 export async function handleAddBoard(numbers: number[]) {
     try {
-        await defApi.pigeon.mainAddBoard({numbers:numbers}, {credentials:"include"});
-        alert("Board added successfully.");
+        return await apiRequest((opts) => defApi.pigeon.mainAddBoard({numbers}, opts));
     }
     catch (error) {
         console.log("Failed to add board: "+error);
@@ -118,7 +158,7 @@ export async function handleAddBoard(numbers: number[]) {
 
 export async function handleAddUser(user: UserAddPost) {
     try {
-        await defApi.pigeon.mainAddUser(user, {credentials:"include"});
+        await apiRequest((opts) => defApi.pigeon.mainAddUser(user, opts));
         alert("User added successfully.");
     }
     catch (error) {
@@ -129,11 +169,10 @@ export async function handleAddUser(user: UserAddPost) {
 
 export async function handleGetWeekIncome() : Promise<number> {
     try {
-        const res = await defApi.pigeon.mainGetWeekIncome({credentials:"include"});
-        return await res.json() as number;
+        return await apiRequest((opts) => defApi.pigeon.mainGetWeekIncome(opts));
     }
     catch (error) {
-        console.log("Failed to retrieve weeks income: "+error);
+        console.log("Failed to retrieve week's income: " + error);
         return -1;
     }
 }

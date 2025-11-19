@@ -44,6 +44,11 @@ builder.Services.AddAuthentication("JwtAuth")
                     context.Token = token;
 
                 return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context => 
+            {
+                Console.WriteLine($"Authentication Failed: {context.Exception.Message}");
+                return Task.CompletedTask;
             }
         };
     });

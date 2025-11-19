@@ -7,7 +7,7 @@ namespace Api.Services;
 
 public class MainService(TokenService tokenService, PasswordService passwordService, PigeonsDbContext context)
 {
-    public static readonly Dictionary<int, int> Prices = new()
+    private static readonly Dictionary<int, int> Prices = new()
     {
         { 5, 20 },
         { 6, 40 },
@@ -15,17 +15,20 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         { 8, 160 }
     };
 
-    public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDTO)
+    public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDto)
     {
         var user = await context.Users
-            .FirstOrDefaultAsync(u => u.username == userLoginReqDTO.username);
+            .FirstOrDefaultAsync(u => u.username == userLoginReqDto.username);
 
-        if (user == null || !passwordService.VerifyHashedPassword(user.password, userLoginReqDTO.password))
+        if (user == null || !passwordService.VerifyHashedPassword(user.password, userLoginReqDto.password))
             throw new Exception("Invalid login credentials");
 
         var token = tokenService.GenerateToken(user);
+        var refresh = tokenService.GenerateRefreshToken();
 
         user.lastLogin = DateTime.UtcNow;
+        user.refreshToken = passwordService.HashRefreshToken(refresh);
+        user.refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
         await context.SaveChangesAsync();
 
         return new UserLoginResDTO
@@ -33,8 +36,56 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             id = user.id,
             username = user.username,
             isAdmin = user.isAdmin,
-            token = token
+            token = token,
+            refreshToken = refresh
         };
+    }
+
+    public async Task<(string token, string refresh)> RefreshToken(string refreshToken)
+    {
+        try
+        {
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.refreshToken == passwordService.HashRefreshToken(refreshToken));
+
+            if (user == null)
+            {
+                Console.WriteLine("Invalid refresh token");
+                throw new Exception("Invalid refresh token");
+            }
+
+            if (user.refreshTokenExpiry < DateTime.UtcNow)
+            {
+                Console.WriteLine("Refresh token expired");
+                throw new Exception("Refresh token expired");
+            }
+            
+            var newRefresh = tokenService.GenerateRefreshToken();
+            user.refreshToken = passwordService.HashRefreshToken(newRefresh);
+            user.refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            await context.SaveChangesAsync();
+            
+            var newToken = tokenService.GenerateToken(user);
+        
+            return (newToken, newRefresh);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task Logout(string refreshToken)
+    {
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.refreshToken == passwordService.HashRefreshToken(refreshToken));
+        if (user == null)
+            throw new Exception("User not found");
+        
+        user.refreshToken = null;
+        user.refreshTokenExpiry = null;
+        await context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid id)
@@ -72,12 +123,12 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             .SumAsync(p => p.amount);
     }
 
-    public async Task AddBoard(BoardReqDTO boardReqDTO, Guid userId)
+    public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId)
     {
-        if (!Prices.TryGetValue(boardReqDTO.numbers.Count, out int price))
+        if (!Prices.TryGetValue(boardReqDto.numbers.Count, out var price))
             throw new Exception("Amount of numbers not found in prices dictionary");
 
-        int bal = await GetBalance(userId);
+        var bal = await GetBalance(userId);
 
         if (bal < price)
             throw new Exception("Insufficient balance");
@@ -86,7 +137,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         {
             id = Guid.NewGuid(),
             userId = userId,
-            numbers = boardReqDTO.numbers,
+            numbers = boardReqDto.numbers,
             createdAt = DateTime.UtcNow,
             isWinner = null
         };
@@ -106,15 +157,15 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         await context.SaveChangesAsync();
     }
 
-    public async Task AddUser(UserAddReqDTO userAddReqDTO, bool isAdmin)
+    public async Task AddUser(UserAddReqDTO userAddReqDto, bool isAdmin)
     {
         if (!isAdmin)
             throw new Exception("No admin privileges");
 
         bool exists = await context.Users.AnyAsync(u =>
-            u.username == userAddReqDTO.username ||
-            u.email == userAddReqDTO.email ||
-            u.phoneNumber == userAddReqDTO.phoneNumber
+            u.username == userAddReqDto.username ||
+            u.email == userAddReqDto.email ||
+            u.phoneNumber == userAddReqDto.phoneNumber
         );
 
         if (exists)
@@ -122,10 +173,10 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
         var user = new User
         {
-            username = userAddReqDTO.username,
-            password = passwordService.HashPassword(userAddReqDTO.password),
-            email = userAddReqDTO.email,
-            phoneNumber = userAddReqDTO.phoneNumber,
+            username = userAddReqDto.username,
+            password = passwordService.HashPassword(userAddReqDto.password),
+            email = userAddReqDto.email,
+            phoneNumber = userAddReqDto.phoneNumber,
             isAdmin = false,
             isActive = false,
             lastLogin = DateTime.UtcNow,

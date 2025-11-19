@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
 using DataAccess;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +15,13 @@ public class TokenService
     {
         _configuration = configuration;
     }
-
+    
+    
+    public string GenerateRefreshToken()
+    {
+        return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+    }
+    
     public string GenerateToken(User user)
     {
         var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);

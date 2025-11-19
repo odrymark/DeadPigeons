@@ -341,6 +341,20 @@ export class Api<
      * No description
      *
      * @tags Main
+     * @name MainRefresh
+     * @request POST:/pigeon/auth/refresh
+     */
+    mainRefresh: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/auth/refresh`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
      * @name MainGetBoards
      * @request GET:/pigeon/getBoards
      */

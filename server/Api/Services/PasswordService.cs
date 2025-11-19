@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace Api.Services;
 
@@ -15,5 +17,12 @@ public class PasswordService
     {
         var result = _hasher.VerifyHashedPassword(null!, hashedPassword, providedPassword);
         return result == PasswordVerificationResult.Success;
+    }
+    
+    public string HashRefreshToken(string token)
+    {
+        var bytes = Encoding.UTF8.GetBytes(token);
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash);
     }
 }

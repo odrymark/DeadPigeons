@@ -11,6 +11,8 @@ public class User
     public bool isActive { get; set; }
     public DateTime createdAt { get; set; }
     public DateTime lastLogin { get; set; }
+    public string? refreshToken { get; set; }
+    public DateTime? refreshTokenExpiry { get; set; }
     
     public ICollection<Payment> payments { get; set; } = new List<Payment>();
     public ICollection<Board> boards { get; set; } = new List<Board>();
