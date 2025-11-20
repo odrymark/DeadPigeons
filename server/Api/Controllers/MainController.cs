@@ -224,4 +224,36 @@ public class MainController(MainService service, IConfiguration configuration) :
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost("addWinningNumbers")]
+    [Authorize]
+    public async Task<ActionResult> AddWinningNumbers([FromBody] WinningNumsReqDTO winningNumsReqDto)
+    {
+        try
+        {
+            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
+            await service.AddWinningNumbers(winningNumsReqDto, isAdmin);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("addPayment")]
+    [Authorize]
+    public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentReqDto)
+    {
+        try
+        {
+            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
+            await service.AddPayment(paymentReqDto, isAdmin);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

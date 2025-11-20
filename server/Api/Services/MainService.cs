@@ -1,4 +1,5 @@
-﻿using Api.DTOs;
+﻿using System.Security.Authentication;
+using Api.DTOs;
 using Api.DTOs.Response;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -160,7 +161,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
     public async Task AddUser(UserAddReqDTO userAddReqDto, bool isAdmin)
     {
         if (!isAdmin)
-            throw new Exception("No admin privileges");
+            throw new Exception("No administrator privileges");
 
         bool exists = await context.Users.AnyAsync(u =>
             u.username == userAddReqDto.username ||
@@ -201,4 +202,96 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         return weekIncome;
     }
 
+    public async Task AddWinningNumbers(WinningNumsReqDTO winningNumsReqDto, bool isAdmin)
+    {
+        try
+        {
+            if (!isAdmin)
+                throw new Exception("No administrator privileges");
+            
+            var today = DateTime.UtcNow.Date;
+            var diff = (7 + (int)today.DayOfWeek - (int)DayOfWeek.Monday) % 7;
+            var startOfWeek = today.AddDays(-diff);
+            var endOfWeek = startOfWeek.AddDays(7);
+        
+            var game = new Game
+            {
+                id = Guid.NewGuid(),
+                numbers = new List<int>(winningNumsReqDto.numbers),
+                winners = new List<User>(),
+                income = 0,
+                payed = 0
+            };
+        
+            var boards = await context.Boards
+                .Include(b => b.user)
+                .ToListAsync();
+        
+            var winningBoards = boards
+                .Where(b =>
+                    b.createdAt.Date >= startOfWeek &&
+                    b.createdAt.Date <= endOfWeek &&
+                    winningNumsReqDto.numbers.All(n => b.numbers.Contains(n))
+                )
+                .ToList();
+        
+            foreach (var board in winningBoards)
+            {
+                board.isWinner = true;
+                if (!game.winners.Any(u => u.id == board.userId))
+                {
+                    game.winners.Add(board.user);
+                }
+            }
+            
+            var currentWeekBoards = boards
+                .Where(b => b.createdAt.Date >= startOfWeek && b.createdAt.Date <= endOfWeek)
+                .ToList();
+            
+            foreach (var board in currentWeekBoards)
+            {
+                if (!winningBoards.Contains(board))
+                {
+                    board.isWinner = false;
+                }
+            }
+        
+            context.Games.Add(game);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
+
+    public async Task AddPayment(PaymentReqDTO paymentReqDto, bool isAdmin)
+    {
+        try
+        {
+            if (!isAdmin)
+                throw new Exception("No administrator privileges");
+            
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.username == paymentReqDto.username);
+            
+            if(user == null)
+                throw new Exception("User not found with the specified username");
+
+            var payment = new Payment
+            {
+                userId = user.id,
+                amount = paymentReqDto.amount,
+                paymentNumber = paymentReqDto.paymentNumber,
+                createdAt = DateTime.UtcNow
+            };
+            
+            context.Payments.Add(payment);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
+        }
+    }
 }

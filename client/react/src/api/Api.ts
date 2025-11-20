@@ -30,6 +30,21 @@ export interface UserAddReqDTO {
   phoneNumber?: string;
 }
 
+export interface WinningNumsReqDTO {
+  /**
+   * @maxItems 3
+   * @minItems 3
+   */
+  numbers?: number[];
+}
+
+export interface PaymentReqDTO {
+  username?: string;
+  /** @format int32 */
+  amount?: number;
+  paymentNumber?: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -436,6 +451,41 @@ export class Api<
       this.request<File, any>({
         path: `/pigeon/getWeekIncome`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainAddWinningNumbers
+     * @request POST:/pigeon/addWinningNumbers
+     */
+    mainAddWinningNumbers: (
+      data: WinningNumsReqDTO,
+      params: RequestParams = {},
+    ) =>
+      this.request<File, any>({
+        path: `/pigeon/addWinningNumbers`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainAddPayment
+     * @request POST:/pigeon/addPayment
+     */
+    mainAddPayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/addPayment`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };

@@ -22,7 +22,7 @@ export default function AdminPage()
             </div>
 
             <div className="flex flex-col items-center gap-6">
-                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("")}>
+                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("winningNumbers")}>
                     Add Winning Numbers
                 </button>
 
@@ -30,7 +30,7 @@ export default function AdminPage()
                     Add User
                 </button>
 
-                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("")}>
+                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("addPayment")}>
                     Add User Payment
                 </button>
 

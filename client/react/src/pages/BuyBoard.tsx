@@ -17,6 +17,16 @@ export default function BuyBoard() {
         }
     };
 
+    const handleSubmit = async () => {
+        if (selectedNumbers.length !== fieldsCount) {
+            alert(`Please select exactly ${fieldsCount} numbers`);
+            return;
+        }
+                                                        //TODO: MAKE BALANCE UPDATE AFTER PURCHASE
+        await handleAddBoard(selectedNumbers);
+        setSelectedNumbers([]);
+    };
+
     const gridNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
 
     return (
@@ -65,13 +75,7 @@ export default function BuyBoard() {
             {/* Submit button */}
             <button
                 className="btn btn-primary w-32 h-12 font-bold"
-                onClick={() => {
-                    if (selectedNumbers.length !== fieldsCount) {
-                        alert(`Please select exactly ${fieldsCount} numbers`);
-                        return;
-                    }
-                    handleAddBoard(selectedNumbers);
-                }}
+                onClick={() => handleSubmit()}
             >
                 Submit
             </button>

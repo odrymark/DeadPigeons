@@ -7,6 +7,8 @@ import PrevPay from "./pages/prevPay.tsx";
 import './style.css'
 import DashboardIndex from "./pages/DashboardIndex.tsx";
 import AddUser from "./pages/AddUser.tsx";
+import WinningNumbers from "./pages/WinningNumbers.tsx";
+import AddPayment from "./pages/AddPayment.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -40,6 +42,14 @@ const routes : RouteObject[] = [
             {
                 path: "addUser",
                 element: <AddUser/>
+            },
+            {
+                path: "winningNumbers",
+                element: <WinningNumbers/>
+            },
+            {
+                path: "addPayment",
+                element: <AddPayment/>
             }
         ]
     },
