@@ -30,7 +30,7 @@ public class TokenService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.id.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, user.username),
-            new Claim("isAdmin", user.isAdmin.ToString())
+            new Claim(ClaimTypes.Role, user.isAdmin ? "Admin" : "User")
         };
 
         var descriptor = new SecurityTokenDescriptor

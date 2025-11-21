@@ -77,7 +77,7 @@ public class MainController(MainService service, IConfiguration configuration) :
         {
             username = User.Identity?.Name,
             id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-            isAdmin = User.FindFirst("isAdmin")?.Value == "True"
+            isAdmin = User.IsInRole("Admin")
         });
     }
 
@@ -195,13 +195,12 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpPost("addUser")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddUser([FromBody] UserAddReqDTO userReqDto)
     {
         try
         {
-            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
-            await service.AddUser(userReqDto, isAdmin);
+            await service.AddUser(userReqDto);
             return Ok();
         }
         catch (Exception ex)
@@ -211,7 +210,7 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpGet("getWeekIncome")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> GetWeekIncome()
     {
         try
@@ -226,13 +225,12 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpPost("addWinningNumbers")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddWinningNumbers([FromBody] WinningNumsReqDTO winningNumsReqDto)
     {
         try
         {
-            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
-            await service.AddWinningNumbers(winningNumsReqDto, isAdmin);
+            await service.AddWinningNumbers(winningNumsReqDto);
             return Ok();
         }
         catch (Exception ex)
@@ -242,7 +240,7 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpGet("getWinners")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> GetWinners()
     {
         try
@@ -257,7 +255,7 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpGet("getAllUsers")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> GetAllUsers()
     {
         try
@@ -272,13 +270,12 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpPost("addPayment")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentReqDto)
     {
         try
         {
-            var isAdmin = User.FindFirst("isAdmin")?.Value == "True";
-            await service.AddPayment(paymentReqDto, isAdmin);
+            await service.AddPayment(paymentReqDto);
             return Ok();
         }
         catch (Exception e)
