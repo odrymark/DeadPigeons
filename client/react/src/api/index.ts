@@ -18,6 +18,11 @@ export type BoardGet = {
     isWinner: boolean;
 }
 
+export type WinnersGet = {
+    username: string;
+    winningBoardsNum: number;
+}
+
 export type PaymentGet = {
     id: string;
     amount: number;
@@ -214,5 +219,25 @@ export async function handleAddPayment(payment: PaymentPost) {
     catch (error) {
         console.log("Failed to add payment: "+error);
         alert("Failed to add payment: "+error);
+    }
+}
+
+export async function handleGetAllUsers() : Promise<string[]> {
+    try {
+        return await apiRequest((opts) => defApi.pigeon.mainGetAllUsers(opts));
+    }
+    catch (error) {
+        console.log("Failed to get users: "+error);
+        return [];
+    }
+}
+
+export async function handleGetWinners() : Promise<WinnersGet[]> {
+    try {
+        return await apiRequest((opts) => defApi.pigeon.mainGetWinners(opts));
+    }
+    catch (error) {
+        console.log("Failed to get the winners: "+error);
+        return [];
     }
 }

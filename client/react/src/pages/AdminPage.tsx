@@ -22,6 +22,10 @@ export default function AdminPage()
             </div>
 
             <div className="flex flex-col items-center gap-6">
+                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("weekWinners")}>
+                    Week's Winners
+                </button>
+
                 <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("winningNumbers")}>
                     Add Winning Numbers
                 </button>

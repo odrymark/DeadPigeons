@@ -22,7 +22,7 @@ export default function PrevPay() {
                 <div>Payment Number</div>
             </div>
 
-            {/* PAYMENT LIST */}
+            {/* LIST */}
             <div className="mt-4 flex flex-col gap-4 max-w-3xl mx-auto w-full">
                 {payments.map((p) => (
                     <div
