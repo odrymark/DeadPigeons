@@ -477,6 +477,34 @@ export class Api<
      * No description
      *
      * @tags Main
+     * @name MainGetWinners
+     * @request GET:/pigeon/getWinners
+     */
+    mainGetWinners: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getWinners`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetAllUsers
+     * @request GET:/pigeon/getAllUsers
+     */
+    mainGetAllUsers: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getAllUsers`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
      * @name MainAddPayment
      * @request POST:/pigeon/addPayment
      */

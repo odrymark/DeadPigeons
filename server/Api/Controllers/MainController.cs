@@ -241,6 +241,36 @@ public class MainController(MainService service, IConfiguration configuration) :
         }
     }
 
+    [HttpGet("getWinners")]
+    [Authorize]
+    public async Task<ActionResult> GetWinners()
+    {
+        try
+        {
+            var res = await service.GetWinners();
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getAllUsers")]
+    [Authorize]
+    public async Task<ActionResult> GetAllUsers()
+    {
+        try
+        {
+            var res = await service.GetAllUsers();
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("addPayment")]
     [Authorize]
     public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentReqDto)

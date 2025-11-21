@@ -9,6 +9,7 @@ import DashboardIndex from "./pages/DashboardIndex.tsx";
 import AddUser from "./pages/AddUser.tsx";
 import WinningNumbers from "./pages/WinningNumbers.tsx";
 import AddPayment from "./pages/AddPayment.tsx";
+import WeekWinners from "./pages/WeekWinners.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -50,6 +51,10 @@ const routes : RouteObject[] = [
             {
                 path: "addPayment",
                 element: <AddPayment/>
+            },
+            {
+                path: "weekWinners",
+                element: <WeekWinners/>
             }
         ]
     },

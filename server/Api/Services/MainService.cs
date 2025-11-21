@@ -265,6 +265,57 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         }
     }
 
+    public async Task<IEnumerable<WinnersResDTO>> GetWinners()
+    {
+        try
+        {
+            var today = DateTime.UtcNow.Date;
+            var diff = (7 + (int)today.DayOfWeek - (int)DayOfWeek.Monday) % 7;
+            var startOfWeek = today.AddDays(-diff);
+            var endOfWeek = startOfWeek.AddDays(7);
+            
+            var weekWinningBoards = await context.Boards
+                .Include(b => b.user)
+                .Where(b =>
+                    b.createdAt.Date >= startOfWeek &&
+                    b.createdAt.Date <= endOfWeek &&
+                    b.isWinner == true
+                )
+                .ToListAsync();
+            
+            var winners = weekWinningBoards
+                .GroupBy(b => b.user)
+                .Select(g => new WinnersResDTO
+                {
+                    username = g.Key.username,
+                    winningBoardsNum = g.Count()
+                })
+                .ToList();
+            
+            return winners;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<IEnumerable<string>> GetAllUsers()
+    {
+        try
+        {
+            var users = await context.Users
+                .Select(u => u.username)
+                .ToListAsync();
+            
+            return users;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     public async Task AddPayment(PaymentReqDTO paymentReqDto, bool isAdmin)
     {
         try
