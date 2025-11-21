@@ -10,6 +10,7 @@ import AddUser from "./pages/AddUser.tsx";
 import WinningNumbers from "./pages/WinningNumbers.tsx";
 import AddPayment from "./pages/AddPayment.tsx";
 import WeekWinners from "./pages/WeekWinners.tsx";
+import AdminRoute from "./components/AdminRoute.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -42,19 +43,35 @@ const routes : RouteObject[] = [
             },
             {
                 path: "addUser",
-                element: <AddUser/>
+                element: (
+                    <AdminRoute>
+                        <AddUser/>
+                    </AdminRoute>
+                )
             },
             {
                 path: "winningNumbers",
-                element: <WinningNumbers/>
+                element: (
+                    <AdminRoute>
+                        <WinningNumbers/>
+                    </AdminRoute>
+                )
             },
             {
                 path: "addPayment",
-                element: <AddPayment/>
+                element: (
+                    <AdminRoute>
+                        <AddPayment/>
+                    </AdminRoute>
+                )
             },
             {
                 path: "weekWinners",
-                element: <WeekWinners/>
+                element: (
+                    <AdminRoute>
+                        <WeekWinners/>
+                    </AdminRoute>
+                )
             }
         ]
     },
