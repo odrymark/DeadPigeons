@@ -95,6 +95,23 @@ using (var scope = app.Services.CreateScope())
         db.Users.Add(admin);
         db.SaveChanges();
     }
+    
+    var baseGame = db.Games.FirstOrDefault();
+
+    if (baseGame == null)
+    {
+        baseGame = new Game
+        {
+            id = Guid.NewGuid(),
+            numbers = new List<int>(),
+            income = 0,
+            createdAt = DateTime.UtcNow
+        };
+
+        db.Games.Add(baseGame);
+        db.SaveChanges();
+    }
+
 
     if (!db.Boards.Any(b => b.userId == admin.id))
     {
@@ -102,7 +119,8 @@ using (var scope = app.Services.CreateScope())
         {
             id = Guid.NewGuid(),
             userId = admin.id,
-            numbers = [1, 5, 12, 19, 23],
+            gameId = baseGame.id,
+            numbers = new List<int> { 1, 5, 12, 19, 23 },
             createdAt = DateTime.UtcNow,
             isWinner = false
         });
