@@ -117,6 +117,7 @@ public class MainController(MainService service, IConfiguration configuration) :
         }
     }
 
+    //TODO: MAKE SEPARATE METHOD FOR RETRIEVING BY USERNAME
     [HttpGet("getBoards")]
     [Authorize]
     public async Task<ActionResult> GetBoards()
@@ -127,7 +128,7 @@ public class MainController(MainService service, IConfiguration configuration) :
             
             var id = Guid.Parse(idStr!);
             
-            var boards = await service.GetBoards(id);
+            var boards = await service.GetBoards(id, null);
             return Ok(boards);
         }
         catch (Exception ex)
@@ -135,7 +136,22 @@ public class MainController(MainService service, IConfiguration configuration) :
             return BadRequest(ex.Message);
         }
     }
-
+    
+    [HttpGet("getBoardsAdmin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> GetBoardsAdmin(string username)
+    {
+        try
+        {
+            var boards = await service.GetBoards(null, username);
+            return Ok(boards);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
     [HttpGet("getPayments")]
     [Authorize]
     public async Task<ActionResult> GetPayments()
@@ -146,7 +162,22 @@ public class MainController(MainService service, IConfiguration configuration) :
             
             var id = Guid.Parse(idStr!);
             
-            var payments = await service.GetPayments(id);
+            var payments = await service.GetPayments(id, null);
+            return Ok(payments);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [HttpGet("getPaymentsAdmin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> GetPaymentsAdmin(string username)
+    {
+        try
+        {
+            var payments = await service.GetPayments(null, username);
             return Ok(payments);
         }
         catch (Exception ex)
@@ -261,6 +292,21 @@ public class MainController(MainService service, IConfiguration configuration) :
         try
         {
             var res = await service.GetAllUsers();
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getUserInfo")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> GetUserInfo(string username)
+    {
+        try
+        {
+            var res = await service.GetUserInfo(username);
             return Ok(res);
         }
         catch (Exception ex)

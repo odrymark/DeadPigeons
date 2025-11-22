@@ -3,7 +3,7 @@ import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import PrevBoards from "./pages/PrevBoards.tsx";
 import BuyBoard from "./pages/BuyBoard.tsx";
-import PrevPay from "./pages/prevPay.tsx";
+import PrevPayments from "./pages/PrevPayments.tsx";
 import './style.css'
 import DashboardIndex from "./pages/DashboardIndex.tsx";
 import AddUser from "./pages/AddUser.tsx";
@@ -11,6 +11,7 @@ import WinningNumbers from "./pages/WinningNumbers.tsx";
 import AddPayment from "./pages/AddPayment.tsx";
 import WeekWinners from "./pages/WeekWinners.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
+import UserHistory from "./pages/UserHistory.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -39,7 +40,7 @@ const routes : RouteObject[] = [
             },
             {
                 path: "prevPay",
-                element: <PrevPay/>
+                element: <PrevPayments/>
             },
             {
                 path: "addUser",
@@ -70,6 +71,14 @@ const routes : RouteObject[] = [
                 element: (
                     <AdminRoute>
                         <WeekWinners/>
+                    </AdminRoute>
+                )
+            },
+            {
+                path: "userHistory",
+                element: (
+                    <AdminRoute>
+                        <UserHistory/>
                     </AdminRoute>
                 )
             }

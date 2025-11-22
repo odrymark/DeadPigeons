@@ -1,20 +1,12 @@
-import {useEffect, useState} from "react";
-import {handleGetPayments, type PaymentGet} from "../api";
+import { type PaymentGet } from "../api";
 
-export default function PrevPay() {
-    const [payments, setPayments] = useState<PaymentGet[]>([]);
+interface Props {
+    payments: PaymentGet[];
+}
 
-    useEffect(() => {
-        async function fetchBoards() {
-            const data = await handleGetPayments();
-            if (data) setPayments(data);
-        }
-        fetchBoards();
-    }, []);
-
+export default function PaymentsTable({ payments }: Props) {
     return (
-        <div className="bg-base-200 w-full flex flex-col p-6 box-border">
-
+        <>
             {/* HEADER */}
             <div className="grid grid-cols-1 sm:grid-cols-3 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-lg shadow font-bold text-lg border-b">
                 <div>Date</div>
@@ -35,6 +27,6 @@ export default function PrevPay() {
                     </div>
                 ))}
             </div>
-        </div>
+        </>
     );
 }
