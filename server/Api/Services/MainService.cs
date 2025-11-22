@@ -125,6 +125,12 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
     public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId)
     {
+        var activeGame = await context.Games
+            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+        
+        if (activeGame == null)
+            throw new Exception("No active game available");
+        
         if (!Prices.TryGetValue(boardReqDto.numbers.Count, out var price))
             throw new Exception("Amount of numbers not found in prices dictionary");
 
@@ -137,6 +143,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         {
             id = Guid.NewGuid(),
             userId = userId,
+            gameId = activeGame.id,
             numbers = boardReqDto.numbers,
             createdAt = DateTime.UtcNow,
             isWinner = null
@@ -150,6 +157,8 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             createdAt = DateTime.UtcNow,
             paymentNumber = null
         };
+        
+        activeGame.income += price;
 
         context.Boards.Add(board);
         context.Payments.Add(payment);
@@ -184,72 +193,65 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         await context.SaveChangesAsync();
     }
     
-    public async Task<int> GetWeekIncome()
+    public async Task<int> GetGameIncome()
     {
-        var today = DateTime.UtcNow.Date;
-        var diff = (7 + (int)today.DayOfWeek - (int)DayOfWeek.Monday) % 7;
-        var startOfWeek = today.AddDays(-diff);
-        var endOfWeek = startOfWeek.AddDays(7);
+        var game = await context.Games
+            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
 
-        var weekIncome = await context.Payments
-            .Where(p => p.amount < 0 && p.createdAt.Date >= startOfWeek && p.createdAt.Date <= endOfWeek)
-            .SumAsync(p => -p.amount);
+        if (game == null)
+            throw new Exception("No active game available");
 
-        return weekIncome;
+        return game.income;
     }
 
     public async Task AddWinningNumbers(WinningNumsReqDTO winningNumsReqDto)
     {
         try
         {
-            var today = DateTime.UtcNow.Date;
-            var diff = (7 + (int)today.DayOfWeek - (int)DayOfWeek.Monday) % 7;
-            var startOfWeek = today.AddDays(-diff);
-            var endOfWeek = startOfWeek.AddDays(7);
-        
-            var game = new Game
-            {
-                id = Guid.NewGuid(),
-                numbers = new List<int>(winningNumsReqDto.numbers),
-                winners = new List<User>(),
-                income = 0,
-                payed = 0
-            };
-        
+            var activeGame = await context.Games
+                .Include(g => g.winners)
+                .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+
+            if (activeGame == null)
+                throw new Exception("No active game available");
+
             var boards = await context.Boards
                 .Include(b => b.user)
+                .Where(b => b.gameId == activeGame.id)
                 .ToListAsync();
-        
+
+            activeGame.numbers = winningNumsReqDto.numbers;
+
             var winningBoards = boards
-                .Where(b =>
-                    b.createdAt.Date >= startOfWeek &&
-                    b.createdAt.Date <= endOfWeek &&
-                    winningNumsReqDto.numbers.All(n => b.numbers.Contains(n))
-                )
+                .Where(b => winningNumsReqDto.numbers.All(n => b.numbers.Contains(n)))
                 .ToList();
-        
+
             foreach (var board in winningBoards)
             {
                 board.isWinner = true;
-                if (!game.winners.Any(u => u.id == board.userId))
+
+                if (activeGame.winners.All(u => u.id != board.userId))
                 {
-                    game.winners.Add(board.user);
+                    activeGame.winners.Add(board.user);
                 }
             }
-            
-            var currentWeekBoards = boards
-                .Where(b => b.createdAt.Date >= startOfWeek && b.createdAt.Date <= endOfWeek)
-                .ToList();
-            
-            foreach (var board in currentWeekBoards)
+
+            foreach (var board in boards)
             {
                 if (!winningBoards.Contains(board))
-                {
                     board.isWinner = false;
-                }
             }
-        
-            context.Games.Add(game);
+
+            var newGame = new Game
+            {
+                id = Guid.NewGuid(),
+                numbers = new List<int>(),
+                income = 0,
+                createdAt = DateTime.UtcNow
+            };
+
+            context.Games.Add(newGame);
+
             await context.SaveChangesAsync();
         }
         catch (Exception e)
@@ -262,21 +264,20 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
     {
         try
         {
-            var today = DateTime.UtcNow.Date;
-            var diff = (7 + (int)today.DayOfWeek - (int)DayOfWeek.Monday) % 7;
-            var startOfWeek = today.AddDays(-diff);
-            var endOfWeek = startOfWeek.AddDays(7);
+            var lastEndedGame = await context.Games
+                .Where(g => g.numbers.Count > 0)
+                .OrderByDescending(g => g.createdAt)
+                .FirstOrDefaultAsync();
             
-            var weekWinningBoards = await context.Boards
+            if (lastEndedGame == null)
+                throw new Exception("No active game available");
+            
+            var winningBoards = await context.Boards
                 .Include(b => b.user)
-                .Where(b =>
-                    b.createdAt.Date >= startOfWeek &&
-                    b.createdAt.Date <= endOfWeek &&
-                    b.isWinner == true
-                )
+                .Where(b => b.gameId == lastEndedGame.id && b.isWinner == true)
                 .ToListAsync();
             
-            var winners = weekWinningBoards
+            var winners = winningBoards
                 .GroupBy(b => b.user)
                 .Select(g => new WinnersResDTO
                 {

@@ -211,11 +211,11 @@ public class MainController(MainService service, IConfiguration configuration) :
 
     [HttpGet("getWeekIncome")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetWeekIncome()
+    public async Task<ActionResult> GetGameIncome()
     {
         try
         {
-            int income = await service.GetWeekIncome();
+            int income = await service.GetGameIncome();
             return Ok(income);
         }
         catch (Exception ex)

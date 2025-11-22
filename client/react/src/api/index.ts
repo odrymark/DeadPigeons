@@ -192,7 +192,7 @@ export async function handleAddUser(user: UserAddPost) {
 
 export async function handleGetWeekIncome() : Promise<number> {
     try {
-        return await apiRequest((opts) => defApi.pigeon.mainGetWeekIncome(opts));
+        return await apiRequest((opts) => defApi.pigeon.mainGetGameIncome(opts));
     }
     catch (error) {
         console.log("Failed to retrieve week's income: " + error);

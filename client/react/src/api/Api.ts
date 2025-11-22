@@ -444,10 +444,10 @@ export class Api<
      * No description
      *
      * @tags Main
-     * @name MainGetWeekIncome
+     * @name MainGetGameIncome
      * @request GET:/pigeon/getWeekIncome
      */
-    mainGetWeekIncome: (params: RequestParams = {}) =>
+    mainGetGameIncome: (params: RequestParams = {}) =>
       this.request<File, any>({
         path: `/pigeon/getWeekIncome`,
         method: "GET",

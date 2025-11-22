@@ -23,6 +23,12 @@ public class PigeonsDbContext : DbContext
             .WithMany(u => u.boards)
             .HasForeignKey(b => b.userId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Board>()
+            .HasOne(b => b.game)
+            .WithMany(g => g.boards)
+            .HasForeignKey(b => b.gameId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Game>()
             .HasMany(w => w.winners)
