@@ -11,6 +11,15 @@ export type UserLoginPost = {
     password: string;
 }
 
+export type UserInfoGet = {
+    username: string;
+    email: string;
+    phoneNumber: string;
+    createdAt: string;
+    lastLogin: string;
+    isActive: boolean;
+}
+
 export type BoardGet = {
     id: string;
     numbers: number[];
@@ -137,9 +146,12 @@ export async function handleUserAuth() : Promise<UserGet | null> {
     }
 }
 
-export async function handleGetBoards() : Promise<BoardGet[]> {
+export async function handleGetBoards(username?: string) : Promise<BoardGet[]> {
     try {
-        return await apiRequest((opts) => defApi.pigeon.mainGetBoards(opts));
+        if (!username)
+            return await apiRequest((opts) => defApi.pigeon.mainGetBoards(opts));
+        else
+            return await apiRequest((opts) => defApi.pigeon.mainGetBoardsAdmin({username}, opts));
     }
     catch (error) {
         console.log("Failed to retrieve boards: "+error);
@@ -147,10 +159,13 @@ export async function handleGetBoards() : Promise<BoardGet[]> {
     }
 }
 
-export async function handleGetPayments() : Promise<PaymentGet[]> {
+export async function handleGetPayments(username?: string) : Promise<PaymentGet[]> {
     try
     {
-        return await apiRequest((opts) => defApi.pigeon.mainGetPayments(opts));
+        if (!username)
+            return await apiRequest((opts) => defApi.pigeon.mainGetPayments(opts));
+        else
+            return await apiRequest((opts) => defApi.pigeon.mainGetPaymentsAdmin({username}, opts));
     }
     catch (error) {
         console.log("Failed to retrieve payments: "+error);
@@ -229,6 +244,16 @@ export async function handleGetAllUsers() : Promise<string[]> {
     catch (error) {
         console.log("Failed to get users: "+error);
         return [];
+    }
+}
+
+export async function handleGetUserInfo(username: string) : Promise<UserInfoGet | null> {
+    try {
+        return await apiRequest((opts) => defApi.pigeon.mainGetUserInfo({username}, opts))
+    }
+    catch (error) {
+        console.log("Failed to get user info: "+error);
+        return null;
     }
 }
 

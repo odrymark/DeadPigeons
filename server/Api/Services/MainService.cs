@@ -88,32 +88,76 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         await context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid id)
+    public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid? id, string? username)
     {
-        return await context.Boards
-            .Where(b => b.userId == id)
-            .Select(b => new BoardResDTO
-            {
-                id = b.id,
-                numbers = b.numbers,
-                createdAt = b.createdAt,
-                isWinner = b.isWinner,
-            })
-            .ToListAsync();
+        if (string.IsNullOrEmpty(username))
+        {
+            return await context.Boards
+                .Where(b => b.userId == id)
+                .Select(b => new BoardResDTO
+                {
+                    id = b.id,
+                    numbers = b.numbers,
+                    createdAt = b.createdAt,
+                    isWinner = b.isWinner
+                })
+                .ToListAsync();
+        }
+        else
+        {
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.username == username);
+            
+            if (user == null)
+                throw new Exception("User not found");
+            
+            return await context.Boards
+                .Where(b => b.userId == user.id)
+                .Select(b => new BoardResDTO
+                {
+                    id = b.id,
+                    numbers = b.numbers,
+                    createdAt = b.createdAt,
+                    isWinner = b.isWinner
+                })
+                .ToListAsync();
+        }
     }
 
-    public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid id)
+    public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid? id, string? username)
     {
-        return await context.Payments
-            .Where(p => p.userId == id)
-            .Select(p => new PaymentResDTO
-            {
-                id = p.id,
-                createdAt = p.createdAt,
-                amount = p.amount,
-                paymentNumber = p.paymentNumber
-            })
-            .ToListAsync();
+        if (string.IsNullOrEmpty(username))
+        {
+            return await context.Payments
+                .Where(p => p.userId == id)
+                .Select(p => new PaymentResDTO
+                {
+                    id = p.id,
+                    createdAt = p.createdAt,
+                    amount = p.amount,
+                    paymentNumber = p.paymentNumber
+                })
+                .ToListAsync();
+        }
+        else
+        {
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.username == username);
+            
+            if (user == null)
+                throw new Exception("User not found");
+            
+            return await context.Payments
+                .Where(p => p.userId == user.id)
+                .Select(p => new PaymentResDTO
+                {
+                    id = p.id,
+                    createdAt = p.createdAt,
+                    amount = p.amount,
+                    paymentNumber = p.paymentNumber
+                })
+                .ToListAsync();
+        }
     }
 
     public async Task<int> GetBalance(Guid id)
@@ -303,6 +347,32 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
                 .ToListAsync();
             
             return users;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<UserInfoResDTO> GetUserInfo(string username)
+    {
+        try
+        {
+            var user = await context.Users
+                .Where(u => u.username == username)
+                .FirstOrDefaultAsync();
+            if (user == null)
+                throw new Exception("No user found");
+
+            return new UserInfoResDTO
+            {
+                username = user.username,
+                createdAt = user.createdAt,
+                lastLogin = user.lastLogin,
+                isActive = user.isActive,
+                email = user.email,
+                phoneNumber = user.phoneNumber,
+            };
         }
         catch (Exception ex)
         {

@@ -384,6 +384,26 @@ export class Api<
      * No description
      *
      * @tags Main
+     * @name MainGetBoardsAdmin
+     * @request GET:/pigeon/getBoardsAdmin
+     */
+    mainGetBoardsAdmin: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<File, any>({
+        path: `/pigeon/getBoardsAdmin`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
      * @name MainGetPayments
      * @request GET:/pigeon/getPayments
      */
@@ -391,6 +411,26 @@ export class Api<
       this.request<File, any>({
         path: `/pigeon/getPayments`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetPaymentsAdmin
+     * @request GET:/pigeon/getPaymentsAdmin
+     */
+    mainGetPaymentsAdmin: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<File, any>({
+        path: `/pigeon/getPaymentsAdmin`,
+        method: "GET",
+        query: query,
         ...params,
       }),
 
@@ -498,6 +538,26 @@ export class Api<
       this.request<File, any>({
         path: `/pigeon/getAllUsers`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainGetUserInfo
+     * @request GET:/pigeon/getUserInfo
+     */
+    mainGetUserInfo: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<File, any>({
+        path: `/pigeon/getUserInfo`,
+        method: "GET",
+        query: query,
         ...params,
       }),
 
