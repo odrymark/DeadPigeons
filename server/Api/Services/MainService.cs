@@ -124,6 +124,39 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         }
     }
 
+    public async Task<IEnumerable<GameResDTO>> GetAllGames()
+    {
+        try
+        {
+            var games = await context.Games
+                .Include(g => g.winners)
+                .Include(g => g.boards)
+                .Where(g => g.numbers.Any())
+                .OrderByDescending(g => g.createdAt)
+                .ToListAsync();
+            
+            var response = games.Select(g => new GameResDTO
+            {
+                createdAt = g.createdAt,
+                income = g.income,
+                winningNums = g.numbers.ToList(),
+                winners = g.winners.Select(w => new WinnersResDTO
+                {
+                    username = w.username,
+                    winningBoardsNum = g.boards.Count(b => b.userId == w.id && b.isWinner == true)
+                }).ToList()
+            })
+            .OrderByDescending(x => x.createdAt)
+            .ToList();
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+
     public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid? id, string? username)
     {
         if (string.IsNullOrEmpty(username))
@@ -301,40 +334,6 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         catch (Exception e)
         {
             throw new Exception(e.Message);
-        }
-    }
-
-    public async Task<IEnumerable<WinnersResDTO>> GetWinners()
-    {
-        try
-        {
-            var lastEndedGame = await context.Games
-                .Where(g => g.numbers.Count > 0)
-                .OrderByDescending(g => g.createdAt)
-                .FirstOrDefaultAsync();
-            
-            if (lastEndedGame == null)
-                throw new Exception("No active game available");
-            
-            var winningBoards = await context.Boards
-                .Include(b => b.user)
-                .Where(b => b.gameId == lastEndedGame.id && b.isWinner == true)
-                .ToListAsync();
-            
-            var winners = winningBoards
-                .GroupBy(b => b.user)
-                .Select(g => new WinnersResDTO
-                {
-                    username = g.Key.username,
-                    winningBoardsNum = g.Count()
-                })
-                .ToList();
-            
-            return winners;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
         }
     }
 

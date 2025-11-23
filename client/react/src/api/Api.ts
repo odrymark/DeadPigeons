@@ -404,6 +404,20 @@ export class Api<
      * No description
      *
      * @tags Main
+     * @name MainGetAllGames
+     * @request GET:/pigeon/getAllGames
+     */
+    mainGetAllGames: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/getAllGames`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
      * @name MainGetPayments
      * @request GET:/pigeon/getPayments
      */
@@ -510,20 +524,6 @@ export class Api<
         method: "POST",
         body: data,
         type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainGetWinners
-     * @request GET:/pigeon/getWinners
-     */
-    mainGetWinners: (params: RequestParams = {}) =>
-      this.request<File, any>({
-        path: `/pigeon/getWinners`,
-        method: "GET",
         ...params,
       }),
 

@@ -32,6 +32,13 @@ export type WinnersGet = {
     winningBoardsNum: number;
 }
 
+export type GamesGet = {
+    createdAt: string;
+    winningNums: number[];
+    income: number;
+    winners: WinnersGet[];
+}
+
 export type PaymentGet = {
     id: string;
     amount: number;
@@ -257,12 +264,12 @@ export async function handleGetUserInfo(username: string) : Promise<UserInfoGet 
     }
 }
 
-export async function handleGetWinners() : Promise<WinnersGet[]> {
+export async function handleGetAllGames() : Promise<GamesGet[] | null> {
     try {
-        return await apiRequest((opts) => defApi.pigeon.mainGetWinners(opts));
+        return await apiRequest((opts) => defApi.pigeon.mainGetAllGames(opts));
     }
     catch (error) {
-        console.log("Failed to get the winners: "+error);
-        return [];
+        console.log("Failed to get all games: "+error);
+        return null;
     }
 }
