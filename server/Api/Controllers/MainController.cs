@@ -117,7 +117,6 @@ public class MainController(MainService service, IConfiguration configuration) :
         }
     }
 
-    //TODO: MAKE SEPARATE METHOD FOR RETRIEVING BY USERNAME
     [HttpGet("getBoards")]
     [Authorize]
     public async Task<ActionResult> GetBoards()
@@ -145,6 +144,21 @@ public class MainController(MainService service, IConfiguration configuration) :
         {
             var boards = await service.GetBoards(null, username);
             return Ok(boards);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("getAllGames")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> GetAllGames()
+    {
+        try
+        {
+            var res = await service.GetAllGames();
+            return Ok(res);
         }
         catch (Exception ex)
         {
@@ -263,21 +277,6 @@ public class MainController(MainService service, IConfiguration configuration) :
         {
             await service.AddWinningNumbers(winningNumsReqDto);
             return Ok();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [HttpGet("getWinners")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetWinners()
-    {
-        try
-        {
-            var res = await service.GetWinners();
-            return Ok(res);
         }
         catch (Exception ex)
         {
