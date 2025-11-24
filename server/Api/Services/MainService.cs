@@ -216,6 +216,9 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         if (bal < price)
             throw new Exception("Insufficient balance");
 
+        if (DateTime.UtcNow > activeGame.openUntil)
+            throw new Exception("The current game is closed for new boards");
+
         var board = new Board
         {
             id = Guid.NewGuid(),
@@ -318,13 +321,24 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
                 if (!winningBoards.Contains(board))
                     board.isWinner = false;
             }
+            
+            var danishTz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Copenhagen");
+            var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, danishTz);
+
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)localTime.DayOfWeek + 7) % 7;
+            
+            var nextSaturdayLocal = localTime.Date.AddDays(daysUntilSaturday)
+                .AddHours(17);
+
+            var openUntilUtc = TimeZoneInfo.ConvertTimeToUtc(nextSaturdayLocal, danishTz);
 
             var newGame = new Game
             {
                 id = Guid.NewGuid(),
                 numbers = new List<int>(),
                 income = 0,
-                createdAt = DateTime.UtcNow
+                createdAt = DateTime.UtcNow,
+                openUntil = openUntilUtc,
             };
 
             context.Games.Add(newGame);
