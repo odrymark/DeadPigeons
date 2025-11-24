@@ -34,8 +34,8 @@ export default function AdminPage()
                     Add User
                 </button>
 
-                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("addPayment")}>
-                    Add User Payment
+                <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("approvePay")}>
+                    Approve User Payment
                 </button>
 
                 <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("userHistory")}>

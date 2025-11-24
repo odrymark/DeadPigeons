@@ -315,17 +315,35 @@ public class MainController(MainService service, IConfiguration configuration) :
     }
 
     [HttpPost("addPayment")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentReqDto)
+    [Authorize]
+    public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentAddReqDto)
     {
         try
         {
-            await service.AddPayment(paymentReqDto);
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            var id = Guid.Parse(idStr!);
+            await service.AddPayment(paymentAddReqDto, id);
             return Ok();
         }
         catch (Exception e)
         {
             return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("approvePayment")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> ApprovePayment([FromBody] PaymentReqDTO paymentReqDto)
+    {
+        try
+        {
+            await service.ApprovePayment(paymentReqDto);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }

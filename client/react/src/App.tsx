@@ -12,6 +12,7 @@ import AddPayment from "./pages/AddPayment.tsx";
 import GameHistory from "./pages/GameHistory.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
 import UserHistory from "./pages/UserHistory.tsx";
+import ApprovePay from "./pages/ApprovePay.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -60,11 +61,7 @@ const routes : RouteObject[] = [
             },
             {
                 path: "addPayment",
-                element: (
-                    <AdminRoute>
-                        <AddPayment/>
-                    </AdminRoute>
-                )
+                element: <AddPayment/>
             },
             {
                 path: "gameHistory",
@@ -79,6 +76,14 @@ const routes : RouteObject[] = [
                 element: (
                     <AdminRoute>
                         <UserHistory/>
+                    </AdminRoute>
+                )
+            },
+            {
+                path: "approvePay",
+                element: (
+                    <AdminRoute>
+                        <ApprovePay/>
                     </AdminRoute>
                 )
             }
