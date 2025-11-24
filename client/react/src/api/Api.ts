@@ -39,10 +39,15 @@ export interface WinningNumsReqDTO {
 }
 
 export interface PaymentReqDTO {
-  username?: string;
+  username?: string | null;
   /** @format int32 */
-  amount?: number;
-  paymentNumber?: string;
+  amount?: number | null;
+  /**
+   * @minLength 1
+   * @pattern ^[0-9]{10}$
+   */
+  paymentNumber: string;
+  isApproved?: boolean | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -571,6 +576,22 @@ export class Api<
     mainAddPayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
         path: `/pigeon/addPayment`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainApprovePayment
+     * @request POST:/pigeon/approvePayment
+     */
+    mainApprovePayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/approvePayment`,
         method: "POST",
         body: data,
         type: ContentType.Json,

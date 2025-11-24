@@ -168,36 +168,36 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
                     id = p.id,
                     createdAt = p.createdAt,
                     amount = p.amount,
-                    paymentNumber = p.paymentNumber
+                    paymentNumber = p.paymentNumber,
+                    isApproved = p.isApproved
                 })
                 .ToListAsync();
         }
-        else
-        {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.username == username);
+        
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.username == username);
             
-            if (user == null)
-                throw new Exception("User not found");
+        if (user == null)
+            throw new Exception("User not found");
             
-            return await context.Payments
-                .Where(p => p.userId == user.id)
-                .Select(p => new PaymentResDTO
-                {
-                    id = p.id,
-                    createdAt = p.createdAt,
-                    amount = p.amount,
-                    paymentNumber = p.paymentNumber
-                })
-                .ToListAsync();
-        }
+        return await context.Payments
+            .Where(p => p.userId == user.id)
+            .Select(p => new PaymentResDTO
+            {
+                id = p.id,
+                createdAt = p.createdAt,
+                amount = p.amount,
+                paymentNumber = p.paymentNumber,
+                isApproved = p.isApproved
+            })
+            .ToListAsync();
     }
 
     public async Task<int> GetBalance(Guid id)
     {
         return await context.Payments
-            .Where(p => p.userId == id)
-            .SumAsync(p => p.amount);
+            .Where(p => p.userId == id && p.amount != null)
+            .SumAsync(p => p.amount) ?? 0;
     }
 
     public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId)
@@ -283,7 +283,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
         return game.income;
     }
-
+    
     public async Task AddWinningNumbers(WinningNumsReqDTO winningNumsReqDto)
     {
         try
@@ -393,20 +393,19 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         }
     }
 
-    public async Task AddPayment(PaymentReqDTO paymentReqDto)
+    public async Task AddPayment(PaymentReqDTO paymentReqDto, Guid userId)
     {
         try
         {
             var user = await context.Users
-                .FirstOrDefaultAsync(u => u.username == paymentReqDto.username);
+                .FirstOrDefaultAsync(u => u.id == userId);
             
             if(user == null)
-                throw new Exception("User not found with the specified username");
+                throw new Exception("User not found");
 
             var payment = new Payment
             {
                 userId = user.id,
-                amount = paymentReqDto.amount,
                 paymentNumber = paymentReqDto.paymentNumber,
                 createdAt = DateTime.UtcNow
             };
@@ -418,5 +417,37 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         {
             throw new Exception(e.Message);
         }
+    }
+
+    public async Task ApprovePayment(PaymentReqDTO paymentReqDto)
+    {
+        var payment = await context.Payments
+            .Include(p => p.user)
+            .FirstOrDefaultAsync(p =>
+                p.user.username == paymentReqDto.username &&
+                p.paymentNumber == paymentReqDto.paymentNumber
+            );
+
+        if (payment == null)
+            throw new Exception("Payment not found for this user");
+
+        if (paymentReqDto.isApproved == true)
+        {
+            if (paymentReqDto.amount == null)
+                throw new Exception("Amount is required for approving");
+
+            payment.isApproved = true;
+            payment.amount = paymentReqDto.amount.Value;
+        }
+        else if (paymentReqDto.isApproved == false)
+        {
+            payment.isApproved = false;
+        }
+        else
+        {
+            throw new Exception("isApproved must be set");
+        }
+
+        await context.SaveChangesAsync();
     }
 }

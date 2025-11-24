@@ -41,15 +41,21 @@ export type GamesGet = {
 
 export type PaymentGet = {
     id: string;
-    amount: number;
+    amount?: number;
     createdAt: string;
+    paymentNumber: string;
+    isApproved?: boolean;
+}
+
+export type PaymentAddPost = {
     paymentNumber: string;
 }
 
-export type PaymentPost = {
+export type PaymentApprovePost = {
     username: string;
-    amount: number;
     paymentNumber: string;
+    amount: number;
+    isApproved: boolean;
 }
 
 export type UserAddPost = {
@@ -233,7 +239,7 @@ export async function handleAddWinningNumbers(numbers: number[]) {
     }
 }
 
-export async function handleAddPayment(payment: PaymentPost) {
+export async function handleAddPayment(payment: PaymentAddPost) {
     try {
         await apiRequest((opts) => defApi.pigeon.mainAddPayment(payment, opts));
         alert("Payment added successfully!");
@@ -271,5 +277,15 @@ export async function handleGetAllGames() : Promise<GamesGet[] | null> {
     catch (error) {
         console.log("Failed to get all games: "+error);
         return null;
+    }
+}
+
+export async function handleApprovePayment(payment: PaymentApprovePost) {
+    try {
+        await apiRequest((opts) => defApi.pigeon.mainApprovePayment(payment, opts));
+        alert("Payment approved successfully!");
+    }
+    catch (error) {
+        console.log("Failed to approve payment: "+error);
     }
 }

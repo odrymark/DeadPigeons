@@ -10,6 +10,9 @@ export default function UserPage() {
                     <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("buyBoard")}>
                         Buy Board
                     </button>
+                    <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("addPayment")}>
+                        Add Payment
+                    </button>
                     <button className="btn btn-secondary btn-lg w-64" onClick={() => navigate("prevBoards")}>
                         Previous Boards
                     </button>

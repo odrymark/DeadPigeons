@@ -8,8 +8,9 @@ export default function PaymentsTable({ payments }: Props) {
     return (
         <>
             {/* HEADER */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-lg shadow font-bold text-lg border-b">
+            <div className="grid grid-cols-1 sm:grid-cols-4 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-lg shadow font-bold text-lg border-b">
                 <div>Date</div>
+                <div>Status</div>
                 <div>Amount</div>
                 <div>Payment Number</div>
             </div>
@@ -19,9 +20,10 @@ export default function PaymentsTable({ payments }: Props) {
                 {payments.map((p) => (
                     <div
                         key={p.id}
-                        className="grid grid-cols-1 sm:grid-cols-3 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
+                        className="grid grid-cols-1 sm:grid-cols-4 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
                     >
                         <div>{new Date(p.createdAt).toLocaleDateString()}</div>
+                        <div>{p.isApproved === null ? "Pending" : p.isApproved ? "Approved" : "Rejected"}</div>
                         <div className="font-bold">{p.amount} DKK</div>
                         <div>{p.paymentNumber}</div>
                     </div>
