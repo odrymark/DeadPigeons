@@ -196,7 +196,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
     public async Task<int> GetBalance(Guid id)
     {
         return await context.Payments
-            .Where(p => p.userId == id && p.amount != null)
+            .Where(p => p.userId == id && p.amount != null && p.isApproved == true)
             .SumAsync(p => p.amount) ?? 0;
     }
 
@@ -235,7 +235,8 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             userId = userId,
             amount = -price,
             createdAt = DateTime.UtcNow,
-            paymentNumber = null
+            paymentNumber = null,
+            isApproved = true
         };
         
         activeGame.income += price;
@@ -421,17 +422,20 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
     public async Task ApprovePayment(PaymentReqDTO paymentReqDto)
     {
+        if (!Guid.TryParse(paymentReqDto.id, out var paymentGuid))
+            throw new Exception("Invalid payment ID format");
+
         var payment = await context.Payments
             .Include(p => p.user)
-            .FirstOrDefaultAsync(p =>
-                p.user.username == paymentReqDto.username &&
-                p.paymentNumber == paymentReqDto.paymentNumber
-            );
+            .FirstOrDefaultAsync(p => p.id == paymentGuid);
 
         if (payment == null)
             throw new Exception("Payment not found for this user");
 
-        if (paymentReqDto.isApproved == true)
+        if (!paymentReqDto.isApproved.HasValue)
+            throw new Exception("isApproved must be set");
+
+        if (paymentReqDto.isApproved.Value)
         {
             if (paymentReqDto.amount == null)
                 throw new Exception("Amount is required for approving");
@@ -439,13 +443,10 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             payment.isApproved = true;
             payment.amount = paymentReqDto.amount.Value;
         }
-        else if (paymentReqDto.isApproved == false)
-        {
-            payment.isApproved = false;
-        }
         else
         {
-            throw new Exception("isApproved must be set");
+            payment.isApproved = false;
+            payment.amount = null;
         }
 
         await context.SaveChangesAsync();

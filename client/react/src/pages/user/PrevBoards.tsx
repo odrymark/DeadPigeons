@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {type BoardGet, handleGetBoards} from "../api";
-import BoardsTable from "../components/BoardsTable.tsx";
+import {type BoardGet, handleGetBoards} from "../../api";
+import BoardsTable from "../../components/tables/BoardsTable.tsx";
 
 export default function PrevBoards() {
     const [boards, setBoards] = useState<BoardGet[]>([]);

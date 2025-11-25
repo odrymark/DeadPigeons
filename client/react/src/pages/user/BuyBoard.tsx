@@ -1,10 +1,13 @@
 import {useState} from "react";
-import {handleAddBoard} from "../api";
+import {handleAddBoard, handleGetBalance} from "../../api";
+import {balanceAtom} from "../../atoms/balanceAtom.ts";
+import {useAtom} from "jotai";
 
 
 export default function BuyBoard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [fieldsCount, setFieldsCount] = useState(5);
+    const [, setBalance] = useAtom(balanceAtom)
 
     const toggleNumber = (num: number) => {
         if (selectedNumbers.includes(num)) {
@@ -22,8 +25,12 @@ export default function BuyBoard() {
             alert(`Please select exactly ${fieldsCount} numbers`);
             return;
         }
-                                                        //TODO: MAKE BALANCE UPDATE AFTER PURCHASE
+
         await handleAddBoard(selectedNumbers);
+
+        const balance = await handleGetBalance();
+        setBalance(balance);
+
         setSelectedNumbers([]);
     };
 

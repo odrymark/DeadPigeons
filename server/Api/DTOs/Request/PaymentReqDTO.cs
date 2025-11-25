@@ -4,7 +4,7 @@ namespace Api.DTOs;
 
 public class PaymentReqDTO
 {
-    public string? username { get; set; }
+    public string? id { get; set; }
     public int? amount { get; set; }
     [Required]
     [RegularExpression("^[0-9]{10}$", ErrorMessage = "Payment number must be exactly 10 digits and contain only numbers.")]

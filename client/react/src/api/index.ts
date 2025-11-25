@@ -52,6 +52,7 @@ export type PaymentAddPost = {
 }
 
 export type PaymentApprovePost = {
+    id: string;
     username: string;
     paymentNumber: string;
     amount: number;

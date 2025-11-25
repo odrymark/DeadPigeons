@@ -1,18 +1,18 @@
 import {createBrowserRouter, type RouteObject, RouterProvider, Navigate} from "react-router-dom";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
-import PrevBoards from "./pages/PrevBoards.tsx";
-import BuyBoard from "./pages/BuyBoard.tsx";
-import PrevPayments from "./pages/PrevPayments.tsx";
+import PrevBoards from "./pages/user/PrevBoards.tsx";
+import BuyBoard from "./pages/user/BuyBoard.tsx";
+import PrevPayments from "./pages/user/PrevPayments.tsx";
 import './style.css'
 import DashboardIndex from "./pages/DashboardIndex.tsx";
-import AddUser from "./pages/AddUser.tsx";
-import WinningNumbers from "./pages/WinningNumbers.tsx";
-import AddPayment from "./pages/AddPayment.tsx";
-import GameHistory from "./pages/GameHistory.tsx";
+import AddUser from "./pages/admin/AddUser.tsx";
+import WinningNumbers from "./pages/admin/WinningNumbers.tsx";
+import AddPayment from "./pages/user/AddPayment.tsx";
+import GameHistory from "./pages/admin/GameHistory.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
-import UserHistory from "./pages/UserHistory.tsx";
-import ApprovePay from "./pages/ApprovePay.tsx";
+import UserHistory from "./pages/admin/UserHistory.tsx";
+import ApprovePay from "./pages/admin/ApprovePay.tsx";
 
 const routes : RouteObject[] = [
     {

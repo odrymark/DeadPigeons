@@ -58,7 +58,6 @@ public class MainController(MainService service, IConfiguration configuration) :
     public async Task<ActionResult> Logout()
     {
         var refreshToken = Request.Cookies["refreshToken"];
-        Console.WriteLine("RefreshToken: "+refreshToken);
 
         if (!string.IsNullOrEmpty(refreshToken))
         {

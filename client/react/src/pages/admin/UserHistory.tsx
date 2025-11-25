@@ -6,10 +6,10 @@ import {
     handleGetPayments, handleGetUserInfo,
     type PaymentGet,
     type UserInfoGet
-} from "../api";
-import PaymentsTable from "../components/PaymentsTable.tsx";
-import BoardsTable from "../components/BoardsTable.tsx";
-import InfoTable from "../components/InfoTable.tsx";
+} from "../../api";
+import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
+import BoardsTable from "../../components/tables/BoardsTable.tsx";
+import InfoTable from "../../components/tables/InfoTable.tsx";
 
 export default function UserHistory() {
     const [payments, setPayments] = useState<PaymentGet[]>([]);

@@ -1,14 +1,15 @@
 import { useAtom } from "jotai";
 import { useNavigate, Outlet } from "react-router-dom";
 import { userAtom } from "../atoms/userAtom.ts";
-import {useEffect, useEffectEvent, useState} from "react";
+import {useEffect, useEffectEvent} from "react";
 import {handleLogout, handleUserAuth, handleGetBalance} from "../api";
 import logoutIcon from "../assets/logout.png";
 import homeIcon from "../assets/home.png";
+import {balanceAtom} from "../atoms/balanceAtom.ts";
 
 export default function Dashboard() {
     const [user, setUser] = useAtom(userAtom);
-    const [balance, setBal] = useState<number>(0);
+    const [balance, setBalance] = useAtom(balanceAtom);
     const navigate = useNavigate();
 
     const loadData = useEffectEvent(() => {
@@ -18,7 +19,7 @@ export default function Dashboard() {
             else navigate("/");
 
             const bal = await handleGetBalance();
-            setBal(bal);
+            setBalance(bal);
         })();
     });
 

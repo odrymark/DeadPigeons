@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {handleAddPayment} from "../api";
+import {handleAddPayment} from "../../api";
 
 export default function AddPayment() {
     const [paymentNumber, setPaymentNumber] = useState("");
@@ -13,6 +13,10 @@ export default function AddPayment() {
         <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
             <form
                 className="flex flex-col gap-4 w-full max-w-[350px] bg-base-100 p-6 rounded-lg shadow"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                }}
             >
                 <label className="font-semibold text-lg text-center">Add Payment</label>
 
@@ -24,7 +28,7 @@ export default function AddPayment() {
                     onChange={(e) => setPaymentNumber(e.target.value)}
                 />
 
-                <button type="submit" className="btn btn-primary w-full mt-2" onClick={() => handleSubmit()}>
+                <button type="submit" className="btn btn-primary w-full mt-2">
                     Submit
                 </button>
             </form>
