@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {handleGetWeekIncome} from "../api";
+import {handleGetWeekIncome} from "../../api";
 import {useEffect, useState} from "react";
 
 export default function AdminPage()

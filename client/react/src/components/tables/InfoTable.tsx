@@ -1,4 +1,4 @@
-import type { UserInfoGet } from "../api";
+import type { UserInfoGet } from "../../api";
 
 interface Props {
     userInfo: UserInfoGet | null;

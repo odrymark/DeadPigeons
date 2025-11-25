@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {handleGetPayments, type PaymentGet} from "../api";
-import PaymentsTable from "../components/PaymentsTable.tsx";
+import {handleGetPayments, type PaymentGet} from "../../api";
+import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
 
 export default function PrevPayments() {
     const [payments, setPayments] = useState<PaymentGet[]>([]);

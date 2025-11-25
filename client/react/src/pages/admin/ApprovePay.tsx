@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { handleGetAllUsers, handleGetPayments, handleApprovePayment } from "../api";
-import type { PaymentGet, PaymentApprovePost } from "../api";
+import { handleGetAllUsers, handleGetPayments, handleApprovePayment } from "../../api";
+import type { PaymentGet, PaymentApprovePost } from "../../api";
 
 export default function ApprovePay() {
     const [users, setUsers] = useState<string[]>([]);
@@ -26,27 +26,42 @@ export default function ApprovePay() {
         })();
     }, [selectedUser]);
 
-    //TODO: Once approved it still stays in the list
     const handleApproveButton = async (payment: PaymentGet, approved: boolean) => {
-        if (payment.amount === undefined) {
+        if (editingAmountId === payment.id) {
+            const updatedAmount = Number(tempAmount);
+
+            setPayments(p =>
+                p.map(row =>
+                    row.id === payment.id ? { ...row, amount: updatedAmount } : row
+                )
+            );
+
+            payment.amount = updatedAmount;
+            setEditingAmountId(null);
+        }
+
+        if (payment.amount === undefined || payment.amount === null) {
             alert("Please enter an amount before approving/rejecting.");
             return;
         }
 
-        const payload: PaymentApprovePost = {
+        const req: PaymentApprovePost = {
+            id: payment.id,
             username: selectedUser,
             paymentNumber: payment.paymentNumber,
             amount: payment.amount,
             isApproved: approved,
         };
 
-        await handleApprovePayment(payload);
+        await handleApprovePayment(req);
 
-        setPayments(p =>
-            p.map(row =>
+        setPayments(p => {
+            const updated = p.map(row =>
                 row.id === payment.id ? { ...row, isApproved: approved } : row
-            )
-        );
+            );
+
+            return updated.filter(x => x.isApproved === undefined || x.isApproved === null);
+        });
     };
 
     const startEditAmount = (payment: PaymentGet) => {
@@ -54,7 +69,6 @@ export default function ApprovePay() {
         setTempAmount(payment.amount?.toString() ?? "");
     };
 
-    //TODO: Amount not changed if immediately press one of the approve buttons
     const finishEditAmount = (paymentId: string) => {
         setPayments(p =>
             p.map(row =>

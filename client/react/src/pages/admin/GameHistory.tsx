@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { type GamesGet, handleGetAllGames } from "../api";
+import { type GamesGet, handleGetAllGames } from "../../api";
 
 function getWeekNumber(date: Date) {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));

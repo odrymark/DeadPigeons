@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { userAtom } from "../atoms/userAtom.ts";
-import UserPage from "./UserPage.tsx";
-import AdminPage from "./AdminPage.tsx";
+import UserPage from "./user/UserPage.tsx";
+import AdminPage from "./admin/AdminPage.tsx";
 
 export default function DashboardIndex() {
     const user = useAtomValue(userAtom);

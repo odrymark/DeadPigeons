@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {handleAddUser} from "../api";
+import {handleAddUser} from "../../api";
 
 export default function AddUser() {
     const [username, setUsername] = useState("");

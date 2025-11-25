@@ -1,4 +1,4 @@
-import type {BoardGet} from "../api";
+import type {BoardGet} from "../../api";
 
 interface Props {
     boards: BoardGet[];
