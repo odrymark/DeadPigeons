@@ -1,18 +1,25 @@
 import { useAtom } from "jotai";
 import { useNavigate, Outlet } from "react-router-dom";
 import { userAtom } from "../atoms/userAtom.ts";
-import {useEffect, useEffectEvent} from "react";
-import {handleLogout, handleUserAuth, handleGetBalance} from "../api";
+import { useEffect, useState } from "react";
+import { handleLogout, handleUserAuth, handleGetBalance } from "../api";
 import logoutIcon from "../assets/logout.png";
 import homeIcon from "../assets/home.png";
-import {balanceAtom} from "../atoms/balanceAtom.ts";
+import { balanceAtom } from "../atoms/balanceAtom.ts";
+import UserBtns from "../components/sidebarBtns/UserBtns.tsx";
+import AdminBtns from "../components/sidebarBtns/AdminBtns.tsx";
 
 export default function Dashboard() {
     const [user, setUser] = useAtom(userAtom);
     const [balance, setBalance] = useAtom(balanceAtom);
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
+    {/*TODO: Make atom, if log out and log back in it gets messed up*/}
+    const [isLightTheme, setLightTheme] = useState(true);
+    const darkTheme = "forest";
+    const lightTheme = "emerald";
 
-    const loadData = useEffectEvent(() => {
+    useEffect(() => {
         (async () => {
             const u = await handleUserAuth();
             if (u) setUser(u);
@@ -21,57 +28,88 @@ export default function Dashboard() {
             const bal = await handleGetBalance();
             setBalance(bal);
         })();
-    });
-
-    useEffect(() => {
-        loadData();
     }, []);
+
+    const toggleTheme = () => {
+        const newTheme = isLightTheme ? darkTheme : lightTheme;
+        setLightTheme(!isLightTheme);
+        document.documentElement.dataset.theme = newTheme;
+    };
 
     if (!user) return <div>Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-base-200 w-screen flex flex-col">
-            {/* Navbar */}
-            <div className="navbar bg-base-100 shadow-md">
+        <div className="min-h-screen bg-base-200 w-screen flex flex-col relative overflow-hidden">
+            {/* Sidebar Toggle Button */}
+            <button
+                className="btn btn-primary absolute top-4 left-4 z-50"
+                onClick={() => setOpen(true)}
+            >
+                ☰
+            </button>
 
-                <div className="navbar-start">
-                    <span className="text-xl font-bold pl-4">Dead Pigeons</span>
+            {/* Sidebar Overlay */}
+            {open && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-40 z-40"
+                    onClick={() => setOpen(false)}
+                ></div>
+            )}
+
+            {/* Sidebar Drawer */}
+            <div
+                className={`fixed top-0 left-0 h-full w-64 bg-base-100 shadow-xl z-50 transform transition-transform duration-300 flex flex-col p-4 gap-4 ${open ? "translate-x-0" : "-translate-x-full"}`}
+            >
+                {/* User Info + Theme Toggle */}
+                <div className="flex items-center justify-between pb-4 border-b border-base-300">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-lg font-bold">{user.username}</span>
+                        {user.isAdmin ? (
+                            <span className="badge badge-warning w-fit">Admin</span>
+                        ) : (
+                            <span className="badge badge-secondary w-fit">Balance: {balance} DKK</span>
+                        )}
+
+                        {/* Login/Logout button */}
+                        <button
+                            className="btn btn-error btn-sm mt-2 w-fit flex items-center gap-2"
+                            onClick={async () => {
+                                await handleLogout();
+                                navigate("/login");
+                            }}
+                        >
+                            <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
+                        </button>
+                    </div>
+
+                    {/*TODO: Add in a light bulb*/}
+
+                    {/* Theme toggle */}
+                    <input
+                        type="checkbox"
+                        className="toggle toggle-primary"
+                        checked={isLightTheme}
+                        onChange={toggleTheme}
+                    />
                 </div>
 
                 {/* Home Button */}
-                <div className="navbar-center">
-                    <button onClick={() => navigate("/dashboard")} className="btn btn-primary w-15 h-15 p-0 rounded-xl flex items-center justify-center">
-                        <img
-                            src={homeIcon}
-                            alt="Home"
-                            className="w-8 h-8 object-contain"
-                        />
-                    </button>
-                </div>
+                <button
+                    className="btn btn-primary w-full flex items-center gap-2"
+                    onClick={() => {
+                        navigate("/dashboard");
+                        setOpen(false);
+                    }}
+                >
+                    <img src={homeIcon} alt="Home" className="h-6 w-6" /> Home
+                </button>
 
-                {/* User Info */}
-                <div className="navbar-end pr-4 flex items-center gap-2">
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="badge badge-primary">{user!.username}</span>
-
-                        {user!.isAdmin ? (
-                            <span className="badge badge-warning">Admin</span>
-                        ) : (
-                            <span className="badge badge-secondary">Balance: {balance} DKK</span>
-                        )}
-                    </div>
-
-                    <button className="btn btn-error p-0 w-15 h-15 flex items-center justify-center rounded-full" onClick={async () => {
-                        await handleLogout();
-                        navigate("/login");
-                    }}>
-                        <img
-                            src={logoutIcon}
-                            alt="Logout"
-                            className="h-6 w-6 object-contain"
-                        />
-                    </button>
-                </div>
+                {/* Admin/User Buttons */}
+                {user.isAdmin ? (
+                    <AdminBtns close={() => setOpen(false)} />
+                ) : (
+                    <UserBtns close={() => setOpen(false)} />
+                )}
             </div>
 
             <Outlet />

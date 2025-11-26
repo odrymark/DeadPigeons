@@ -4,7 +4,6 @@ import Dashboard from "./pages/Dashboard.tsx";
 import PrevBoards from "./pages/user/PrevBoards.tsx";
 import BuyBoard from "./pages/user/BuyBoard.tsx";
 import PrevPayments from "./pages/user/PrevPayments.tsx";
-import DashboardIndex from "./pages/DashboardIndex.tsx";
 import AddUser from "./pages/admin/AddUser.tsx";
 import WinningNumbers from "./pages/admin/WinningNumbers.tsx";
 import AddPayment from "./pages/user/AddPayment.tsx";
@@ -26,10 +25,6 @@ const routes : RouteObject[] = [
         path: "/dashboard",
         element: <Dashboard/>,
         children: [
-            {
-                path: "/dashboard/",
-                element: <DashboardIndex/>
-            },
             {
                 path: "buyBoard",
                 element: <BuyBoard/>
