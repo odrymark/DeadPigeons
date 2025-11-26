@@ -50,7 +50,7 @@ export default function AddWinningNumbers() {
             </div>
 
             {/* Submit */}
-            <button className="btn w-40 h-12" onClick={() => handleSubmit()}>
+            <button className="btn btn-primary w-40 h-12" onClick={() => handleSubmit()}>
                 Submit Numbers
             </button>
         </div>
