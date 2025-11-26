@@ -99,29 +99,28 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
                     id = b.id,
                     numbers = b.numbers,
                     createdAt = b.createdAt,
-                    isWinner = b.isWinner
+                    isWinner = b.isWinner,
+                    repeats = b.repeats
                 })
                 .ToListAsync();
         }
-        else
-        {
-            var user = await context.Users
-                .FirstOrDefaultAsync(u => u.username == username);
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.username == username);
             
-            if (user == null)
-                throw new Exception("User not found");
+        if (user == null)
+            throw new Exception("User not found");
             
-            return await context.Boards
-                .Where(b => b.userId == user.id)
-                .Select(b => new BoardResDTO
-                {
-                    id = b.id,
-                    numbers = b.numbers,
-                    createdAt = b.createdAt,
-                    isWinner = b.isWinner
-                })
-                .ToListAsync();
-        }
+        return await context.Boards
+            .Where(b => b.userId == user.id)
+            .Select(b => new BoardResDTO
+            {
+                id = b.id,
+                numbers = b.numbers,
+                createdAt = b.createdAt,
+                isWinner = b.isWinner,
+                repeats = b.repeats
+            })
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<GameResDTO>> GetAllGames()
@@ -200,10 +199,17 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             .SumAsync(p => p.amount) ?? 0;
     }
 
-    public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId)
+    public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId, Game? newGame)
     {
-        var activeGame = await context.Games
-            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+        Game? activeGame;
+        if (newGame == null)
+        {
+            activeGame = await context.Games
+                .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+        }
+        else
+            activeGame = newGame;
+        
         
         if (activeGame == null)
             throw new Exception("No active game available");
@@ -218,7 +224,7 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
         if (DateTime.UtcNow > activeGame.openUntil)
             throw new Exception("The current game is closed for new boards");
-
+        
         var board = new Board
         {
             id = Guid.NewGuid(),
@@ -226,7 +232,8 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             gameId = activeGame.id,
             numbers = boardReqDto.numbers,
             createdAt = DateTime.UtcNow,
-            isWinner = null
+            isWinner = null,
+            repeats = boardReqDto.repeats,
         };
 
         var payment = new Payment
@@ -245,6 +252,32 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
         context.Payments.Add(payment);
 
         await context.SaveChangesAsync();
+    }
+
+    public async Task EndRepeat(string id, Guid userId)
+    {
+        try
+        {
+            if (!Guid.TryParse(id, out var boardId))
+                throw new Exception("Invalid board ID");
+
+            var board = await context.Boards
+                .FirstOrDefaultAsync(b => b.id == boardId);
+
+            if (board == null)
+                throw new Exception("Board not found");
+
+            if (board.userId != userId)
+                throw new Exception("You do not own this board");
+
+            board.repeats = 0;
+
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public async Task AddUser(UserAddReqDTO userAddReqDto)
@@ -343,6 +376,29 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
             };
 
             context.Games.Add(newGame);
+            
+            var repeatBoards = await context.Boards
+                .Where(b => b.repeats > 0)
+                .ToListAsync();
+            
+            foreach (var oldBoard in repeatBoards)
+            {
+                try
+                {
+                    var boardReqDto = new BoardReqDTO
+                    {
+                        numbers = new List<int>(oldBoard.numbers),
+                        repeats = oldBoard.repeats - 1
+                    };
+
+                    await AddBoard(boardReqDto, oldBoard.userId, newGame);
+                    oldBoard.repeats = 0;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
 
             await context.SaveChangesAsync();
         }

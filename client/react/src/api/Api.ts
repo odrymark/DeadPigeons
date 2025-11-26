@@ -21,6 +21,8 @@ export interface BoardReqDTO {
    * @minItems 5
    */
   numbers?: number[];
+  /** @format int32 */
+  repeats?: number;
 }
 
 export interface UserAddReqDTO {
@@ -39,7 +41,7 @@ export interface WinningNumsReqDTO {
 }
 
 export interface PaymentReqDTO {
-  username?: string | null;
+  id?: string | null;
   /** @format int32 */
   amount?: number | null;
   /**
@@ -477,6 +479,22 @@ export class Api<
     mainAddBoard: (data: BoardReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
         path: `/pigeon/addBoard`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Main
+     * @name MainEndRepeat
+     * @request POST:/pigeon/endRepeat
+     */
+    mainEndRepeat: (data: string, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/pigeon/endRepeat`,
         method: "POST",
         body: data,
         type: ContentType.Json,

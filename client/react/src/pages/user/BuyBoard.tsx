@@ -1,13 +1,15 @@
-import {useState} from "react";
+import { useAtom } from "jotai";
 import {handleAddBoard, handleGetBalance} from "../../api";
+import {useState} from "react";
 import {balanceAtom} from "../../atoms/balanceAtom.ts";
-import {useAtom} from "jotai";
-
 
 export default function BuyBoard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [fieldsCount, setFieldsCount] = useState(5);
-    const [, setBalance] = useAtom(balanceAtom)
+    const [, setBalance] = useAtom(balanceAtom);
+
+    const [repeatEnabled, setRepeatEnabled] = useState(false);
+    const [repeatCount, setRepeatCount] = useState(1);
 
     const toggleNumber = (num: number) => {
         if (selectedNumbers.includes(num)) {
@@ -26,12 +28,14 @@ export default function BuyBoard() {
             return;
         }
 
-        await handleAddBoard(selectedNumbers);
+        await handleAddBoard({numbers: selectedNumbers, repeats: repeatEnabled ? repeatCount : 0});
 
         const balance = await handleGetBalance();
         setBalance(balance);
 
         setSelectedNumbers([]);
+        setRepeatEnabled(false);
+        setRepeatCount(1);
     };
 
     const gridNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
@@ -78,6 +82,31 @@ export default function BuyBoard() {
                     ))}
                 </select>
             </div>
+
+            {/* Repeat Toggle */}
+            <div className="mb-4 flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={repeatEnabled}
+                    onChange={() => setRepeatEnabled(!repeatEnabled)}
+                />
+                <span className="font-semibold">Repeat for multiple weeks</span>
+            </div>
+
+            {/* Repeat Count Input*/}
+            {repeatEnabled && (
+                <div className="mb-4 flex flex-col items-center">
+                    <label className="font-semibold mb-1">Number of repeats:</label>
+                    <input
+                        type="number"
+                        min={1}
+                        className="input input-bordered w-32 text-center"
+                        value={repeatCount}
+                        onChange={(e) => setRepeatCount(Number(e.target.value))}
+                    />
+                </div>
+            )}
 
             {/* Submit button */}
             <button
