@@ -20,10 +20,16 @@ export type UserInfoGet = {
     isActive: boolean;
 }
 
+export type BoardPost = {
+    numbers: number[];
+    repeats: number;
+}
+
 export type BoardGet = {
     id: string;
     numbers: number[];
     createdAt: string;
+    repeats: number;
     isWinner: boolean;
 }
 
@@ -197,14 +203,25 @@ export async function handleGetBalance() : Promise<number> {
     }
 }
 
-export async function handleAddBoard(numbers: number[]) {
+export async function handleAddBoard(board: BoardPost){
     try {
-        await apiRequest((opts) => defApi.pigeon.mainAddBoard({numbers}, opts));
+        await apiRequest((opts) => defApi.pigeon.mainAddBoard(board, opts));
         alert("Board added successfully.");
     }
     catch (error) {
         console.log("Failed to add board: "+error);
         alert("Failed to add board: "+error);
+    }
+}
+
+export async function handleEndRepeat(id: string) {
+    try {
+        await apiRequest((opts) => defApi.pigeon.mainEndRepeat(id, opts));
+        alert("Board updated successfully.");
+    }
+    catch (error) {
+        console.log("Failed to update board: "+error);
+        alert("Failed to update board: "+error);
     }
 }
 

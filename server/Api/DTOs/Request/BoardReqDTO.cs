@@ -7,6 +7,7 @@ public class BoardReqDTO : IValidatableObject
     [MinLength(5, ErrorMessage = "You must provide at least 5 numbers.")]
     [MaxLength(8, ErrorMessage = "You must provide maximum 8 numbers.")]
     public List<int> numbers { get; set; } = new List<int>();
+    public int repeats { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

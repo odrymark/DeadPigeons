@@ -228,7 +228,7 @@ public class MainController(MainService service, IConfiguration configuration) :
             var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             
             var id = Guid.Parse(idStr!);
-            await service.AddBoard(boardReqDto, id);
+            await service.AddBoard(boardReqDto, id, null);
             
             return Ok();
         }
@@ -237,6 +237,25 @@ public class MainController(MainService service, IConfiguration configuration) :
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost("endRepeat")]
+    [Authorize]
+    public async Task<ActionResult> EndRepeat([FromBody] string id)
+    {
+        try
+        {
+            var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            var userId = Guid.Parse(idStr!);
+            await service.EndRepeat(id, userId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
 
     [HttpPost("addUser")]
     [Authorize(Roles = "Admin")]
