@@ -50,7 +50,7 @@ export default function BuyBoard() {
                     <button
                         key={num}
                         className={`w-14 h-14 rounded-lg flex items-center justify-center font-bold text-lg border 
-              ${selectedNumbers.includes(num) ? "bg-blue-500 text-white" : "bg-white text-black"}
+              ${selectedNumbers.includes(num) ? "btn btn-primary text-white" : "bg-gray-300 text-black"}
               ${!selectedNumbers.includes(num) && selectedNumbers.length >= fieldsCount ? "opacity-50 cursor-not-allowed" : ""}`}
                         onClick={() => toggleNumber(num)}
                         disabled={!selectedNumbers.includes(num) && selectedNumbers.length >= fieldsCount}
