@@ -12,8 +12,8 @@ namespace Api.Controllers;
 public class MainController(MainService service, IConfiguration configuration) : ControllerBase
 {
     
-    private readonly double _jwtExpireMin = double.Parse(configuration["Jwt:ExpireMinutes"]!);
-    private readonly double _refreshExpireDay = double.Parse(configuration["RefreshToken:ExpireDays"]!);
+    private readonly double _jwtExpireMin = double.Parse(configuration["JWT_EXPIREMINUTES"]!);
+    private readonly double _refreshExpireDay = double.Parse(configuration["REFRESHTOKEN_EXPIREDAYS"]!);
     
     [HttpPost("login")]
     public async Task<ActionResult> Login([FromBody] UserLoginReqDTO loginReqDto)
@@ -27,15 +27,15 @@ public class MainController(MainService service, IConfiguration configuration) :
             Response.Cookies.Append("jwt", response.token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, //TEMPORARY, LATER CHANGE TO HTTPS
-                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(_jwtExpireMin),
             });
             Response.Cookies.Append("refreshToken", response.refreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, //TEMPORARY, LATER CHANGE TO HTTPS
-                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(_refreshExpireDay),
             });
             
@@ -58,13 +58,21 @@ public class MainController(MainService service, IConfiguration configuration) :
     public async Task<ActionResult> Logout()
     {
         var refreshToken = Request.Cookies["refreshToken"];
-
+        
         if (!string.IsNullOrEmpty(refreshToken))
         {
             await service.Logout(refreshToken);
         }
-        Response.Cookies.Delete("jwt");
-        Response.Cookies.Delete("refreshToken");
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTime.UtcNow.AddDays(-1)
+        };
+        
+        Response.Cookies.Delete("jwt", cookieOptions);
+        Response.Cookies.Delete("refreshToken", cookieOptions);
         return Ok();
     }
 
@@ -95,16 +103,16 @@ public class MainController(MainService service, IConfiguration configuration) :
             Response.Cookies.Append("jwt", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false, //TEMPORARY, LATER CHANGE TO HTTPS
-                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(_jwtExpireMin),
             });
         
             Response.Cookies.Append("refreshToken", refresh,  new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.Lax,
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(_refreshExpireDay)
             });
         

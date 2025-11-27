@@ -105,7 +105,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:5000";
+  public baseUrl: string = "https://dead-pigeons-backend.fly.dev";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -309,7 +309,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title My Title
  * @version 1.0.0
- * @baseUrl http://localhost:5000
+ * @baseUrl https://dead-pigeons-backend.fly.dev
  */
 export class Api<
   SecurityDataType extends unknown,
