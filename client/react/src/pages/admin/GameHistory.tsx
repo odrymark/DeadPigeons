@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { type GamesGet, handleGetAllGames } from "../../api";
 
-function getWeekNumber(date: Date) {
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+function getWeekNumber(date: Date): number {
+    const d = new Date(date);
+    const yearStart = new Date(d.getFullYear(), 0, 1);
+
+    const diff = d.getTime() - yearStart.getTime(); // number
+    const days = diff / 86400000;
+
+    return Math.ceil((days + 1) / 7);
 }
 
 export default function GameHistory() {

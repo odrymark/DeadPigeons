@@ -50,13 +50,11 @@ public class MainService(TokenService tokenService, PasswordService passwordServ
 
             if (user == null)
             {
-                Console.WriteLine("Invalid refresh token");
                 throw new Exception("Invalid refresh token");
             }
 
             if (user.refreshTokenExpiry < DateTime.UtcNow)
             {
-                Console.WriteLine("Refresh token expired");
                 throw new Exception("Refresh token expired");
             }
             

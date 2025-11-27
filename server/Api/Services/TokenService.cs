@@ -24,7 +24,7 @@ public class TokenService
     
     public string GenerateToken(User user)
     {
-        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!);
+        var key = Encoding.UTF8.GetBytes(_configuration["JWT_KEY"]!);
 
         var claims = new[]
         {
@@ -36,9 +36,9 @@ public class TokenService
         var descriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpireMinutes"]!)),
-            Issuer = _configuration["Jwt:Issuer"]!,
-            Audience = _configuration["Jwt:Audience"]!,
+            Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["JWT_EXPIREMINUTES"]!)),
+            Issuer = _configuration["JWT_ISSUER"]!,
+            Audience = _configuration["JWT_AUDIENCE"]!,
             SigningCredentials =
                 new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };

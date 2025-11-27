@@ -73,7 +73,7 @@ export type UserAddPost = {
 }
 
 export const defApi = new Api({
-    baseUrl: 'http://localhost:5000'
+    baseUrl: 'https://dead-pigeons-backend.fly.dev'
 });
 
 async function apiRequest<T>(requestFunc: (opts?: RequestInit) => Promise<Response>): Promise<T> {
