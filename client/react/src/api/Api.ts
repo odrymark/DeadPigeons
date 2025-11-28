@@ -25,13 +25,6 @@ export interface BoardReqDTO {
   repeats?: number;
 }
 
-export interface UserAddReqDTO {
-  username?: string;
-  password?: string;
-  email?: string;
-  phoneNumber?: string;
-}
-
 export interface WinningNumsReqDTO {
   /**
    * @maxItems 3
@@ -50,6 +43,13 @@ export interface PaymentReqDTO {
    */
   paymentNumber: string;
   isApproved?: boolean | null;
+}
+
+export interface UserAddReqDTO {
+  username?: string;
+  password?: string;
+  email?: string;
+  phoneNumber?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -314,17 +314,17 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  pigeon = {
+  api = {
     /**
      * No description
      *
-     * @tags Main
-     * @name MainLogin
-     * @request POST:/pigeon/login
+     * @tags Auth
+     * @name AuthLogin
+     * @request POST:/api/auth/login
      */
-    mainLogin: (data: UserLoginReqDTO, params: RequestParams = {}) =>
+    authLogin: (data: UserLoginReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/login`,
+        path: `/api/auth/login`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -334,13 +334,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainLogout
-     * @request POST:/pigeon/logout
+     * @tags Auth
+     * @name AuthLogout
+     * @request POST:/api/auth/logout
      */
-    mainLogout: (params: RequestParams = {}) =>
+    authLogout: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/logout`,
+        path: `/api/auth/logout`,
         method: "POST",
         ...params,
       }),
@@ -348,13 +348,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetMe
-     * @request GET:/pigeon/auth/me
+     * @tags Auth
+     * @name AuthGetMe
+     * @request GET:/api/auth/me
      */
-    mainGetMe: (params: RequestParams = {}) =>
+    authGetMe: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/auth/me`,
+        path: `/api/auth/me`,
         method: "GET",
         ...params,
       }),
@@ -362,13 +362,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainRefresh
-     * @request POST:/pigeon/auth/refresh
+     * @tags Auth
+     * @name AuthRefresh
+     * @request POST:/api/auth/refresh
      */
-    mainRefresh: (params: RequestParams = {}) =>
+    authRefresh: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/auth/refresh`,
+        path: `/api/auth/refresh`,
         method: "POST",
         ...params,
       }),
@@ -376,13 +376,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetBoards
-     * @request GET:/pigeon/getBoards
+     * @tags Boards
+     * @name BoardsGetBoards
+     * @request GET:/api/boards/getBoards
      */
-    mainGetBoards: (params: RequestParams = {}) =>
+    boardsGetBoards: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/getBoards`,
+        path: `/api/boards/getBoards`,
         method: "GET",
         ...params,
       }),
@@ -390,18 +390,18 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetBoardsAdmin
-     * @request GET:/pigeon/getBoardsAdmin
+     * @tags Boards
+     * @name BoardsGetBoardsAdmin
+     * @request GET:/api/boards/getBoardsAdmin
      */
-    mainGetBoardsAdmin: (
+    boardsGetBoardsAdmin: (
       query?: {
         username?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<File, any>({
-        path: `/pigeon/getBoardsAdmin`,
+        path: `/api/boards/getBoardsAdmin`,
         method: "GET",
         query: query,
         ...params,
@@ -410,75 +410,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetAllGames
-     * @request GET:/pigeon/getAllGames
+     * @tags Boards
+     * @name BoardsAddBoard
+     * @request POST:/api/boards/addBoard
      */
-    mainGetAllGames: (params: RequestParams = {}) =>
+    boardsAddBoard: (data: BoardReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/getAllGames`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainGetPayments
-     * @request GET:/pigeon/getPayments
-     */
-    mainGetPayments: (params: RequestParams = {}) =>
-      this.request<File, any>({
-        path: `/pigeon/getPayments`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainGetPaymentsAdmin
-     * @request GET:/pigeon/getPaymentsAdmin
-     */
-    mainGetPaymentsAdmin: (
-      query?: {
-        username?: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<File, any>({
-        path: `/pigeon/getPaymentsAdmin`,
-        method: "GET",
-        query: query,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainGetBalance
-     * @request GET:/pigeon/getBalance
-     */
-    mainGetBalance: (params: RequestParams = {}) =>
-      this.request<File, any>({
-        path: `/pigeon/getBalance`,
-        method: "GET",
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainAddBoard
-     * @request POST:/pigeon/addBoard
-     */
-    mainAddBoard: (data: BoardReqDTO, params: RequestParams = {}) =>
-      this.request<File, any>({
-        path: `/pigeon/addBoard`,
+        path: `/api/boards/addBoard`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -488,13 +426,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainEndRepeat
-     * @request POST:/pigeon/endRepeat
+     * @tags Boards
+     * @name BoardsEndRepeat
+     * @request POST:/api/boards/endRepeat
      */
-    mainEndRepeat: (data: string, params: RequestParams = {}) =>
+    boardsEndRepeat: (data: string, params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/endRepeat`,
+        path: `/api/boards/endRepeat`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -504,29 +442,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainAddUser
-     * @request POST:/pigeon/addUser
+     * @tags Games
+     * @name GamesGetAllGames
+     * @request GET:/api/games/getAllGames
      */
-    mainAddUser: (data: UserAddReqDTO, params: RequestParams = {}) =>
+    gamesGetAllGames: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/addUser`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name MainGetGameIncome
-     * @request GET:/pigeon/getWeekIncome
-     */
-    mainGetGameIncome: (params: RequestParams = {}) =>
-      this.request<File, any>({
-        path: `/pigeon/getWeekIncome`,
+        path: `/api/games/getAllGames`,
         method: "GET",
         ...params,
       }),
@@ -534,16 +456,16 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainAddWinningNumbers
-     * @request POST:/pigeon/addWinningNumbers
+     * @tags Games
+     * @name GamesAddWinningNumbers
+     * @request POST:/api/games/addWinningNumbers
      */
-    mainAddWinningNumbers: (
+    gamesAddWinningNumbers: (
       data: WinningNumsReqDTO,
       params: RequestParams = {},
     ) =>
       this.request<File, any>({
-        path: `/pigeon/addWinningNumbers`,
+        path: `/api/games/addWinningNumbers`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -553,13 +475,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetAllUsers
-     * @request GET:/pigeon/getAllUsers
+     * @tags Games
+     * @name GamesGetGameIncome
+     * @request GET:/api/games/getGameIncome
      */
-    mainGetAllUsers: (params: RequestParams = {}) =>
+    gamesGetGameIncome: (params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/getAllUsers`,
+        path: `/api/games/getGameIncome`,
         method: "GET",
         ...params,
       }),
@@ -567,18 +489,32 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainGetUserInfo
-     * @request GET:/pigeon/getUserInfo
+     * @tags Payments
+     * @name PaymentsGetPayments
+     * @request GET:/api/payments/getPayments
      */
-    mainGetUserInfo: (
+    paymentsGetPayments: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/payments/getPayments`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Payments
+     * @name PaymentsGetPaymentsAdmin
+     * @request GET:/api/payments/getPaymentsAdmin
+     */
+    paymentsGetPaymentsAdmin: (
       query?: {
         username?: string;
       },
       params: RequestParams = {},
     ) =>
       this.request<File, any>({
-        path: `/pigeon/getUserInfo`,
+        path: `/api/payments/getPaymentsAdmin`,
         method: "GET",
         query: query,
         ...params,
@@ -587,13 +523,13 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainAddPayment
-     * @request POST:/pigeon/addPayment
+     * @tags Payments
+     * @name PaymentsAddPayment
+     * @request POST:/api/payments/addPayment
      */
-    mainAddPayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
+    paymentsAddPayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/addPayment`,
+        path: `/api/payments/addPayment`,
         method: "POST",
         body: data,
         type: ContentType.Json,
@@ -603,16 +539,95 @@ export class Api<
     /**
      * No description
      *
-     * @tags Main
-     * @name MainApprovePayment
-     * @request POST:/pigeon/approvePayment
+     * @tags Payments
+     * @name PaymentsApprovePayment
+     * @request POST:/api/payments/approvePayment
      */
-    mainApprovePayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
+    paymentsApprovePayment: (data: PaymentReqDTO, params: RequestParams = {}) =>
       this.request<File, any>({
-        path: `/pigeon/approvePayment`,
+        path: `/api/payments/approvePayment`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Payments
+     * @name PaymentsGetBalance
+     * @request GET:/api/payments/getBalance
+     */
+    paymentsGetBalance: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/payments/getBalance`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name UsersAddUser
+     * @request POST:/api/users/addUser
+     */
+    usersAddUser: (data: UserAddReqDTO, params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/users/addUser`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name UsersGetAllUsers
+     * @request GET:/api/users/getAllUsers
+     */
+    usersGetAllUsers: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/users/getAllUsers`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name UsersGetUserInfo
+     * @request GET:/api/users/getUserInfo
+     */
+    usersGetUserInfo: (
+      query?: {
+        username?: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<File, any>({
+        path: `/api/users/getUserInfo`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+  };
+  error = {
+    /**
+     * No description
+     *
+     * @tags Error
+     * @name ErrorHandleError
+     * @request GET:/error
+     */
+    errorHandleError: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/error`,
+        method: "GET",
         ...params,
       }),
   };

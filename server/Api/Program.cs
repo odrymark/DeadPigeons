@@ -1,6 +1,7 @@
 using System.Text;
 using api;
 using Api.Services;
+using api.Settings;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 
 builder.Services.AddCors(options =>
 {
@@ -55,6 +58,8 @@ builder.Services.AddAuthentication("JwtAuth")
         };
     });
 
+builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
+
 builder.Services.AddSingleton<PasswordService>();
 builder.Services.AddScoped<ISeeder, Seeder>();
 builder.Services.AddScoped<TokenService>();
@@ -72,6 +77,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseOpenApi();
 app.UseSwaggerUi();
+app.UseExceptionHandler("/error");
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
