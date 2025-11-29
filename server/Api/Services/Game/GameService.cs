@@ -1,0 +1,76 @@
+﻿using Api.DTOs;
+using Api.DTOs.Response;
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
+
+namespace Api.Services.Games;
+
+public class GameService(PigeonsDbContext context) : IGameService
+{
+    public async Task<Game?> GetActiveGame()
+        => await context.Games
+            .Include(g => g.winners)
+            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+
+    public async Task Save()
+        => await context.SaveChangesAsync();
+    
+    public Game CreateNextGame(DateTime openUntilUtc)
+    {
+        var newGame = new Game
+        {
+            id = Guid.NewGuid(),
+            numbers = new List<int>(),
+            income = 0,
+            createdAt = DateTime.UtcNow,
+            openUntil = openUntilUtc
+        };
+
+        context.Games.Add(newGame);
+        return newGame;
+    }
+    
+    public async Task<IEnumerable<GameResDTO>> GetAllGames()
+    {
+        try
+        {
+            var games = await context.Games
+                .Include(g => g.winners)
+                .Include(g => g.boards)
+                .Where(g => g.numbers.Any())
+                .OrderByDescending(g => g.createdAt)
+                .ToListAsync();
+            
+            var response = games.Select(g => new GameResDTO
+                {
+                    createdAt = g.createdAt,
+                    income = g.income,
+                    winningNums = g.numbers.ToList(),
+                    winners = g.winners.Select(w => new WinnersResDTO
+                    {
+                        username = w.username,
+                        winningBoardsNum = g.boards.Count(b => b.userId == w.id && b.isWinner == true)
+                    }).ToList()
+                })
+                .OrderByDescending(x => x.createdAt)
+                .ToList();
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    
+    public async Task<int> GetGameIncome()
+    {
+        var game = await context.Games
+            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+
+        if (game == null)
+            throw new Exception("No active game available");
+
+        return game.income;
+    }
+}

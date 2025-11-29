@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Api.Services;
 
-public class TokenService
+public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
 
@@ -15,7 +15,6 @@ public class TokenService
     {
         _configuration = configuration;
     }
-    
     
     public string GenerateRefreshToken()
     {

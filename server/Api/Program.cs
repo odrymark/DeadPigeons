@@ -1,6 +1,12 @@
 using System.Text;
 using api;
 using Api.Services;
+using Api.Services.Auth;
+using Api.Services.Boards;
+using Api.Services.Games;
+using Api.Services.Payments;
+using api.Services.Price;
+using Api.Services.Users;
 using api.Settings;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -60,10 +66,16 @@ builder.Services.AddAuthentication("JwtAuth")
 
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 
-builder.Services.AddSingleton<PasswordService>();
+builder.Services.AddSingleton<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ISeeder, Seeder>();
-builder.Services.AddScoped<TokenService>();
-builder.Services.AddScoped<MainService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPriceService, PriceService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IBoardService, BoardService>();
+builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IGameManager, GameManager>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
 

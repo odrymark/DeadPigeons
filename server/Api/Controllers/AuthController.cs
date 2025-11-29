@@ -2,6 +2,7 @@
 using Api.DTOs;
 using Api.DTOs.Response;
 using Api.Services;
+using Api.Services.Auth;
 using api.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(MainService service, IOptions<AuthSettings> options) : ControllerBase
+public class AuthController(IAuthService service, IOptions<AuthSettings> options) : ControllerBase
 {
     private readonly AuthSettings _settings = options.Value;
     private double JwtExpireMinutes => _settings.JwtExpireMinutes;
