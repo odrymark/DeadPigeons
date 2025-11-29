@@ -411,6 +411,34 @@ export class Api<
      * No description
      *
      * @tags Boards
+     * @name BoardsGetCurrBoardsForUser
+     * @request GET:/api/boards/getCurrBoardsForUser
+     */
+    boardsGetCurrBoardsForUser: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/boards/getCurrBoardsForUser`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Boards
+     * @name BoardsGetPrevBoardsForUser
+     * @request GET:/api/boards/getPrevBoardsForUser
+     */
+    boardsGetPrevBoardsForUser: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/boards/getPrevBoardsForUser`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Boards
      * @name BoardsAddBoard
      * @request POST:/api/boards/addBoard
      */
@@ -482,6 +510,34 @@ export class Api<
     gamesGetGameIncome: (params: RequestParams = {}) =>
       this.request<File, any>({
         path: `/api/games/getGameIncome`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Games
+     * @name GamesGetCurrGameClosing
+     * @request GET:/api/games/getCurrGameClosing
+     */
+    gamesGetCurrGameClosing: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/games/getCurrGameClosing`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Games
+     * @name GamesGetLastGameNums
+     * @request GET:/api/games/getLastGameNums
+     */
+    gamesGetLastGameNums: (params: RequestParams = {}) =>
+      this.request<File, any>({
+        path: `/api/games/getLastGameNums`,
         method: "GET",
         ...params,
       }),

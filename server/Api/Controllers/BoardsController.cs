@@ -29,6 +29,26 @@ public class BoardsController(IBoardService service) : ControllerBase
         var boards = await service.GetBoards(null, username);
         return Ok(boards);
     }
+
+    [HttpGet("getCurrBoardsForUser")]
+    [Authorize]
+    public async Task<ActionResult> GetCurrBoardsForUser()
+    {
+        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var id = Guid.Parse(idStr!);
+        var boards = await service.GetCurrGameUserBoards(id);
+        return Ok(boards);
+    }
+
+    [HttpGet("getPrevBoardsForUser")]
+    [Authorize]
+    public async Task<ActionResult> GetPrevBoardsForUser()
+    {
+        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var id = Guid.Parse(idStr!);
+        var boards = await service.GetPrevGameUserBoards(id);
+        return Ok(boards);
+    }
     
     [HttpPost("addBoard")]
     [Authorize]

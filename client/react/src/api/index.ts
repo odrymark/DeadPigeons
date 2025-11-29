@@ -38,11 +38,15 @@ export type WinnersGet = {
     winningBoardsNum: number;
 }
 
-export type GamesGet = {
+export type GameGet = {
     createdAt: string;
     winningNums: number[];
     income: number;
     winners: WinnersGet[];
+}
+
+export type CurrGameCloseGet = {
+    closeDate: string;
 }
 
 export type PaymentGet = {
@@ -288,7 +292,7 @@ export async function handleGetUserInfo(username: string) : Promise<UserInfoGet 
     }
 }
 
-export async function handleGetAllGames() : Promise<GamesGet[] | null> {
+export async function handleGetAllGames() : Promise<GameGet[] | null> {
     try {
         return await apiRequest((opts) => defApi.api.gamesGetAllGames(opts));
     }
@@ -305,5 +309,46 @@ export async function handleApprovePayment(payment: PaymentApprovePost) {
     }
     catch (error) {
         console.log("Failed to approve payment: "+error);
+    }
+}
+
+export async function handleGetCurrGameClosing() : Promise<CurrGameCloseGet | null> {
+    try {
+        const res =  await apiRequest((opts) => defApi.api.gamesGetCurrGameClosing(opts));
+        return res as CurrGameCloseGet;
+    }
+    catch (error) {
+        console.log("Failed to get current game closing: "+error);
+        return null;
+    }
+}
+
+export async function handleGetLastGameNums() : Promise<number[]> {
+    try {
+        return await apiRequest((opts) => defApi.api.gamesGetLastGameNums(opts));
+    }
+    catch (error) {
+        console.log("Failed to get last game nums: "+error);
+        return [];
+    }
+}
+
+export async function handleGetCurrBoardsForUser() : Promise<BoardGet[]> {
+    try {
+        return await apiRequest((opts) => defApi.api.boardsGetCurrBoardsForUser(opts));
+    }
+    catch (error) {
+        console.log("Failed to get boards for user: "+error);
+        return [];
+    }
+}
+
+export async function handleGetPrevBoardsForUser() : Promise<BoardGet[]> {
+    try {
+        return await apiRequest((opts) => defApi.api.boardsGetPrevBoardsForUser(opts));
+    }
+    catch (error) {
+        console.log("Failed to get boards for user: "+error);
+        return [];
     }
 }

@@ -25,6 +25,46 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
             .Where(b => b.repeats > 0)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<BoardResDTO>> GetCurrGameUserBoards(Guid userId)
+    {
+        var game = await gameService.GetActiveGame();
+        if (game == null)
+            throw new Exception("No active game found");
+
+        var boards = await context.Boards
+            .Where(b => b.gameId == game.id && b.userId == userId)
+            .Select(b => new BoardResDTO
+            {
+                id = b.id,
+                numbers = b.numbers,
+                createdAt = b.createdAt,
+                repeats = b.repeats,
+                isWinner = b.isWinner
+            })
+            .ToListAsync();
+
+        return boards;
+    }
+
+    public async Task<IEnumerable<BoardResDTO>> GetPrevGameUserBoards(Guid userId)
+    {
+        var lastGame = await gameService.GetLastGame();
+
+        var boards = await context.Boards
+            .Where(b => b.gameId == lastGame.id && b.userId == userId)
+            .Select(b => new BoardResDTO
+            {
+                id = b.id,
+                numbers = b.numbers,
+                createdAt = b.createdAt,
+                repeats = b.repeats,
+                isWinner = b.isWinner
+            })
+            .ToListAsync();
+
+        return boards;
+    }
     
     public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid? id, string? username)
     {
