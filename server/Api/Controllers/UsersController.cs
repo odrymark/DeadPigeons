@@ -1,5 +1,6 @@
 ﻿using Api.DTOs;
 using Api.Services;
+using Api.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UsersController(MainService service) : ControllerBase
+public class UsersController(IUserService service) : ControllerBase
 {
     [HttpPost("addUser")]
     [Authorize(Roles = "Admin")]

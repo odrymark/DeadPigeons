@@ -3,12 +3,13 @@ using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Api.DTOs;
+using Api.Services.Boards;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/boards")]
-public class BoardsController(MainService service) : ControllerBase
+public class BoardsController(IBoardService service) : ControllerBase
 {
     [HttpGet("getBoards")]
     [Authorize]

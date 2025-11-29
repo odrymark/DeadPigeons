@@ -3,12 +3,13 @@ using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Api.DTOs;
+using Api.Services.Payments;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/payments")]
-public class PaymentsController(MainService service) : ControllerBase
+public class PaymentsController(IPaymentService service) : ControllerBase
 {
     [HttpGet("getPayments")]
     [Authorize]
@@ -33,10 +34,9 @@ public class PaymentsController(MainService service) : ControllerBase
     [Authorize]
     public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentAddReqDto)
     {
-        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var id = Guid.Parse(idStr!);
+        var username = User.Identity!.Name!;
             
-        await service.AddPayment(paymentAddReqDto, id);
+        await service.AddPayment(paymentAddReqDto, username);
         return Ok();
     }
     

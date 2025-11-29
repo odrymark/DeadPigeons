@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Api.DTOs;
+using Api.Services.Games;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/games")]
-public class GamesController(MainService service) : ControllerBase
+public class GamesController(IGameManager manager, IGameService service) : ControllerBase
 {
     [HttpGet("getAllGames")]
     [Authorize(Roles = "Admin")]
@@ -21,7 +22,7 @@ public class GamesController(MainService service) : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> AddWinningNumbers([FromBody] WinningNumsReqDTO winningNumsReqDto)
     {
-        await service.AddWinningNumbers(winningNumsReqDto);
+        await manager.AddWinningNumbers(winningNumsReqDto);
         return Ok();
     }
     

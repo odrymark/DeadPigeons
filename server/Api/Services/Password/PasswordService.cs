@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Api.Services;
 
-public class PasswordService
+public class PasswordService : IPasswordService
 {
     private readonly PasswordHasher<object> _hasher = new();
 
