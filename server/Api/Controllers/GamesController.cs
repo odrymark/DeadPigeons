@@ -33,4 +33,20 @@ public class GamesController(IGameManager manager, IGameService service) : Contr
         int income = await service.GetGameIncome();
         return Ok(income);
     }
+
+    [HttpGet("getCurrGameClosing")]
+    [Authorize]
+    public async Task<ActionResult> GetCurrGameClosing()
+    {
+        var res = await service.GetCurrGameClosing();
+        return Ok(res);
+    }
+
+    [HttpGet("getLastGameNums")]
+    [Authorize]
+    public async Task<ActionResult> GetLastGameNums()
+    {
+        var res = await service.GetLastGameNums();
+        return Ok(res);
+    }
 }

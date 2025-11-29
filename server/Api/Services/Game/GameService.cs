@@ -8,12 +8,44 @@ namespace Api.Services.Games;
 public class GameService(PigeonsDbContext context) : IGameService
 {
     public async Task<Game?> GetActiveGame()
-        => await context.Games
+    {
+        return await context.Games
             .Include(g => g.winners)
             .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+    }
+    
+    public async Task<GameCloseResDTO> GetCurrGameClosing()
+    {
+        var currGame = await context.Games
+            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+        
+        if (currGame == null)
+            throw new Exception("No active game found");
 
-    public async Task Save()
-        => await context.SaveChangesAsync();
+        return new  GameCloseResDTO
+        {
+            closeDate = currGame.openUntil
+        };
+    }
+        
+    public async Task<IEnumerable<int>> GetLastGameNums()
+    {
+        var game = await GetLastGame();
+        return game.numbers;
+    }
+
+    public async Task<Game> GetLastGame()
+    {
+        var game = await context.Games
+            .OrderByDescending(g => g.createdAt)
+            .Skip(1)
+            .FirstOrDefaultAsync();
+        
+        if (game == null)
+            throw new Exception("No active game found");
+        
+        return game;
+    }
     
     public Game CreateNextGame(DateTime openUntilUtc)
     {

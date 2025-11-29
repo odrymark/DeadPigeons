@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { type GamesGet, handleGetAllGames } from "../../api";
+import { type GameGet, handleGetAllGames } from "../../api";
 
 function getWeekNumber(date: Date): number {
     const d = new Date(date);
@@ -12,7 +12,7 @@ function getWeekNumber(date: Date): number {
 }
 
 export default function GameHistory() {
-    const [games, setGames] = useState<GamesGet[]>([]);
+    const [games, setGames] = useState<GameGet[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {

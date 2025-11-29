@@ -11,6 +11,7 @@ import GameHistory from "./pages/admin/GameHistory.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
 import UserHistory from "./pages/admin/UserHistory.tsx";
 import ApprovePay from "./pages/admin/ApprovePay.tsx";
+import MainPage from "./pages/HomePage.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -25,6 +26,10 @@ const routes : RouteObject[] = [
         path: "/dashboard",
         element: <Dashboard/>,
         children: [
+            {
+                path: "/dashboard/",
+                element: <MainPage/>
+            },
             {
                 path: "buyBoard",
                 element: <BuyBoard/>

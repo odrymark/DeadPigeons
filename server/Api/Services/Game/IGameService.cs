@@ -9,4 +9,7 @@ public interface IGameService
     Game CreateNextGame(DateTime openUntilUtc);
     Task<IEnumerable<GameResDTO>> GetAllGames();
     Task<int> GetGameIncome();
+    Task<GameCloseResDTO> GetCurrGameClosing();
+    Task<Game> GetLastGame();
+    Task<IEnumerable<int>> GetLastGameNums();
 }
