@@ -69,6 +69,7 @@ public class AuthService(ITokenService tokenService, IPasswordService passwordSe
     public async Task Logout(string refreshToken)
     {
         var user = await context.Users
+            .AsTracking()
             .FirstOrDefaultAsync(u => u.refreshToken == passwordService.HashRefreshToken(refreshToken));
         if (user == null)
             throw new Exception("User not found");

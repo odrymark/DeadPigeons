@@ -9,10 +9,13 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 using Xunit;
+using Xunit.DependencyInjection;
 
-public class BoardTest
+namespace Test.ServiceTests.BoardTests;
+
+[Startup(typeof(BoardStartup))]
+public class BoardTest : TestBase
 {
-    private readonly PigeonsDbContext _db;
     private readonly IBoardService _boardService;
     private readonly IPaymentService _paymentService;
     private readonly IPriceService _priceService;
@@ -25,16 +28,13 @@ public class BoardTest
         IPaymentService payment,
         IPriceService price,
         IUserService users,
-        IGameService games)
+        IGameService games) : base(db)
     {
-        _db = db;
         _boardService = service;
         _paymentService = payment;
         _priceService = price;
         _userService = users;
         _gameService = games;
-
-        db.Database.EnsureCreated();
     }
 
     // ----------------------------------------------------
@@ -44,19 +44,12 @@ public class BoardTest
     [Fact]
     public async Task GetBoardsForGame_Returns_List()
     {
-        var gameId = Guid.NewGuid();
+        var game = await CreateGameAsync();
+        var user = await CreateUserAsync();
 
-        await _db.Boards.AddAsync(new Board
-        {
-            id = Guid.NewGuid(),
-            gameId = gameId,
-            userId = Guid.NewGuid(),
-            numbers = [1, 2, 3]
-        });
+        await CreateBoardAsync(user.id, game.id);
 
-        await _db.SaveChangesAsync();
-
-        var result = await _boardService.GetBoardsForGame(gameId);
+        var result = await _boardService.GetBoardsForGame(game.id);
 
         Assert.Single(result);
     }
@@ -68,12 +61,12 @@ public class BoardTest
     [Fact]
     public async Task GetRepeatBoards_Returns_Only_Repeaters()
     {
-        await _db.Boards.AddRangeAsync(
-            new Board { id = Guid.NewGuid(), repeats = 2 },
-            new Board { id = Guid.NewGuid(), repeats = 0 }
-        );
+        var game = await CreateGameAsync();
+        var user1 = await CreateUserAsync("user1");
+        var user2 = await CreateUserAsync("user2");
 
-        await _db.SaveChangesAsync();
+        await CreateBoardAsync(user1.id, game.id, repeats: 2);
+        await CreateBoardAsync(user2.id, game.id, repeats: 0);
 
         var result = await _boardService.GetRepeatBoards();
 
@@ -87,26 +80,14 @@ public class BoardTest
     [Fact]
     public async Task GetCurrGameUserBoards_Returns_Boards()
     {
-        var userId = Guid.NewGuid();
-        var game = new Game
-        {
-            id = Guid.NewGuid(),
-            openUntil = DateTime.UtcNow.AddDays(1)
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
         _gameService.GetActiveGame().Returns(game);
 
-        await _db.Boards.AddAsync(new Board
-        {
-            id = Guid.NewGuid(),
-            gameId = game.id,
-            userId = userId,
-            numbers = [1, 2, 3]
-        });
+        await CreateBoardAsync(user.id, game.id);
 
-        await _db.SaveChangesAsync();
-
-        var result = await _boardService.GetCurrGameUserBoards(userId);
+        var result = await _boardService.GetCurrGameUserBoards(user.id);
 
         Assert.Single(result);
     }
@@ -127,22 +108,14 @@ public class BoardTest
     [Fact]
     public async Task GetPrevGameUserBoards_Returns_Boards()
     {
-        var userId = Guid.NewGuid();
-        var game = new Game { id = Guid.NewGuid() };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
         _gameService.GetLastGame().Returns(game);
 
-        await _db.Boards.AddAsync(new Board
-        {
-            id = Guid.NewGuid(),
-            gameId = game.id,
-            userId = userId,
-            numbers = [4, 5, 6]
-        });
+        await CreateBoardAsync(user.id, game.id, numbers: new List<int> { 4, 5, 6 });
 
-        await _db.SaveChangesAsync();
-
-        var result = await _boardService.GetPrevGameUserBoards(userId);
+        var result = await _boardService.GetPrevGameUserBoards(user.id);
 
         Assert.Single(result);
     }
@@ -154,18 +127,12 @@ public class BoardTest
     [Fact]
     public async Task GetBoards_ByUserId_Returns()
     {
-        var userId = Guid.NewGuid();
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
-        await _db.Boards.AddAsync(new Board
-        {
-            id = Guid.NewGuid(),
-            userId = userId,
-            numbers = [7, 8, 9]
-        });
+        await CreateBoardAsync(user.id, game.id, numbers: new List<int> { 7, 8, 9 });
 
-        await _db.SaveChangesAsync();
-
-        var result = await _boardService.GetBoards(userId, null);
+        var result = await _boardService.GetBoards(user.id, null);
 
         Assert.Single(result);
     }
@@ -173,24 +140,12 @@ public class BoardTest
     [Fact]
     public async Task GetBoards_ByUsername_Returns()
     {
-        var userId = Guid.NewGuid();
+        var user = await CreateUserAsync("bob");
+        var game = await CreateGameAsync();
 
-        var testUser = new User
-        {
-            id = userId,
-            username = "bob"
-        };
+        _userService.GetUserByName("bob").Returns(user);
 
-        _userService.GetUserByName("bob").Returns(testUser);
-
-        await _db.Boards.AddAsync(new Board
-        {
-            id = Guid.NewGuid(),
-            userId = userId,
-            numbers = [1, 1, 1]
-        });
-
-        await _db.SaveChangesAsync();
+        await CreateBoardAsync(user.id, game.id, numbers: new List<int> { 1, 1, 1 });
 
         var result = await _boardService.GetBoards(null, "bob");
 
@@ -204,15 +159,11 @@ public class BoardTest
     [Fact]
     public async Task AddBoard_Adds_When_Valid()
     {
-        var userId = Guid.NewGuid();
-        var game = new Game
-        {
-            id = Guid.NewGuid(),
-            openUntil = DateTime.UtcNow.AddHours(1)
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
         _gameService.GetActiveGame().Returns(game);
-        _paymentService.GetBalance(userId).Returns(100);
+        _paymentService.GetBalance(user.id).Returns(100);
         _priceService.GetPrice(Arg.Any<int>()).Returns(10);
 
         var req = new BoardReqDTO
@@ -221,9 +172,9 @@ public class BoardTest
             repeats = 0
         };
 
-        await _boardService.AddBoard(req, userId, null);
+        await _boardService.AddBoard(req, user.id, null);
 
-        Assert.Equal(1, _db.Boards.Count());
+        Assert.Equal(1, await Db.Boards.CountAsync());
     }
 
     [Fact]
@@ -240,39 +191,31 @@ public class BoardTest
     [Fact]
     public async Task AddBoard_Throws_When_InsufficientBalance()
     {
-        var userId = Guid.NewGuid();
-        var game = new Game
-        {
-            id = Guid.NewGuid(),
-            openUntil = DateTime.UtcNow.AddHours(1)
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
         _gameService.GetActiveGame().Returns(game);
-        _paymentService.GetBalance(userId).Returns(1);
+        _paymentService.GetBalance(user.id).Returns(1);
         _priceService.GetPrice(3).Returns(50);
 
         var req = new BoardReqDTO { numbers = [1, 2, 3] };
 
         await Assert.ThrowsAsync<Exception>(() =>
-            _boardService.AddBoard(req, userId, null));
+            _boardService.AddBoard(req, user.id, null));
     }
 
     [Fact]
     public async Task AddBoard_Throws_When_GameClosed()
     {
-        var userId = Guid.NewGuid();
-        var game = new Game
-        {
-            id = Guid.NewGuid(),
-            openUntil = DateTime.UtcNow.AddHours(-1)
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync(isOpen: false);
 
         _gameService.GetActiveGame().Returns(game);
 
         var req = new BoardReqDTO { numbers = [1, 2, 3] };
 
         await Assert.ThrowsAsync<Exception>(() =>
-            _boardService.AddBoard(req, userId, null));
+            _boardService.AddBoard(req, user.id, null));
     }
 
     // ----------------------------------------------------
@@ -282,20 +225,15 @@ public class BoardTest
     [Fact]
     public async Task EndRepeat_Sets_Repeats_ToZero()
     {
-        var userId = Guid.NewGuid();
-        var board = new Board
-        {
-            id = Guid.NewGuid(),
-            userId = userId,
-            repeats = 5
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
-        await _db.Boards.AddAsync(board);
-        await _db.SaveChangesAsync();
+        var board = await CreateBoardAsync(user.id, game.id, repeats: 5);
 
-        await _boardService.EndRepeat(board.id.ToString(), userId);
+        await _boardService.EndRepeat(board.id.ToString(), user.id);
 
-        Assert.Equal(0, board.repeats);
+        var updatedBoard = await Db.Boards.FindAsync(board.id);
+        Assert.Equal(0, updatedBoard.repeats);
     }
 
     [Fact]
@@ -308,14 +246,10 @@ public class BoardTest
     [Fact]
     public async Task EndRepeat_Throws_NotOwner()
     {
-        var board = new Board
-        {
-            id = Guid.NewGuid(),
-            userId = Guid.NewGuid()
-        };
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
 
-        await _db.Boards.AddAsync(board);
-        await _db.SaveChangesAsync();
+        var board = await CreateBoardAsync(user.id, game.id);
 
         await Assert.ThrowsAsync<Exception>(() =>
             _boardService.EndRepeat(board.id.ToString(), Guid.NewGuid()));

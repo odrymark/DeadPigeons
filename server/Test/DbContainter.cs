@@ -1,4 +1,7 @@
 ﻿using Testcontainers.PostgreSql;
+using Xunit;
+
+namespace Test;
 
 public class DbContainer : IAsyncLifetime
 {
@@ -12,7 +15,7 @@ public class DbContainer : IAsyncLifetime
             .WithPassword("test")
             .Build();
     }
-
-    public Task InitializeAsync() => Container.StartAsync();
-    public Task DisposeAsync() => Container.DisposeAsync().AsTask();
+    
+    public async ValueTask InitializeAsync() => await Container.StartAsync();
+    public async ValueTask DisposeAsync() => await Container.DisposeAsync().AsTask();
 }

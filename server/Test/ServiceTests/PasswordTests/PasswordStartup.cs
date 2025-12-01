@@ -3,6 +3,8 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace Test.ServiceTests.PasswordTests;
+
 public class PasswordStartup
 {
     private static DbContainer? _container;

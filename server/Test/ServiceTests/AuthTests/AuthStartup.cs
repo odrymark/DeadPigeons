@@ -1,9 +1,11 @@
-﻿using Api.Services.Auth;
-using Api.Services;
+﻿using Api.Services;
+using Api.Services.Auth;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+
+namespace Test.ServiceTests.AuthTests;
 
 public class AuthStartup
 {
@@ -24,16 +26,16 @@ public class AuthStartup
         
         var tokenMock = Substitute.For<ITokenService>();
         tokenMock.GenerateToken(Arg.Any<User>())
-                 .Returns("jwt_token");
+            .Returns("jwt_token");
 
         tokenMock.GenerateRefreshToken()
-                 .Returns("refresh_token_new");
+            .Returns("refresh_token_new");
 
         var passwordMock = Substitute.For<IPasswordService>();
         passwordMock.HashRefreshToken(Arg.Any<string>())
-                    .Returns(ci => "HASH_" + ci.Arg<string>());
+            .Returns(ci => "HASH_" + ci.Arg<string>());
         passwordMock.VerifyHashedPassword(Arg.Any<string>(), Arg.Any<string>())
-                    .Returns(true);
+            .Returns(true);
 
         services.AddSingleton(tokenMock);
         services.AddSingleton(passwordMock);

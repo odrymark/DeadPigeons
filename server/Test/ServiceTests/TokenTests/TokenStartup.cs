@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace Test.ServiceTests.TokenTests;
+
 public class TokenStartup
 {
     private static DbContainer? _container;
@@ -21,11 +23,13 @@ public class TokenStartup
         services.AddDbContext<PigeonsDbContext>(options =>
             options.UseNpgsql(_container.Container.GetConnectionString()));
 
-        // Provide configuration for JWT
+        var key = new byte[64];
+        new Random().NextBytes(key);
+        var jwtKey = Convert.ToBase64String(key);
         var config = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["JWT_KEY"] = Convert.ToBase64String(Guid.NewGuid().ToByteArray()),
+                ["JWT_KEY"] = jwtKey,
                 ["JWT_ISSUER"] = "test_issuer",
                 ["JWT_AUDIENCE"] = "test_audience",
                 ["JWT_EXPIREMINUTES"] = "15"
