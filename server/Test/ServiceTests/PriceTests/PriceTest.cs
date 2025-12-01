@@ -1,8 +1,11 @@
 ﻿using api.Services.Price;
 using DataAccess;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
+using Xunit.DependencyInjection;
 
+namespace Test.ServiceTests.PriceTests;
+
+[Startup(typeof(PriceStartup))]
 public class PriceTest
 {
     private readonly IPriceService _priceService;

@@ -1,19 +1,20 @@
-﻿using Api.Services;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Api.Services;
 using DataAccess;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Xunit;
-using System;
-using System.Linq;
-using System.IdentityModel.Tokens.Jwt;
+using Xunit.DependencyInjection;
 
-public class TokenTest
+namespace Test.ServiceTests.TokenTests;
+
+[Startup(typeof(TokenStartup))]
+public class TokenTest : TestBase
 {
     private readonly TokenService _tokenService;
     private readonly PigeonsDbContext _db;
     private readonly IConfiguration _config;
 
-    public TokenTest(TokenService tokenService, PigeonsDbContext db, IConfiguration config)
+    public TokenTest(TokenService tokenService, PigeonsDbContext db, IConfiguration config) : base(db)
     {
         _tokenService = tokenService;
         _db = db;
@@ -51,14 +52,9 @@ public class TokenTest
     // --------------------------------------------------------
 
     [Fact]
-    public void GenerateToken_Creates_Valid_JWT()
+    public async Task GenerateToken_Creates_Valid_JWT()
     {
-        var user = new User
-        {
-            id = Guid.NewGuid(),
-            username = "john",
-            isAdmin = true
-        };
+        var user = await CreateUserAsync(isAdmin: true);
 
         var jwt = _tokenService.GenerateToken(user);
 
@@ -74,7 +70,7 @@ public class TokenTest
     }
 
     [Fact]
-    public void GenerateToken_Throws_When_KeyMissing()
+    public async Task GenerateToken_Throws_When_KeyMissing()
     {
         var badConfig = new ConfigurationBuilder()
             .AddInMemoryCollection() // no JWT_KEY
@@ -82,13 +78,13 @@ public class TokenTest
 
         var service = new TokenService(badConfig);
 
-        var user = new User { id = Guid.NewGuid(), username = "test" };
+        var user = await CreateUserAsync();
 
         Assert.Throws<ArgumentNullException>(() => service.GenerateToken(user));
     }
 
     [Fact]
-    public void GenerateToken_Throws_When_ExpireMinutes_Invalid()
+    public async Task GenerateToken_Throws_When_ExpireMinutes_Invalid()
     {
         var badConfig = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -102,7 +98,7 @@ public class TokenTest
 
         var service = new TokenService(badConfig);
 
-        var user = new User { id = Guid.NewGuid(), username = "abc" };
+        var user = await CreateUserAsync();
 
         Assert.Throws<FormatException>(() => service.GenerateToken(user));
     }

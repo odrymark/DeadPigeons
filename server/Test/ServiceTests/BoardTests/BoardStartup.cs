@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
+namespace Test.ServiceTests.BoardTests;
+
 public class BoardStartup
 {
     private static DbContainer? _container;

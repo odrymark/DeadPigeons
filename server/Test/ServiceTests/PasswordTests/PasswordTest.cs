@@ -1,7 +1,10 @@
 ﻿using Api.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
+using Xunit.DependencyInjection;
 
+namespace Test.ServiceTests.PasswordTests;
+
+[Startup(typeof(PasswordStartup))]
 public class PasswordTest
 {
     private readonly IPasswordService _service;
@@ -24,7 +27,6 @@ public class PasswordTest
         Assert.False(string.IsNullOrWhiteSpace(hash1));
         Assert.False(string.IsNullOrWhiteSpace(hash2));
 
-        // Should be DIFFERENT because Identity uses random salt
         Assert.NotEqual(hash1, hash2);
     }
 
@@ -70,7 +72,7 @@ public class PasswordTest
         var hash = _service.HashRefreshToken("abcd1234");
 
         Assert.False(string.IsNullOrWhiteSpace(hash));
-        Assert.Equal(64, hash.Length); // 32 bytes → 64 hex chars
+        Assert.Equal(64, hash.Length);
     }
 
     [Fact]

@@ -2,26 +2,27 @@
 using Api.Services;
 using Api.Services.Auth;
 using DataAccess;
-using Microsoft.EntityFrameworkCore;
 using NSubstitute;
+using Test.ServiceTests; // For TestBase
 using Xunit;
+using Xunit.DependencyInjection;
 
-public class AuthServiceTests
+namespace Test.ServiceTests.AuthTests;
+
+[Startup(typeof(AuthStartup))]
+public class AuthServiceTests : TestBase
 {
-    private readonly PigeonsDbContext _db;
     private readonly IAuthService _authService;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
 
     public AuthServiceTests(PigeonsDbContext db, IAuthService authService,
         IPasswordService passwordService, ITokenService tokenService)
+        : base(db)
     {
-        _db = db;
         _authService = authService;
         _passwordService = passwordService;
         _tokenService = tokenService;
-
-        db.Database.EnsureCreated();
     }
 
     // -------------------------
@@ -31,19 +32,17 @@ public class AuthServiceTests
     [Fact]
     public async Task AuthenticateUser_Returns_Token_When_Valid()
     {
-        var user = new User
-        {
-            username = "test",
-            password = "hashed_pw",
-            isAdmin = false
-        };
+        string username = "test_auth_valid_" + Guid.NewGuid().ToString("N");
+        var user = await CreateUserAsync(username, password: "hashed_pw");
 
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        _passwordService.VerifyHashedPassword("hashed_pw", "password").Returns(true);
+        _tokenService.GenerateToken(user).Returns("jwt_token");
+        _tokenService.GenerateRefreshToken().Returns("refresh_token_new");
+        _passwordService.HashRefreshToken("refresh_token_new").Returns("HASH_refresh_token_new");
 
         var req = new UserLoginReqDTO
         {
-            username = "test",
+            username = username,
             password = "password"
         };
 
@@ -57,11 +56,12 @@ public class AuthServiceTests
     [Fact]
     public async Task AuthenticateUser_Throws_When_User_Not_Found()
     {
+        string ghostUsername = "ghost_" + Guid.NewGuid().ToString("N");
         await Assert.ThrowsAsync<Exception>(async () =>
         {
             await _authService.AuthenticateUser(new UserLoginReqDTO
             {
-                username = "ghost",
+                username = ghostUsername,
                 password = "password"
             });
         });
@@ -70,26 +70,16 @@ public class AuthServiceTests
     [Fact]
     public async Task AuthenticateUser_Throws_When_Password_Invalid()
     {
-        var user = new User
-        {
-            username = "test",
-            password = "pw_hash"
-        };
+        string username = "test_auth_invalid_pw_" + Guid.NewGuid().ToString("N");
+        var user = await CreateUserAsync(username, password: "pw_hash");
 
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
-
-        var mockPwd = Substitute.For<IPasswordService>();
-        mockPwd.VerifyHashedPassword(Arg.Any<string>(), Arg.Any<string>())
-               .Returns(false);
-
-        var badService = new AuthService(_tokenService, mockPwd, _db);
+        _passwordService.VerifyHashedPassword(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
 
         await Assert.ThrowsAsync<Exception>(async () =>
         {
-            await badService.AuthenticateUser(new UserLoginReqDTO
+            await _authService.AuthenticateUser(new UserLoginReqDTO
             {
-                username = "test",
+                username = username,
                 password = "incorrect"
             });
         });
@@ -102,17 +92,19 @@ public class AuthServiceTests
     [Fact]
     public async Task RefreshToken_Returns_NewTokens_When_Valid()
     {
-        var user = new User
-        {
-            username = "test",
-            refreshToken = "HASH_123",
-            refreshTokenExpiry = DateTime.UtcNow.AddDays(1)
-        };
+        string username = "test_refresh_valid_" + Guid.NewGuid().ToString("N");
+        string plainRefresh = "refresh_valid_" + Guid.NewGuid().ToString("N");
+        var user = await CreateUserAsync(username, password: "hashed_pw");
+        user.refreshToken = "HASH_" + plainRefresh;
+        user.refreshTokenExpiry = DateTime.UtcNow.AddDays(1);
+        await Db.SaveChangesAsync();
 
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        _passwordService.VerifyHashedPassword("HASH_" + plainRefresh, plainRefresh).Returns(true);
+        _tokenService.GenerateToken(user).Returns("jwt_token");
+        _tokenService.GenerateRefreshToken().Returns("refresh_token_new");
+        _passwordService.HashRefreshToken("refresh_token_new").Returns("HASH_refresh_token_new");
 
-        var (token, refresh) = await _authService.RefreshToken("123");
+        var (token, refresh) = await _authService.RefreshToken(plainRefresh);
 
         Assert.Equal("jwt_token", token);
         Assert.Equal("refresh_token_new", refresh);
@@ -121,25 +113,23 @@ public class AuthServiceTests
     [Fact]
     public async Task RefreshToken_Throws_When_Invalid()
     {
+        string invalidRefresh = "not_in_db_" + Guid.NewGuid().ToString("N");
         await Assert.ThrowsAsync<Exception>(() =>
-            _authService.RefreshToken("not_in_db"));
+            _authService.RefreshToken(invalidRefresh));
     }
 
     [Fact]
     public async Task RefreshToken_Throws_When_Expired()
     {
-        var user = new User
-        {
-            username = "test",
-            refreshToken = "HASH_123",
-            refreshTokenExpiry = DateTime.UtcNow.AddDays(-1)
-        };
-
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        string username = "test_refresh_expired_" + Guid.NewGuid().ToString("N");
+        string plainRefresh = "refresh_expired_" + Guid.NewGuid().ToString("N");
+        var user = await CreateUserAsync(username, password: "hashed_pw");
+        user.refreshToken = "HASH_" + plainRefresh;
+        user.refreshTokenExpiry = DateTime.UtcNow.AddDays(-1);
+        await Db.SaveChangesAsync();
 
         await Assert.ThrowsAsync<Exception>(() =>
-            _authService.RefreshToken("123"));
+            _authService.RefreshToken(plainRefresh));
     }
 
     // -------------------------
@@ -149,17 +139,18 @@ public class AuthServiceTests
     [Fact]
     public async Task Logout_Removes_RefreshToken_When_Valid()
     {
-        var user = new User
-        {
-            username = "test",
-            refreshToken = "HASH_123",
-            refreshTokenExpiry = DateTime.UtcNow.AddDays(5)
-        };
+        string username = "test_logout_" + Guid.NewGuid().ToString("N");
+        string plainRefresh = "refresh_logout_" + Guid.NewGuid().ToString("N");
+        var user = await CreateUserAsync(username, password: "hashed_pw");
+        user.refreshToken = "HASH_" + plainRefresh;
+        user.refreshTokenExpiry = DateTime.UtcNow.AddDays(5);
+        await Db.SaveChangesAsync();
 
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        _passwordService.VerifyHashedPassword("HASH_" + plainRefresh, plainRefresh).Returns(true);
 
-        await _authService.Logout("123");
+        await _authService.Logout(plainRefresh);
+
+        await Db.Entry(user).ReloadAsync();
 
         Assert.Null(user.refreshToken);
         Assert.Null(user.refreshTokenExpiry);
@@ -168,7 +159,8 @@ public class AuthServiceTests
     [Fact]
     public async Task Logout_Throws_When_User_Not_Found()
     {
+        string invalidRefresh = "invalid_" + Guid.NewGuid().ToString("N");
         await Assert.ThrowsAsync<Exception>(() =>
-            _authService.Logout("invalid"));
+            _authService.Logout(invalidRefresh));
     }
 }
