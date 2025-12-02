@@ -3,7 +3,6 @@ using Api.Services;
 using Api.Services.Auth;
 using DataAccess;
 using NSubstitute;
-using Test.ServiceTests; // For TestBase
 using Xunit;
 using Xunit.DependencyInjection;
 

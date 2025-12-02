@@ -37,12 +37,12 @@ public class GameService(PigeonsDbContext context) : IGameService
     public async Task<Game> GetLastGame()
     {
         var game = await context.Games
+            .Where(g => g.numbers.Any())
             .OrderByDescending(g => g.createdAt)
-            .Skip(1)
             .FirstOrDefaultAsync();
         
         if (game == null)
-            throw new Exception("No active game found");
+            throw new Exception("No previous game found");
         
         return game;
     }
