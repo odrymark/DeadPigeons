@@ -1,4 +1,4 @@
-name: Build and test
+name: CI/CD Pipeline
 on:
   push:
     branches: ["main"]
@@ -11,7 +11,7 @@ jobs:
   # ============================
   # REACT
   # ============================
-  frontend_build_test_job:
+  frontend_build_job:
     runs-on: ubuntu-latest
     name: Frontend build job
 
@@ -33,6 +33,26 @@ jobs:
         run: |
           cd client/react
           npm run build
+
+  frontend_deploy_job:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Deploy Frontend to Fly.io
+    needs: frontend_build_job
+    concurrency: frontend-deploy-group
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy Frontend
+        run: |
+          cd client/react
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_FRONTEND_TOKEN }}
 
   # ============================
   # API
@@ -58,3 +78,23 @@ jobs:
 
       - name: Test backend
         run: dotnet test ./server/api.sln --no-build --configuration Release --verbosity normal
+
+  backend_deploy_job:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Deploy Backend to Fly.io
+    needs: backend_build_test_job
+    concurrency: backend-deploy-group
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy Backend
+        run: |
+          cd server
+          flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_BACKEND_TOKEN }}
