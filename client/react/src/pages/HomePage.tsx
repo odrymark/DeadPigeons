@@ -62,7 +62,7 @@ export default function MainPage() {
                     {/* Current Boards */}
                     <div className="w-full">
                         <h2 className="text-xl font-bold mb-3 text-center lg:text-left">
-                            Your currently playing boards: (Deployed from git)
+                            Your currently playing boards:
                         </h2>
 
                         <div className="border rounded-xl p-4 shadow">
