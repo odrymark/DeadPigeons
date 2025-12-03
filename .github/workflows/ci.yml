@@ -57,4 +57,4 @@ jobs:
         run: dotnet build ./server/api.sln --no-restore --configuration Release
 
       - name: Test backend
-        run: dotnet test ./server/api.sln --no-build --verbosity normal
+        run: dotnet test ./server/api.sln --no-build --configuration Release --verbosity normal
