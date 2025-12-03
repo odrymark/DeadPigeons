@@ -18,6 +18,8 @@ builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("Auth"));
 
+Console.WriteLine("Deployed from git");
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
