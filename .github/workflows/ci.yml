@@ -1,0 +1,60 @@
+name: Build and test
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: ["main"]
+
+jobs:
+
+  # ============================
+  # REACT
+  # ============================
+  frontend_build_test_job:
+    runs-on: ubuntu-latest
+    name: Frontend build job
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install React dependencies
+        run: |
+          cd client/react
+          npm install
+
+      - name: Build React app
+        run: |
+          cd client/react
+          npm run build
+
+  # ============================
+  # API
+  # ============================
+  backend_build_test_job:
+    runs-on: ubuntu-latest
+    name: Backend build & test job
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore backend
+        run: dotnet restore ./server/api.sln
+
+      - name: Build backend
+        run: dotnet build ./server/api.sln --no-restore --configuration Release
+
+      - name: Test backend
+        run: dotnet test ./server/api.sln --no-build --configuration Release --verbosity normal
