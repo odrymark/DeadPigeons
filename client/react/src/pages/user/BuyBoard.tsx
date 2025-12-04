@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import {handleAddBoard, handleGetBalance} from "../../api";
+import {apiService} from "../../api";
 import {useState} from "react";
 import {balanceAtom} from "../../atoms/balanceAtom.ts";
 
@@ -28,9 +28,9 @@ export default function BuyBoard() {
             return;
         }
 
-        await handleAddBoard({numbers: selectedNumbers, repeats: repeatEnabled ? repeatCount : 0});
+        await apiService.addBoard({numbers: selectedNumbers, repeats: repeatEnabled ? repeatCount : 0});
 
-        const balance = await handleGetBalance();
+        const balance = await apiService.getBalance();
         setBalance(balance);
 
         setSelectedNumbers([]);

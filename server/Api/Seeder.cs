@@ -11,8 +11,7 @@ public class Seeder(PigeonsDbContext ctx) : ISeeder
 
         SeedAdminUser();
         SeedBaseGame();
-        SeedAdminBoard();
-
+        
         await ctx.SaveChangesAsync();
     }
 
@@ -63,28 +62,6 @@ public class Seeder(PigeonsDbContext ctx) : ISeeder
             };
 
             ctx.Games.Add(game);
-        }
-    }
-
-    private void SeedAdminBoard()
-    {
-        var admin = ctx.Users.FirstOrDefault(u => u.username == "admin");
-        var game = ctx.Games.FirstOrDefault();
-
-        if (admin == null || game == null)
-            return;
-
-        if (!ctx.Boards.Any(b => b.userId == admin.id))
-        {
-            ctx.Boards.Add(new Board
-            {
-                id = Guid.NewGuid(),
-                userId = admin.id,
-                gameId = game.id,
-                numbers = new List<int> { 1, 5, 12, 19, 23 },
-                createdAt = DateTime.UtcNow,
-                isWinner = false
-            });
         }
     }
 }

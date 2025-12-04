@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {handleGetWeekIncome} from "../../api";
+import {apiService} from "../../api";
 import {useEffect, useState} from "react";
 
 export default function AdminPage()
@@ -9,7 +9,7 @@ export default function AdminPage()
 
     useEffect(() => {
         (async () => {
-            const i = await handleGetWeekIncome();
+            const i = await apiService.getWeekIncome();
             setIncome(i);
         })();
     }, []);

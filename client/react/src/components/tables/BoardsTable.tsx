@@ -1,4 +1,4 @@
-import {type BoardGet, handleEndRepeat} from "../../api";
+import {type BoardGet, apiService} from "../../api";
 
 interface Props {
     boards: BoardGet[];
@@ -10,7 +10,7 @@ export default function BoardsTable({ boards }: Props) {
         const ok = confirm("Are you sure you want to clear repeats for this board?");
         if (!ok) return;
 
-        await handleEndRepeat(id);
+        await apiService.endRepeat(id);
     };
 
     return (

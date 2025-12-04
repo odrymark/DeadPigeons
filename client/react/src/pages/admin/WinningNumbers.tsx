@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {handleAddWinningNumbers} from "../../api";
+import {apiService} from "../../api";
 
 export default function AddWinningNumbers() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -22,7 +22,7 @@ export default function AddWinningNumbers() {
             return;
         }
 
-        await handleAddWinningNumbers(selectedNumbers);
+        await apiService.addWinningNumbers(selectedNumbers);
         setSelectedNumbers([]);
     };
 

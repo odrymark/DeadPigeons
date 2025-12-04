@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {handleGetPayments, type PaymentGet} from "../../api";
+import {apiService, type PaymentGet} from "../../api";
 import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
 
 export default function PrevPayments() {
@@ -7,7 +7,7 @@ export default function PrevPayments() {
 
     useEffect(() => {
         async function fetchBoards() {
-            const data = await handleGetPayments();
+            const data = await apiService.getPayments();
             if (data) setPayments(data);
         }
         fetchBoards();

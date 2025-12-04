@@ -1,10 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import BoardsTable from "../components/tables/BoardsTable";
 import { useEffect, useState } from "react";
-import {
-    type BoardGet, type CurrGameCloseGet,
-    handleGetCurrBoardsForUser, handleGetCurrGameClosing, handleGetLastGameNums, handleGetPrevBoardsForUser
-} from "../api";
+import {type BoardGet, type CurrGameCloseGet, apiService} from "../api";
 
 export default function MainPage() {
     const navigate = useNavigate();
@@ -23,10 +20,10 @@ export default function MainPage() {
                 cBoards,
                 pBoards
             ] = await Promise.all([
-                handleGetCurrGameClosing(),
-                handleGetLastGameNums(),
-                handleGetCurrBoardsForUser(),
-                handleGetPrevBoardsForUser()
+                apiService.getCurrentGameClosing(),
+                apiService.getLastGameNums(),
+                apiService.getCurrentBoardsForUser(),
+                apiService.getPreviousBoardsForUser()
             ]);
 
             setCurrGameClose(close);

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {type BoardGet, handleGetBoards} from "../../api";
+import {type BoardGet, apiService} from "../../api";
 import BoardsTable from "../../components/tables/BoardsTable.tsx";
 
 export default function PrevBoards() {
@@ -7,7 +7,7 @@ export default function PrevBoards() {
 
     useEffect(() => {
         async function fetchBoards() {
-            const data = await handleGetBoards();
+            const data = await apiService.getBoards();
             if (data) setBoards(data);
         }
         fetchBoards();

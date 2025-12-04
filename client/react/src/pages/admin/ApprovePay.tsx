@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { handleGetAllUsers, handleGetPayments, handleApprovePayment } from "../../api";
+import { apiService } from "../../api";
 import type { PaymentGet, PaymentApprovePost } from "../../api";
 
 export default function ApprovePay() {
@@ -11,7 +11,7 @@ export default function ApprovePay() {
 
     useEffect(() => {
         (async () => {
-            const u = await handleGetAllUsers();
+            const u = await apiService.getAllUsers();
             setUsers(u);
         })();
     }, []);
@@ -20,7 +20,7 @@ export default function ApprovePay() {
         if (!selectedUser) return;
 
         (async () => {
-            const allPayments = await handleGetPayments(selectedUser);
+            const allPayments = await apiService.getPayments(selectedUser);
             const pending = allPayments.filter(p => p.isApproved === undefined || p.isApproved === null);
             setPayments(pending);
         })();
@@ -53,7 +53,7 @@ export default function ApprovePay() {
             isApproved: approved,
         };
 
-        await handleApprovePayment(req);
+        await apiService.approvePayment(req);
 
         setPayments(p => {
             const updated = p.map(row =>
