@@ -2,7 +2,7 @@ import { useAtom } from "jotai";
 import { useNavigate, Outlet } from "react-router-dom";
 import { userAtom } from "../atoms/userAtom.ts";
 import { useEffect, useState } from "react";
-import { handleLogout, handleUserAuth, handleGetBalance } from "../api";
+import { apiService } from "../api";
 import logoutIcon from "../assets/logout.png";
 import homeIcon from "../assets/home.png";
 import { balanceAtom } from "../atoms/balanceAtom.ts";
@@ -21,11 +21,11 @@ export default function Dashboard() {
 
     useEffect(() => {
         (async () => {
-            const u = await handleUserAuth();
+            const u = await apiService.getCurrentUser();
             if (u) setUser(u);
             else navigate("/");
 
-            const bal = await handleGetBalance();
+            const bal = await apiService.getBalance();
             setBalance(bal);
         })();
     }, []);
@@ -74,7 +74,7 @@ export default function Dashboard() {
                         <button
                             className="btn btn-error btn-sm mt-2 w-fit flex items-center gap-2"
                             onClick={async () => {
-                                await handleLogout();
+                                await apiService.logout();
                                 navigate("/login");
                             }}
                         >

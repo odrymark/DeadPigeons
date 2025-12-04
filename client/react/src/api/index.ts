@@ -140,215 +140,199 @@ async function handleRefreshToken() : Promise<void> {
     return refreshPromise;
 }
 
-export async function handleUserLogin(user: UserLoginPost): Promise<UserGet | null> {
-    try {
-        return await apiRequest((opts) => defApi.api.authLogin(user, opts));
+class ApiService {
+    private api = defApi.api; // Encapsulate the API instance
+
+    private async _get<T>(
+        requestFunc: (opts?: RequestInit) => Promise<Response>,
+        defaultValue: T,
+        errorMsg: string
+    ): Promise<T> {
+        try {
+            return await apiRequest<T>(requestFunc);
+        } catch (error) {
+            console.log(`${errorMsg}: ${error}`);
+            return defaultValue;
+        }
     }
-    catch (error) {
-        console.log("Failed to login: "+error);
-        return null;
+
+    private async _action(
+        requestFunc: (opts?: RequestInit) => Promise<Response>,
+        successMsg: string,
+        errorMsg: string
+    ): Promise<void> {
+        try {
+            await apiRequest<unknown>(requestFunc);
+            if (successMsg) alert(successMsg);
+        } catch (error) {
+            console.log(`${errorMsg}: ${error}`);
+            if (successMsg) alert(`${errorMsg}: ${error}`);
+        }
+    }
+
+    async login(user: UserLoginPost): Promise<UserGet | null> {
+        return this._get(
+            (opts) => this.api.authLogin(user, opts),
+            null,
+            "Failed to login"
+        );
+    }
+
+    async logout(): Promise<void> {
+        return this._action(
+            (opts) => this.api.authLogout(opts),
+            "",
+            "Failed to logout"
+        );
+    }
+
+    async getCurrentUser(): Promise<UserGet | null> {
+        return this._get(
+            (opts) => this.api.authGetMe(opts),
+            null,
+            "Failed to authenticate user"
+        );
+    }
+
+    async getBoards(username?: string): Promise<BoardGet[]> {
+        return this._get(
+            (opts) => username
+                ? this.api.boardsGetBoardsAdmin({ username }, opts)
+                : this.api.boardsGetBoards(opts),
+            [],
+            "Failed to retrieve boards"
+        );
+    }
+
+    async getPayments(username?: string): Promise<PaymentGet[]> {
+        return this._get(
+            (opts) => username
+                ? this.api.paymentsGetPaymentsAdmin({ username }, opts)
+                : this.api.paymentsGetPayments(opts),
+            [],
+            "Failed to retrieve payments"
+        );
+    }
+
+    async getBalance(): Promise<number> {
+        return this._get(
+            (opts) => this.api.paymentsGetBalance(opts),
+            -1,
+            "Failed to retrieve balance"
+        );
+    }
+
+    async addBoard(board: BoardPost): Promise<void> {
+        return this._action(
+            (opts) => this.api.boardsAddBoard(board, opts),
+            "Board added successfully.",
+            "Failed to add board"
+        );
+    }
+
+    async endRepeat(id: string): Promise<void> {
+        return this._action(
+            (opts) => this.api.boardsEndRepeat(id, opts),
+            "Board updated successfully.",
+            "Failed to update board"
+        );
+    }
+
+    async addUser(user: UserAddPost): Promise<void> {
+        return this._action(
+            (opts) => this.api.usersAddUser(user, opts),
+            "User added successfully.",
+            "Failed to add user"
+        );
+    }
+
+    async getWeekIncome(): Promise<number> {
+        return this._get(
+            (opts) => this.api.gamesGetGameIncome(opts),
+            -1,
+            "Failed to retrieve week's income"
+        );
+    }
+
+    async addWinningNumbers(numbers: number[]): Promise<void> {
+        return this._action(
+            (opts) => this.api.gamesAddWinningNumbers({ numbers }, opts),
+            "Winning numbers added successfully.",
+            "Failed to add the winning numbers"
+        );
+    }
+
+    async addPayment(payment: PaymentAddPost): Promise<void> {
+        return this._action(
+            (opts) => this.api.paymentsAddPayment(payment, opts),
+            "Payment added successfully!",
+            "Failed to add payment"
+        );
+    }
+
+    async getAllUsers(): Promise<string[]> {
+        return this._get(
+            (opts) => this.api.usersGetAllUsers(opts),
+            [],
+            "Failed to get users"
+        );
+    }
+
+    async getUserInfo(username: string): Promise<UserInfoGet | null> {
+        return this._get(
+            (opts) => this.api.usersGetUserInfo({ username }, opts),
+            null,
+            "Failed to get user info"
+        );
+    }
+
+    async getAllGames(): Promise<GameGet[] | null> {
+        return this._get(
+            (opts) => this.api.gamesGetAllGames(opts),
+            null,
+            "Failed to get all games"
+        );
+    }
+
+    async approvePayment(payment: PaymentApprovePost): Promise<void> {
+        return this._action(
+            (opts) => this.api.paymentsApprovePayment(payment, opts),
+            "Payment approved successfully!",
+            "Failed to approve payment"
+        );
+    }
+
+    async getCurrentGameClosing(): Promise<CurrGameCloseGet | null> {
+        return this._get(
+            (opts) => this.api.gamesGetCurrGameClosing(opts),
+            null,
+            "Failed to get current game closing"
+        );
+    }
+
+    async getLastGameNums(): Promise<number[]> {
+        return this._get(
+            (opts) => this.api.gamesGetLastGameNums(opts),
+            [],
+            "Failed to get last game nums"
+        );
+    }
+
+    async getCurrentBoardsForUser(): Promise<BoardGet[]> {
+        return this._get(
+            (opts) => this.api.boardsGetCurrBoardsForUser(opts),
+            [],
+            "Failed to get boards for user"
+        );
+    }
+
+    async getPreviousBoardsForUser(): Promise<BoardGet[]> {
+        return this._get(
+            (opts) => this.api.boardsGetPrevBoardsForUser(opts),
+            [],
+            "Failed to get boards for user"
+        );
     }
 }
 
-export async function handleLogout(): Promise<void> {
-    try
-    {
-        await defApi.api.authLogout({credentials: "include"});
-    }
-    catch (error) {
-        console.log("Failed to logout: "+error);
-    }
-}
-
-export async function handleUserAuth() : Promise<UserGet | null> {
-    try {
-        return await apiRequest((opts) => defApi.api.authGetMe(opts));
-    }
-    catch (error) {
-        console.log("Failed to authenticate user: "+error);
-        return null;
-    }
-}
-
-export async function handleGetBoards(username?: string) : Promise<BoardGet[]> {
-    try {
-        if (!username)
-            return await apiRequest((opts) => defApi.api.boardsGetBoards(opts));
-        else
-            return await apiRequest((opts) => defApi.api.boardsGetBoardsAdmin({username}, opts));
-    }
-    catch (error) {
-        console.log("Failed to retrieve boards: "+error);
-        return [];
-    }
-}
-
-export async function handleGetPayments(username?: string) : Promise<PaymentGet[]> {
-    try
-    {
-        if (!username)
-            return await apiRequest((opts) => defApi.api.paymentsGetPayments(opts));
-        else
-            return await apiRequest((opts) => defApi.api.paymentsGetPaymentsAdmin({username}, opts));
-    }
-    catch (error) {
-        console.log("Failed to retrieve payments: "+error);
-        return [];
-    }
-}
-
-export async function handleGetBalance() : Promise<number> {
-    try {
-        return await apiRequest((opts) => defApi.api.paymentsGetBalance(opts));
-    }
-    catch (error) {
-        console.log("Failed to retrieve balance: "+error);
-        return -1;
-    }
-}
-
-export async function handleAddBoard(board: BoardPost){
-    try {
-        await apiRequest((opts) => defApi.api.boardsAddBoard(board, opts));
-        alert("Board added successfully.");
-    }
-    catch (error) {
-        console.log("Failed to add board: "+error);
-        alert("Failed to add board: "+error);
-    }
-}
-
-export async function handleEndRepeat(id: string) {
-    try {
-        await apiRequest((opts) => defApi.api.boardsEndRepeat(id, opts));
-        alert("Board updated successfully.");
-    }
-    catch (error) {
-        console.log("Failed to update board: "+error);
-        alert("Failed to update board: "+error);
-    }
-}
-
-export async function handleAddUser(user: UserAddPost) {
-    try {
-        await apiRequest((opts) => defApi.api.usersAddUser(user, opts));
-        alert("User added successfully.");
-    }
-    catch (error) {
-        console.log("Failed to add user: "+error);
-        alert("Failed to add user: "+error);
-    }
-}
-
-export async function handleGetWeekIncome() : Promise<number> {
-    try {
-        return await apiRequest((opts) => defApi.api.gamesGetGameIncome(opts));
-    }
-    catch (error) {
-        console.log("Failed to retrieve week's income: " + error);
-        return -1;
-    }
-}
-
-export async function handleAddWinningNumbers(numbers: number[]) {
-    try {
-        await apiRequest((opts) => defApi.api.gamesAddWinningNumbers({numbers}, opts));
-        alert("Winning numbers added successfully.");
-    }
-    catch (error) {
-        console.log("Failed to add the winning numbers: "+error);
-        alert("Failed to add the winning numbers: "+error);
-    }
-}
-
-export async function handleAddPayment(payment: PaymentAddPost) {
-    try {
-        await apiRequest((opts) => defApi.api.paymentsAddPayment(payment, opts));
-        alert("Payment added successfully!");
-    }
-    catch (error) {
-        console.log("Failed to add payment: "+error);
-        alert("Failed to add payment: "+error);
-    }
-}
-
-export async function handleGetAllUsers() : Promise<string[]> {
-    try {
-        return await apiRequest((opts) => defApi.api.usersGetAllUsers(opts));
-    }
-    catch (error) {
-        console.log("Failed to get users: "+error);
-        return [];
-    }
-}
-
-export async function handleGetUserInfo(username: string) : Promise<UserInfoGet | null> {
-    try {
-        return await apiRequest((opts) => defApi.api.usersGetUserInfo({username}, opts))
-    }
-    catch (error) {
-        console.log("Failed to get user info: "+error);
-        return null;
-    }
-}
-
-export async function handleGetAllGames() : Promise<GameGet[] | null> {
-    try {
-        return await apiRequest((opts) => defApi.api.gamesGetAllGames(opts));
-    }
-    catch (error) {
-        console.log("Failed to get all games: "+error);
-        return null;
-    }
-}
-
-export async function handleApprovePayment(payment: PaymentApprovePost) {
-    try {
-        await apiRequest((opts) => defApi.api.paymentsApprovePayment(payment, opts));
-        alert("Payment approved successfully!");
-    }
-    catch (error) {
-        console.log("Failed to approve payment: "+error);
-    }
-}
-
-export async function handleGetCurrGameClosing() : Promise<CurrGameCloseGet | null> {
-    try {
-        const res =  await apiRequest((opts) => defApi.api.gamesGetCurrGameClosing(opts));
-        return res as CurrGameCloseGet;
-    }
-    catch (error) {
-        console.log("Failed to get current game closing: "+error);
-        return null;
-    }
-}
-
-export async function handleGetLastGameNums() : Promise<number[]> {
-    try {
-        return await apiRequest((opts) => defApi.api.gamesGetLastGameNums(opts));
-    }
-    catch (error) {
-        console.log("Failed to get last game nums: "+error);
-        return [];
-    }
-}
-
-export async function handleGetCurrBoardsForUser() : Promise<BoardGet[]> {
-    try {
-        return await apiRequest((opts) => defApi.api.boardsGetCurrBoardsForUser(opts));
-    }
-    catch (error) {
-        console.log("Failed to get boards for user: "+error);
-        return [];
-    }
-}
-
-export async function handleGetPrevBoardsForUser() : Promise<BoardGet[]> {
-    try {
-        return await apiRequest((opts) => defApi.api.boardsGetPrevBoardsForUser(opts));
-    }
-    catch (error) {
-        console.log("Failed to get boards for user: "+error);
-        return [];
-    }
-}
+export const apiService = new ApiService();

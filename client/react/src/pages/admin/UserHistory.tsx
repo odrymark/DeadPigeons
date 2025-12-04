@@ -1,12 +1,5 @@
 import {useEffect, useEffectEvent, useState} from "react";
-import {
-    type BoardGet,
-    handleGetAllUsers,
-    handleGetBoards,
-    handleGetPayments, handleGetUserInfo,
-    type PaymentGet,
-    type UserInfoGet
-} from "../../api";
+import {type BoardGet, type PaymentGet, type UserInfoGet, apiService} from "../../api";
 import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
 import BoardsTable from "../../components/tables/BoardsTable.tsx";
 import InfoTable from "../../components/tables/InfoTable.tsx";
@@ -21,7 +14,7 @@ export default function UserHistory() {
     const modes = ["General", "Payments", "Boards"];
 
     const loadUsers = useEffectEvent(async () => {
-        const u = await handleGetAllUsers();
+        const u = await apiService.getAllUsers();
         setUsers(u);
     });
 
@@ -34,17 +27,17 @@ export default function UserHistory() {
         }
 
         if (selectedMode === "Payments") {
-            const data = await handleGetPayments(selectedUser);
+            const data = await apiService.getPayments(selectedUser);
             setPayments(data ?? []);
             setBoards([]);
             setUserInfo(null);
         } else if (selectedMode === "Boards") {
-            const data = await handleGetBoards(selectedUser);
+            const data = await apiService.getBoards(selectedUser);
             setBoards(data ?? []);
             setPayments([]);
             setUserInfo(null);
         } else if (selectedMode === "General") {
-            const data = await handleGetUserInfo(selectedUser);
+            const data = await apiService.getUserInfo(selectedUser);
             setUserInfo(data);
             setPayments([]);
             setBoards([]);

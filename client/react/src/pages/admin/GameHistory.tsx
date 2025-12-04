@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { type GameGet, handleGetAllGames } from "../../api";
+import { type GameGet, apiService } from "../../api";
 
 function getWeekNumber(date: Date): number {
     const d = new Date(date);
@@ -17,7 +17,7 @@ export default function GameHistory() {
 
     useEffect(() => {
         async function fetchGames() {
-            const data = await handleGetAllGames();
+            const data = await apiService.getAllGames();
             if (data) {
                 setGames(data);
                 setCurrentIndex(0);

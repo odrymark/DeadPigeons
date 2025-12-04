@@ -1,11 +1,11 @@
 import { useState } from "react";
-import {handleAddPayment} from "../../api";
+import {apiService} from "../../api";
 
 export default function AddPayment() {
     const [paymentNumber, setPaymentNumber] = useState("");
 
     const handleSubmit = async () => {
-        await handleAddPayment({paymentNumber});
+        await apiService.addPayment({paymentNumber});
         setPaymentNumber("");
     }
 

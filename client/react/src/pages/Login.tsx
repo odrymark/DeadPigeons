@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import { useNavigate } from "react-router-dom";
-import {handleUserAuth, handleUserLogin} from "../api";
+import {apiService} from "../api";
 import { useAtom } from "jotai";
 import { userAtom } from "../atoms/userAtom.ts";
 
@@ -12,7 +12,7 @@ export default function Login() {
 
     useEffect(() => {
         (async () => {
-            const u = await handleUserAuth();
+            const u = await apiService.getCurrentUser();
             if (u)
             {
                 setUser(u);
@@ -44,7 +44,7 @@ export default function Login() {
                     <button
                         className="btn btn-primary w-64"
                         onClick={async () => {
-                            const u = await handleUserLogin({ username, password });
+                            const u = await apiService.login({ username, password });
                             if (u)
                             {
                                 setUser(u);

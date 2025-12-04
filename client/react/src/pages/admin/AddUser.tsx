@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {handleAddUser} from "../../api";
+import {apiService} from "../../api";
 
 export default function AddUser() {
     const [username, setUsername] = useState("");
@@ -17,7 +17,7 @@ export default function AddUser() {
             return;
         }
 
-        await handleAddUser({username: username, password: password, email:email, phoneNumber: phone});
+        await apiService.addUser({username: username, password: password, email:email, phoneNumber: phone});
         setUsername("");
         setPassword("");
         setEmail("");
