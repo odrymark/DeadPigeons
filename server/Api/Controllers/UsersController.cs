@@ -1,5 +1,4 @@
 ﻿using Api.DTOs.Request;
-using Api.Services;
 using Api.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

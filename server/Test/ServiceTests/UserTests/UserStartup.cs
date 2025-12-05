@@ -1,4 +1,5 @@
 ﻿using Api.Services;
+using Api.Services.Password;
 using Api.Services.Users;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;

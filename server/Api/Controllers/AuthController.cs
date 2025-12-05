@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
-using Api.DTOs.Request.Request;
+using Api.DTOs.Request;
 using Api.DTOs.Response;
-using Api.Services;
 using Api.Services.Auth;
 using api.Settings;
 using Microsoft.AspNetCore.Authorization;

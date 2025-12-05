@@ -1,5 +1,7 @@
-﻿using Api.DTOs.Request.Request;
+﻿using Api.DTOs.Request;
 using Api.DTOs.Response;
+using Api.Services.Password;
+using Api.Services.Token;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 

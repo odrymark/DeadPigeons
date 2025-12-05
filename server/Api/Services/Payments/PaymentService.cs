@@ -1,4 +1,4 @@
-﻿using Api.DTOs.Request.Request;
+﻿using Api.DTOs.Request;
 using Api.DTOs.Response;
 using Api.Services.Users;
 using DataAccess;

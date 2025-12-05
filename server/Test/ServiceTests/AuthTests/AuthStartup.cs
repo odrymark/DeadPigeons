@@ -1,5 +1,7 @@
 ﻿using Api.Services;
 using Api.Services.Auth;
+using Api.Services.Password;
+using Api.Services.Token;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
-using Api.Services;
+using Api.DTOs.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Api.DTOs.Request.Request;
 using Api.Services.Payments;
 
 namespace Api.Controllers;

@@ -1,4 +1,4 @@
-﻿using Api.DTOs.Request.Request;
+﻿using Api.DTOs.Request;
 using Api.Services.Boards;
 using Api.Services.Games;
 using Api.Services.Payments;

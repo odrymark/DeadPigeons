@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Api.DTOs.Request.Request;
+﻿using Api.DTOs.Request;
 using Api.Services.Boards;
 using DataAccess;
 
@@ -17,7 +16,8 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
 
         activeGame.numbers = dto.numbers;
 
-        var winningBoards = boards
+        var enumerable = boards.ToList();
+        var winningBoards = enumerable
             .Where(b => dto.numbers.All(n => b.numbers.Contains(n)))
             .ToList();
 
@@ -29,7 +29,7 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
                 activeGame.winners.Add(board.user);
         }
 
-        foreach (var board in boards)
+        foreach (var board in enumerable)
             if (!winningBoards.Contains(board))
                 board.isWinner = false;
 

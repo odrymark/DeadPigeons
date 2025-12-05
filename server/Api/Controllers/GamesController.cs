@@ -1,5 +1,4 @@
-﻿using Api.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Api.DTOs.Request;
 using Api.Services.Games;

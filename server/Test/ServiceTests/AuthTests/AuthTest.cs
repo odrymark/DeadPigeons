@@ -1,6 +1,8 @@
-﻿using Api.DTOs.Request.Request;
+﻿using Api.DTOs.Request;
 using Api.Services;
 using Api.Services.Auth;
+using Api.Services.Password;
+using Api.Services.Token;
 using DataAccess;
 using NSubstitute;
 using Xunit;
