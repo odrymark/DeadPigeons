@@ -230,7 +230,7 @@ public class BoardTest : TestBase
 
         var board = await CreateBoardAsync(user.id, game.id, repeats: 5);
 
-        await _boardService.EndRepeat(board.id.ToString(), user.id);
+        await _boardService.EndRepeat(board.id.ToString(), user.id, false);
 
         var updatedBoard = await Db.Boards.FindAsync(board.id);
         Assert.Equal(0, updatedBoard.repeats);
@@ -240,7 +240,7 @@ public class BoardTest : TestBase
     public async Task EndRepeat_Throws_InvalidId()
     {
         await Assert.ThrowsAsync<Exception>(() =>
-            _boardService.EndRepeat("not-a-guid", Guid.NewGuid()));
+            _boardService.EndRepeat("not-a-guid", Guid.NewGuid(), false));
     }
 
     [Fact]
@@ -252,6 +252,22 @@ public class BoardTest : TestBase
         var board = await CreateBoardAsync(user.id, game.id);
 
         await Assert.ThrowsAsync<Exception>(() =>
-            _boardService.EndRepeat(board.id.ToString(), Guid.NewGuid()));
+            _boardService.EndRepeat(board.id.ToString(), Guid.NewGuid(), false));
+    }
+
+    [Fact]
+    public async Task EndRepeat_Allows_Admin_Even_If_Not_Owner()
+    {
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
+
+        var board = await CreateBoardAsync(user.id, game.id, repeats: 5);
+
+        var adminUserId = Guid.NewGuid(); // different from user.id
+
+        await _boardService.EndRepeat(board.id.ToString(), adminUserId, true);
+
+        var updatedBoard = await Db.Boards.FindAsync(board.id);
+        Assert.Equal(0, updatedBoard.repeats);
     }
 }

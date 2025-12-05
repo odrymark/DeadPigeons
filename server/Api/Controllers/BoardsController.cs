@@ -67,8 +67,10 @@ public class BoardsController(IBoardService service) : ControllerBase
     {
         var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var userId = Guid.Parse(idStr!);
+
+        var isAdmin = User.IsInRole("Admin");
         
-        await service.EndRepeat(id, userId);
+        await service.EndRepeat(id, userId, isAdmin);
         return Ok();
     }
 }

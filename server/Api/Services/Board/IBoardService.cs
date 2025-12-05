@@ -10,7 +10,7 @@ public interface IBoardService
     Task<IEnumerable<Board>> GetRepeatBoards();
     Task AddBoard(BoardReqDTO boardReqDto, Guid userId, Game? newGame);
     Task<IEnumerable<BoardResDTO>> GetBoards(Guid? id, string? username);
-    Task EndRepeat(string id, Guid userId);
+    Task EndRepeat(string id, Guid userId, bool isAdmin);
     Task<IEnumerable<BoardResDTO>> GetCurrGameUserBoards(Guid userId);
     Task<IEnumerable<BoardResDTO>> GetPrevGameUserBoards(Guid userId);
 }

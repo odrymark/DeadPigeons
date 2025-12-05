@@ -1,16 +1,28 @@
-import {type BoardGet, apiService} from "../../api";
+import { type BoardGet, apiService } from "../../api";
+import { useState, useEffect } from "react";
 
 interface Props {
     boards: BoardGet[];
 }
 
 export default function BoardsTable({ boards }: Props) {
+    const [localBoards, setLocalBoards] = useState<BoardGet[]>(boards);
+
+    useEffect(() => {
+        setLocalBoards(boards);
+    }, [boards]);
 
     const clearRepeats = async (id: string) => {
         const ok = confirm("Are you sure you want to clear repeats for this board?");
         if (!ok) return;
 
         await apiService.endRepeat(id);
+
+        setLocalBoards((prev) =>
+            prev.map((board) =>
+                board.id === id ? { ...board, repeats: 0 } : board
+            )
+        );
     };
 
     return (
@@ -25,7 +37,7 @@ export default function BoardsTable({ boards }: Props) {
 
             {/* LIST */}
             <div className="mt-4 flex flex-col gap-4 max-w-3xl mx-auto w-full">
-                {boards.map((b) => (
+                {localBoards.map((b) => (
                     <div
                         key={b.id}
                         className="grid grid-cols-1 sm:grid-cols-4 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
