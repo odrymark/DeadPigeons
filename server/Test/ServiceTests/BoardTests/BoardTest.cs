@@ -1,5 +1,4 @@
-﻿using Api.DTOs;
-using Api.DTOs.Response;
+﻿using Api.DTOs.Request;
 using Api.Services.Boards;
 using Api.Services.Games;
 using Api.Services.Payments;
@@ -166,7 +165,7 @@ public class BoardTest : TestBase
         _paymentService.GetBalance(user.id).Returns(100);
         _priceService.GetPrice(Arg.Any<int>()).Returns(10);
 
-        var req = new BoardReqDTO
+        var req = new BoardReqDto
         {
             numbers = new List<int> { 1, 2, 3 },
             repeats = 0
@@ -182,7 +181,7 @@ public class BoardTest : TestBase
     {
         _gameService.GetActiveGame().Returns((Game?)null);
 
-        var req = new BoardReqDTO { numbers = [1, 2] };
+        var req = new BoardReqDto { numbers = [1, 2] };
 
         await Assert.ThrowsAsync<Exception>(() =>
             _boardService.AddBoard(req, Guid.NewGuid(), null));
@@ -198,7 +197,7 @@ public class BoardTest : TestBase
         _paymentService.GetBalance(user.id).Returns(1);
         _priceService.GetPrice(3).Returns(50);
 
-        var req = new BoardReqDTO { numbers = [1, 2, 3] };
+        var req = new BoardReqDto { numbers = [1, 2, 3] };
 
         await Assert.ThrowsAsync<Exception>(() =>
             _boardService.AddBoard(req, user.id, null));
@@ -212,7 +211,7 @@ public class BoardTest : TestBase
 
         _gameService.GetActiveGame().Returns(game);
 
-        var req = new BoardReqDTO { numbers = [1, 2, 3] };
+        var req = new BoardReqDto { numbers = [1, 2, 3] };
 
         await Assert.ThrowsAsync<Exception>(() =>
             _boardService.AddBoard(req, user.id, null));

@@ -1,6 +1,6 @@
 ﻿using DataAccess;
 
-namespace Api.Services;
+namespace Api.Services.Token;
 
 public interface ITokenService
 {

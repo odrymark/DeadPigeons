@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services.Boards;
 using Api.Services.Games;
 using DataAccess;
@@ -44,7 +44,7 @@ public class ManagerTest : TestBase
 
         _gameService.CreateNextGame(Arg.Any<DateTime>()).Returns(new Game { id = Guid.NewGuid() });
 
-        var dto = new WinningNumsReqDTO
+        var dto = new WinningNumsReqDto
         {
             numbers = new List<int> {1, 2, 3}
         };
@@ -64,7 +64,7 @@ public class ManagerTest : TestBase
     {
         _gameService.GetActiveGame().Returns((Game?)null);
 
-        var dto = new WinningNumsReqDTO { numbers = new List<int> {1,2,3} };
+        var dto = new WinningNumsReqDto { numbers = new List<int> {1,2,3} };
 
         await Assert.ThrowsAsync<Exception>(() => _service.AddWinningNumbers(dto));
     }
@@ -92,7 +92,7 @@ public class ManagerTest : TestBase
         _boardService.GetBoardsForGame(activeGame.id).Returns(new List<Board>());
         _boardService.GetRepeatBoards().Returns(new List<Board> { repeatBoard });
 
-        await _service.AddWinningNumbers(new WinningNumsReqDTO { numbers = new List<int> {1} });
+        await _service.AddWinningNumbers(new WinningNumsReqDto { numbers = new List<int> {1} });
 
         Assert.Equal(0, repeatBoard.repeats);
     }
@@ -114,7 +114,7 @@ public class ManagerTest : TestBase
         _boardService.GetRepeatBoards().Returns(new List<Board>());
         _gameService.CreateNextGame(Arg.Any<DateTime>()).Returns(new Game { id = Guid.NewGuid() });
 
-        await _service.AddWinningNumbers(new WinningNumsReqDTO { numbers = new List<int> {1,2} });
+        await _service.AddWinningNumbers(new WinningNumsReqDto { numbers = new List<int> {1,2} });
 
         Assert.True(board1.isWinner);
         Assert.False(board2.isWinner);

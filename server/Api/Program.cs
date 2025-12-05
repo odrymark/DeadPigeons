@@ -1,11 +1,12 @@
 using System.Text;
 using api;
-using Api.Services;
 using Api.Services.Auth;
 using Api.Services.Boards;
 using Api.Services.Games;
+using Api.Services.Password;
 using Api.Services.Payments;
 using api.Services.Price;
+using Api.Services.Token;
 using Api.Services.Users;
 using api.Settings;
 using DataAccess;

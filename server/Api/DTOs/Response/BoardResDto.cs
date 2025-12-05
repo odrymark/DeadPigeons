@@ -1,6 +1,6 @@
 ﻿namespace Api.DTOs.Response;
 
-public class BoardResDTO
+public class BoardResDto
 {
     public Guid id { get; set; }
     public List<int> numbers { get; set; } = new List<int>();

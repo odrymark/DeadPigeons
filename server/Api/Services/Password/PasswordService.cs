@@ -2,7 +2,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 
-namespace Api.Services;
+namespace Api.Services.Password;
 
 public class PasswordService : IPasswordService
 {

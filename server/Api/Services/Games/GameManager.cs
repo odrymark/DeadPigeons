@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services.Boards;
 using DataAccess;
 
@@ -7,7 +6,7 @@ namespace Api.Services.Games;
 
 public class GameManager(IGameService gameService, IBoardService boardService, PigeonsDbContext context) : IGameManager
 {
-    public async Task AddWinningNumbers(WinningNumsReqDTO dto)
+    public async Task AddWinningNumbers(WinningNumsReqDto dto)
     {
         var activeGame = await gameService.GetActiveGame();
         if (activeGame == null)
@@ -17,7 +16,8 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
 
         activeGame.numbers = dto.numbers;
 
-        var winningBoards = boards
+        var enumerable = boards.ToList();
+        var winningBoards = enumerable
             .Where(b => dto.numbers.All(n => b.numbers.Contains(n)))
             .ToList();
 
@@ -29,7 +29,7 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
                 activeGame.winners.Add(board.user);
         }
 
-        foreach (var board in boards)
+        foreach (var board in enumerable)
             if (!winningBoards.Contains(board))
                 board.isWinner = false;
 
@@ -42,7 +42,7 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
         {
             try
             {
-                var req = new BoardReqDTO
+                var req = new BoardReqDto
                 {
                     numbers = new List<int>(old.numbers),
                     repeats = old.repeats - 1

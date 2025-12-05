@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.DTOs.Response;
 using Api.Services.Users;
 using DataAccess;
@@ -8,13 +8,13 @@ namespace Api.Services.Payments;
 
 public class PaymentService(PigeonsDbContext context, IUserService userService) : IPaymentService
 {
-    public async Task<IEnumerable<PaymentResDTO>> GetPayments(Guid? id, string? username)
+    public async Task<IEnumerable<PaymentResDto>> GetPayments(Guid? id, string? username)
     {
         if (string.IsNullOrEmpty(username))
         {
             return await context.Payments
                 .Where(p => p.userId == id)
-                .Select(p => new PaymentResDTO
+                .Select(p => new PaymentResDto
                 {
                     id = p.id,
                     createdAt = p.createdAt,
@@ -32,7 +32,7 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
             
         return await context.Payments
             .Where(p => p.userId == user.id)
-            .Select(p => new PaymentResDTO
+            .Select(p => new PaymentResDto
             {
                 id = p.id,
                 createdAt = p.createdAt,
@@ -66,7 +66,7 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
             .SumAsync(p => p.amount) ?? 0;
     }
     
-    public async Task AddPayment(PaymentReqDTO paymentReqDto, string username)
+    public async Task AddPayment(PaymentReqDto paymentReqDto, string username)
     {
         try
         {
@@ -88,7 +88,7 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
         }
     }
 
-    public async Task ApprovePayment(PaymentReqDTO paymentReqDto)
+    public async Task ApprovePayment(PaymentReqDto paymentReqDto)
     {
         if (!Guid.TryParse(paymentReqDto.id, out var paymentGuid))
             throw new Exception("Invalid payment ID format");

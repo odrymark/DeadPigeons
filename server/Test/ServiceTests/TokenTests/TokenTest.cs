@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Api.Services;
+using Api.Services.Token;
 using DataAccess;
 using Microsoft.Extensions.Configuration;
 using Xunit;

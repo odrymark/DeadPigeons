@@ -1,6 +1,6 @@
 ﻿namespace Api.DTOs.Response;
 
-public class UserInfoResDTO
+public class UserInfoResDto
 {
     public string username { get; set; }
     public string email { get; set; }

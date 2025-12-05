@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services.Payments;
 using Api.Services.Users;
 using DataAccess;
@@ -97,7 +97,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("alice");
         _userService.GetUserByName("alice").Returns(user);
 
-        var dto = new PaymentReqDTO { paymentNumber = "12345" };
+        var dto = new PaymentReqDto { paymentNumber = "12345" };
 
         await _service.AddPayment(dto, "alice");
 
@@ -111,7 +111,7 @@ public class PaymentTest : TestBase
     {
         _userService.GetUserByName("fail").Returns<User>(_ => throw new Exception("User not found"));
 
-        var dto = new PaymentReqDTO { paymentNumber = "123" };
+        var dto = new PaymentReqDto { paymentNumber = "123" };
 
         await Assert.ThrowsAsync<Exception>(() => _service.AddPayment(dto, "fail"));
     }
@@ -125,7 +125,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id, null, false);
 
-        var dto = new PaymentReqDTO
+        var dto = new PaymentReqDto
         {
             id = payment.id.ToString(),
             isApproved = true,
@@ -145,7 +145,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id, 100, true);
 
-        var dto = new PaymentReqDTO
+        var dto = new PaymentReqDto
         {
             id = payment.id.ToString(),
             isApproved = false
@@ -161,7 +161,7 @@ public class PaymentTest : TestBase
     [Fact]
     public async Task ApprovePayment_Throws_When_InvalidId()
     {
-        var dto = new PaymentReqDTO { id = "not-a-guid", isApproved = true, amount = 10 };
+        var dto = new PaymentReqDto { id = "not-a-guid", isApproved = true, amount = 10 };
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }
@@ -169,7 +169,7 @@ public class PaymentTest : TestBase
     [Fact]
     public async Task ApprovePayment_Throws_When_PaymentNotFound()
     {
-        var dto = new PaymentReqDTO { id = Guid.NewGuid().ToString(), isApproved = true, amount = 10 };
+        var dto = new PaymentReqDto { id = Guid.NewGuid().ToString(), isApproved = true, amount = 10 };
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }
@@ -180,7 +180,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id);
 
-        var dto = new PaymentReqDTO { id = payment.id.ToString(), isApproved = true, amount = null };
+        var dto = new PaymentReqDto { id = payment.id.ToString(), isApproved = true, amount = null };
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }
@@ -191,7 +191,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id);
 
-        var dto = new PaymentReqDTO { id = payment.id.ToString() }; // isApproved not set
+        var dto = new PaymentReqDto { id = payment.id.ToString() }; // isApproved not set
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }

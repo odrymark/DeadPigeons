@@ -1,6 +1,8 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services;
 using Api.Services.Auth;
+using Api.Services.Password;
+using Api.Services.Token;
 using DataAccess;
 using NSubstitute;
 using Xunit;
@@ -39,7 +41,7 @@ public class AuthServiceTests : TestBase
         _tokenService.GenerateRefreshToken().Returns("refresh_token_new");
         _passwordService.HashRefreshToken("refresh_token_new").Returns("HASH_refresh_token_new");
 
-        var req = new UserLoginReqDTO
+        var req = new UserLoginReqDto
         {
             username = username,
             password = "password"
@@ -58,7 +60,7 @@ public class AuthServiceTests : TestBase
         string ghostUsername = "ghost_" + Guid.NewGuid().ToString("N");
         await Assert.ThrowsAsync<Exception>(async () =>
         {
-            await _authService.AuthenticateUser(new UserLoginReqDTO
+            await _authService.AuthenticateUser(new UserLoginReqDto
             {
                 username = ghostUsername,
                 password = "password"
@@ -76,7 +78,7 @@ public class AuthServiceTests : TestBase
 
         await Assert.ThrowsAsync<Exception>(async () =>
         {
-            await _authService.AuthenticateUser(new UserLoginReqDTO
+            await _authService.AuthenticateUser(new UserLoginReqDto
             {
                 username = username,
                 password = "incorrect"

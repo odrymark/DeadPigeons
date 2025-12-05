@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.DTOs;
+namespace Api.DTOs.Request;
 
-public class BoardReqDTO : IValidatableObject
+public class WinningNumsReqDto : IValidatableObject
 {
-    [MinLength(5, ErrorMessage = "You must provide at least 5 numbers.")]
-    [MaxLength(8, ErrorMessage = "You must provide maximum 8 numbers.")]
+    [Required(ErrorMessage = "Winning numbers are required")]
+    [MinLength(3, ErrorMessage = "You must provide exactly 3 numbers.")]
+    [MaxLength(3, ErrorMessage = "You must provide exactly 3 numbers.")]
     public List<int> numbers { get; set; } = new List<int>();
-    public int repeats { get; set; }
-
+    
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if(numbers.Any(n => n < 1 || n > 16))

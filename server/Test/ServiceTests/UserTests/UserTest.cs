@@ -1,5 +1,6 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services;
+using Api.Services.Password;
 using Api.Services.Users;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -82,7 +83,7 @@ public class UserTest : TestBase
     [Fact]
     public async Task AddUser_Creates_New_User()
     {
-        var dto = new UserAddReqDTO
+        var dto = new UserAddReqDto
         {
             username = "eve",
             password = "password",
@@ -107,7 +108,7 @@ public class UserTest : TestBase
     {
         await CreateUserAsync("frank");
 
-        var dto = new UserAddReqDTO
+        var dto = new UserAddReqDto
         {
             username = "frank",
             password = "pw",
@@ -123,7 +124,7 @@ public class UserTest : TestBase
     {
         await CreateUserAsync("gwen");
 
-        var dto = new UserAddReqDTO
+        var dto = new UserAddReqDto
         {
             username = "newuser",
             password = "pw",
@@ -139,7 +140,7 @@ public class UserTest : TestBase
     {
         await CreateUserAsync("harry");
 
-        var dto = new UserAddReqDTO
+        var dto = new UserAddReqDto
         {
             username = "newuser",
             password = "pw",

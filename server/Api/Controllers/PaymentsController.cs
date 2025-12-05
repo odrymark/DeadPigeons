@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
-using Api.Services;
+using Api.DTOs.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Api.DTOs;
 using Api.Services.Payments;
 
 namespace Api.Controllers;
@@ -32,7 +31,7 @@ public class PaymentsController(IPaymentService service) : ControllerBase
     
     [HttpPost("addPayment")]
     [Authorize]
-    public async Task<ActionResult> AddPayment([FromBody] PaymentReqDTO paymentAddReqDto)
+    public async Task<ActionResult> AddPayment([FromBody] PaymentReqDto paymentAddReqDto)
     {
         var username = User.Identity!.Name!;
             
@@ -42,7 +41,7 @@ public class PaymentsController(IPaymentService service) : ControllerBase
     
     [HttpPost("approvePayment")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> ApprovePayment([FromBody] PaymentReqDTO paymentReqDto)
+    public async Task<ActionResult> ApprovePayment([FromBody] PaymentReqDto paymentReqDto)
     {
         await service.ApprovePayment(paymentReqDto);
         return Ok();

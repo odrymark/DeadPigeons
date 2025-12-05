@@ -1,5 +1,6 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.DTOs.Response;
+using Api.Services.Password;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +34,7 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         }
     }
 
-    public async Task<UserInfoResDTO> GetUserInfo(string username)
+    public async Task<UserInfoResDto> GetUserInfo(string username)
     {
         try
         {
@@ -43,7 +44,7 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
             if (user == null)
                 throw new Exception("No user found");
 
-            return new UserInfoResDTO
+            return new UserInfoResDto
             {
                 username = user.username,
                 createdAt = user.createdAt,
@@ -59,7 +60,7 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         }
     }
     
-    public async Task AddUser(UserAddReqDTO userAddReqDto)
+    public async Task AddUser(UserAddReqDto userAddReqDto)
     {
         bool exists = await context.Users.AnyAsync(u =>
             u.username == userAddReqDto.username ||

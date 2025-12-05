@@ -1,6 +1,6 @@
 ﻿namespace Api.DTOs.Response;
 
-public class PaymentResDTO
+public class PaymentResDto
 {
     public Guid id { get; set; }
     public Guid userId { get; set; }
