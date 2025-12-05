@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request.Request;
 using Api.DTOs.Response;
 using Api.Services.Games;
 using Api.Services.Payments;
@@ -26,7 +26,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BoardResDTO>> GetCurrGameUserBoards(Guid userId)
+    public async Task<IEnumerable<BoardResDto>> GetCurrGameUserBoards(Guid userId)
     {
         var game = await gameService.GetActiveGame();
         if (game == null)
@@ -34,7 +34,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
 
         var boards = await context.Boards
             .Where(b => b.gameId == game.id && b.userId == userId)
-            .Select(b => new BoardResDTO
+            .Select(b => new BoardResDto
             {
                 id = b.id,
                 numbers = b.numbers,
@@ -47,13 +47,13 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         return boards;
     }
 
-    public async Task<IEnumerable<BoardResDTO>> GetPrevGameUserBoards(Guid userId)
+    public async Task<IEnumerable<BoardResDto>> GetPrevGameUserBoards(Guid userId)
     {
         var lastGame = await gameService.GetLastGame();
 
         var boards = await context.Boards
             .Where(b => b.gameId == lastGame.id && b.userId == userId)
-            .Select(b => new BoardResDTO
+            .Select(b => new BoardResDto
             {
                 id = b.id,
                 numbers = b.numbers,
@@ -66,13 +66,13 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         return boards;
     }
     
-    public async Task<IEnumerable<BoardResDTO>> GetBoards(Guid? id, string? username)
+    public async Task<IEnumerable<BoardResDto>> GetBoards(Guid? id, string? username)
     {
         if (string.IsNullOrEmpty(username))
         {
             return await context.Boards
                 .Where(b => b.userId == id)
-                .Select(b => new BoardResDTO
+                .Select(b => new BoardResDto
                 {
                     id = b.id,
                     numbers = b.numbers,
@@ -87,7 +87,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
             
         return await context.Boards
             .Where(b => b.userId == user.id)
-            .Select(b => new BoardResDTO
+            .Select(b => new BoardResDto
             {
                 id = b.id,
                 numbers = b.numbers,
@@ -98,7 +98,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
             .ToListAsync();
     }
     
-    public async Task AddBoard(BoardReqDTO boardReqDto, Guid userId, Game? newGame)
+    public async Task AddBoard(BoardReqDto boardReqDto, Guid userId, Game? newGame)
     {
         Game? activeGame;
         if (newGame == null)

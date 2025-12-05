@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Api.DTOs;
+using Api.DTOs.Request.Request;
 using Api.Services.Boards;
 using DataAccess;
 
@@ -7,7 +7,7 @@ namespace Api.Services.Games;
 
 public class GameManager(IGameService gameService, IBoardService boardService, PigeonsDbContext context) : IGameManager
 {
-    public async Task AddWinningNumbers(WinningNumsReqDTO dto)
+    public async Task AddWinningNumbers(WinningNumsReqDto dto)
     {
         var activeGame = await gameService.GetActiveGame();
         if (activeGame == null)
@@ -42,7 +42,7 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
         {
             try
             {
-                var req = new BoardReqDTO
+                var req = new BoardReqDto
                 {
                     numbers = new List<int>(old.numbers),
                     repeats = old.repeats - 1

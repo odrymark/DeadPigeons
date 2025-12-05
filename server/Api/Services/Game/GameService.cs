@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.DTOs.Response;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,7 @@ public class GameService(PigeonsDbContext context) : IGameService
             .FirstOrDefaultAsync(g => g.numbers.Count == 0);
     }
     
-    public async Task<GameCloseResDTO> GetCurrGameClosing()
+    public async Task<GameCloseResDto> GetCurrGameClosing()
     {
         var currGame = await context.Games
             .FirstOrDefaultAsync(g => g.numbers.Count == 0);
@@ -22,7 +22,7 @@ public class GameService(PigeonsDbContext context) : IGameService
         if (currGame == null)
             throw new Exception("No active game found");
 
-        return new  GameCloseResDTO
+        return new  GameCloseResDto
         {
             closeDate = currGame.openUntil
         };
@@ -62,7 +62,7 @@ public class GameService(PigeonsDbContext context) : IGameService
         return newGame;
     }
     
-    public async Task<IEnumerable<GameResDTO>> GetAllGames()
+    public async Task<IEnumerable<GameResDto>> GetAllGames()
     {
         try
         {
@@ -73,12 +73,12 @@ public class GameService(PigeonsDbContext context) : IGameService
                 .OrderByDescending(g => g.createdAt)
                 .ToListAsync();
             
-            var response = games.Select(g => new GameResDTO
+            var response = games.Select(g => new GameResDto
                 {
                     createdAt = g.createdAt,
                     income = g.income,
                     winningNums = g.numbers.ToList(),
-                    winners = g.winners.Select(w => new WinnersResDTO
+                    winners = g.winners.Select(w => new WinnersResDto
                     {
                         username = w.username,
                         winningBoardsNum = g.boards.Count(b => b.userId == w.id && b.isWinner == true)

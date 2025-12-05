@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 using Api.Services;
 using Api.Services.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ public class UsersController(IUserService service) : ControllerBase
 {
     [HttpPost("addUser")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> AddUser([FromBody] UserAddReqDTO userReqDto)
+    public async Task<ActionResult> AddUser([FromBody] UserAddReqDto userReqDto)
     {
         await service.AddUser(userReqDto);
         return Ok();

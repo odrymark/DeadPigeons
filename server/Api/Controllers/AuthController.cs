@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Api.DTOs;
+using Api.DTOs.Request.Request;
 using Api.DTOs.Response;
 using Api.Services;
 using Api.Services.Auth;
@@ -41,14 +41,14 @@ public class AuthController(IAuthService service, IOptions<AuthSettings> options
     }
     
     [HttpPost("login")]
-    public async Task<ActionResult> Login([FromBody] UserLoginReqDTO loginReqDto)
+    public async Task<ActionResult> Login([FromBody] UserLoginReqDto loginReqDto)
     {
-        UserLoginResDTO output = await service.AuthenticateUser(loginReqDto);
+        UserLoginResDto output = await service.AuthenticateUser(loginReqDto);
 
         SetJwtCookie(output.token);
         SetRefreshCookie(output.refreshToken);
 
-        var res = new GetMeResDTO
+        var res = new GetMeResDto
         {
             id = output.id,
             username = output.username,
@@ -87,7 +87,7 @@ public class AuthController(IAuthService service, IOptions<AuthSettings> options
     {
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-        var res = new GetMeResDTO
+        var res = new GetMeResDto
         {
             id = userId,
             username = User.Identity?.Name!,

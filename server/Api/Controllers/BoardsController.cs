@@ -2,7 +2,7 @@
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Api.DTOs;
+using Api.DTOs.Request.Request;
 using Api.Services.Boards;
 
 namespace Api.Controllers;
@@ -52,7 +52,7 @@ public class BoardsController(IBoardService service) : ControllerBase
     
     [HttpPost("addBoard")]
     [Authorize]
-    public async Task<ActionResult> AddBoard([FromBody] BoardReqDTO boardReqDto)
+    public async Task<ActionResult> AddBoard([FromBody] BoardReqDto boardReqDto)
     {
         var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var id = Guid.Parse(idStr!);

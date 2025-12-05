@@ -1,6 +1,6 @@
 ﻿namespace Api.DTOs.Response;
 
-public class WinnersResDTO
+public class WinnersResDto
 {
     public string username { get; set; }
     public int winningBoardsNum { get; set; }

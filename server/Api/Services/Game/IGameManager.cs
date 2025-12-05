@@ -1,8 +1,8 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request;
 
 namespace Api.Services.Games;
 
 public interface IGameManager
 {
-    Task AddWinningNumbers(WinningNumsReqDTO dto);
+    Task AddWinningNumbers(WinningNumsReqDto dto);
 }

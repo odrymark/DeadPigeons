@@ -1,4 +1,4 @@
-﻿using Api.DTOs;
+﻿using Api.DTOs.Request.Request;
 using Api.DTOs.Response;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +7,7 @@ namespace Api.Services.Auth;
 
 public class AuthService(ITokenService tokenService, IPasswordService passwordService, PigeonsDbContext context) : IAuthService
 {
-    public async Task<UserLoginResDTO> AuthenticateUser(UserLoginReqDTO userLoginReqDto)
+    public async Task<UserLoginResDto> AuthenticateUser(UserLoginReqDto userLoginReqDto)
     {
         var user = await context.Users
             .FirstOrDefaultAsync(u => u.username == userLoginReqDto.username);
@@ -23,7 +23,7 @@ public class AuthService(ITokenService tokenService, IPasswordService passwordSe
         user.refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
         await context.SaveChangesAsync();
 
-        return new UserLoginResDTO
+        return new UserLoginResDto
         {
             id = user.id,
             username = user.username,

@@ -1,6 +1,6 @@
 ﻿namespace Api.DTOs.Response;
 
-public class GameCloseResDTO
+public class GameCloseResDto
 {
     public DateTime closeDate { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Api.DTOs;
+using Api.DTOs.Request;
 using Api.Services.Games;
 
 namespace Api.Controllers;
@@ -20,7 +20,7 @@ public class GamesController(IGameManager manager, IGameService service) : Contr
     
     [HttpPost("addWinningNumbers")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> AddWinningNumbers([FromBody] WinningNumsReqDTO winningNumsReqDto)
+    public async Task<ActionResult> AddWinningNumbers([FromBody] WinningNumsReqDto winningNumsReqDto)
     {
         await manager.AddWinningNumbers(winningNumsReqDto);
         return Ok();
