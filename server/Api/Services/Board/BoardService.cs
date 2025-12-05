@@ -142,7 +142,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         await context.SaveChangesAsync();
     }
 
-    public async Task EndRepeat(string id, Guid userId)
+    public async Task EndRepeat(string id, Guid userId, bool isAdmin)
     {
         try
         {
@@ -155,7 +155,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
             if (board == null)
                 throw new Exception("Board not found");
 
-            if (board.userId != userId)
+            if (board.userId != userId && !isAdmin)
                 throw new Exception("You do not own this board");
 
             board.repeats = 0;
