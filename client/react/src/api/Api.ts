@@ -507,7 +507,10 @@ export class Api<
      * @name GamesGetGameIncome
      * @request GET:/api/games/getGameIncome
      */
-    gamesGetGameIncome: (params: RequestParams = {}) =>
+    gamesGetGameIncome: (
+        data: string,
+        params: RequestParams = {}
+    ) =>
       this.request<File, any>({
         path: `/api/games/getGameIncome`,
         method: "GET",

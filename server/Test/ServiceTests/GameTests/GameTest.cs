@@ -163,20 +163,20 @@ public class GameTest : TestBase
     // GetGameIncome
     // -------------------------
     [Fact]
-    public async Task GetGameIncome_Returns_Income_When_ActiveGameExists()
+    public async Task GetGameIncome_Returns_Income_When_GameExists()
     {
         var game = await CreateGameAsync(true);
         game.income = 500;
         Db.Games.Update(game);
         await Db.SaveChangesAsync();
 
-        var income = await _service.GetGameIncome();
+        var income = await _service.GetGameIncome(game.id);
         Assert.Equal(500, income);
     }
 
     [Fact]
-    public async Task GetGameIncome_Throws_When_NoActiveGame()
+    public async Task GetGameIncome_Throws_When_NoGameWithId()
     {
-        await Assert.ThrowsAsync<Exception>(() => _service.GetGameIncome());
+        await Assert.ThrowsAsync<Exception>(() => _service.GetGameIncome(Guid.NewGuid()));
     }
 }
