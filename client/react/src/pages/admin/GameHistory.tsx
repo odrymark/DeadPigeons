@@ -5,7 +5,7 @@ function getWeekNumber(date: Date): number {
     const d = new Date(date);
     const yearStart = new Date(d.getFullYear(), 0, 1);
 
-    const diff = d.getTime() - yearStart.getTime(); // number
+    const diff = d.getTime() - yearStart.getTime();
     const days = diff / 86400000;
 
     return Math.ceil((days + 1) / 7);
@@ -14,6 +14,7 @@ function getWeekNumber(date: Date): number {
 export default function GameHistory() {
     const [games, setGames] = useState<GameGet[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [income, setIncome] = useState<number>(0);
 
     useEffect(() => {
         async function fetchGames() {
@@ -25,6 +26,17 @@ export default function GameHistory() {
         }
         fetchGames();
     }, []);
+
+    useEffect(() => {
+        async function fetchIncome() {
+            if (games.length > 0) {
+                const game = games[currentIndex];
+                const inc = await apiService.getWeekIncome(game.id);
+                setIncome(inc);
+            }
+        }
+        fetchIncome();
+    }, [currentIndex, games]);
 
     const nextGame = () => {
         if (currentIndex < games.length - 1)
@@ -67,6 +79,10 @@ export default function GameHistory() {
 
                     <p className="text-sm opacity-70 mt-1">
                         Created: {new Date(game.createdAt).toLocaleString()}
+                    </p>
+
+                    <p className="mt-4 text-xl font-semibold">
+                        Week's Income: ${income}
                     </p>
 
                     <p className="mt-4 text-xl font-semibold">

@@ -39,6 +39,7 @@ export type WinnersGet = {
 }
 
 export type GameGet = {
+    id: string;
     createdAt: string;
     winningNums: number[];
     income: number;
@@ -141,7 +142,7 @@ async function handleRefreshToken() : Promise<void> {
 }
 
 class ApiService {
-    private api = defApi.api; // Encapsulate the API instance
+    private api = defApi.api;
 
     private async _get<T>(
         requestFunc: (opts?: RequestInit) => Promise<Response>,
@@ -246,9 +247,9 @@ class ApiService {
         );
     }
 
-    async getWeekIncome(): Promise<number> {
+    async getWeekIncome(id: string): Promise<number> {
         return this._get(
-            (opts) => this.api.gamesGetGameIncome(opts),
+            (opts) => this.api.gamesGetGameIncome(id, opts),
             -1,
             "Failed to retrieve week's income"
         );
