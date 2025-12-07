@@ -24,15 +24,6 @@ public class GamesController(IGameManager manager, IGameService service) : Contr
         await manager.AddWinningNumbers(winningNumsReqDto);
         return Ok();
     }
-    
-    [HttpGet("getGameIncome")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetGameIncome([FromBody] string idStr)
-    {
-        var id = Guid.Parse(idStr);
-        int income = await service.GetGameIncome(id);
-        return Ok(income);
-    }
 
     [HttpGet("getCurrGameClosing")]
     [Authorize]

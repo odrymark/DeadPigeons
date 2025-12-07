@@ -31,8 +31,7 @@ export default function GameHistory() {
         async function fetchIncome() {
             if (games.length > 0) {
                 const game = games[currentIndex];
-                const inc = await apiService.getWeekIncome(game.id);
-                setIncome(inc);
+                setIncome(game.income);
             }
         }
         fetchIncome();
@@ -82,7 +81,7 @@ export default function GameHistory() {
                     </p>
 
                     <p className="mt-4 text-xl font-semibold">
-                        Week's Income: ${income}
+                        Week's Income: {income} DKK
                     </p>
 
                     <p className="mt-4 text-xl font-semibold">
