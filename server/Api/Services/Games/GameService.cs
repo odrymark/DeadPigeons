@@ -75,6 +75,7 @@ public class GameService(PigeonsDbContext context) : IGameService
             
             var response = games.Select(g => new GameResDto
                 {
+                    id = g.id.ToString(),
                     createdAt = g.createdAt,
                     income = g.income,
                     winningNums = g.numbers.ToList(),
@@ -95,13 +96,13 @@ public class GameService(PigeonsDbContext context) : IGameService
         }
     }
     
-    public async Task<int> GetGameIncome()
+    public async Task<int> GetGameIncome(Guid id)
     {
         var game = await context.Games
-            .FirstOrDefaultAsync(g => g.numbers.Count == 0);
+            .FirstOrDefaultAsync(g => g.id == id);
 
         if (game == null)
-            throw new Exception("No active game available");
+            throw new Exception("No game found with id");
 
         return game.income;
     }

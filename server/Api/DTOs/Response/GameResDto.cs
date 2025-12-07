@@ -2,6 +2,7 @@
 
 public class GameResDto
 {
+    public string id { get; set; }
     public DateTime createdAt { get; set; }
     public int income { get; set; }
     public List<int> winningNums { get; set; } = new List<int>();
