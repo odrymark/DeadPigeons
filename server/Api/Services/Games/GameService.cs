@@ -95,15 +95,4 @@ public class GameService(PigeonsDbContext context) : IGameService
             throw new Exception(ex.Message);
         }
     }
-    
-    public async Task<int> GetGameIncome(Guid id)
-    {
-        var game = await context.Games
-            .FirstOrDefaultAsync(g => g.id == id);
-
-        if (game == null)
-            throw new Exception("No game found with id");
-
-        return game.income;
-    }
 }

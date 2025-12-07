@@ -247,14 +247,6 @@ class ApiService {
         );
     }
 
-    async getWeekIncome(id: string): Promise<number> {
-        return this._get(
-            (opts) => this.api.gamesGetGameIncome(id, opts),
-            -1,
-            "Failed to retrieve week's income"
-        );
-    }
-
     async addWinningNumbers(numbers: number[]): Promise<void> {
         return this._action(
             (opts) => this.api.gamesAddWinningNumbers({ numbers }, opts),
