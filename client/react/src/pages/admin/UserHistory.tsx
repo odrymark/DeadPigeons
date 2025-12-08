@@ -10,7 +10,7 @@ export default function UserHistory() {
     const [userInfo, setUserInfo] = useState<UserInfoGet | null>(null);
     const [selectedUser, setSelectedUser] = useState<string>("");
     const [selectedMode, setSelectedMode] = useState<string>("General");
-    const [users, setUsers] = useState<string[]>([]);
+    const [users, setUsers] = useState<UserInfoGet[]>([]);
     const modes = ["General", "Payments", "Boards"];
 
     const loadUsers = useEffectEvent(async () => {
@@ -69,8 +69,8 @@ export default function UserHistory() {
                         Select User
                     </option>
                     {users.map((u) => (
-                        <option key={u} value={u} title={u}>
-                            {u}
+                        <option key={u.id} value={u.id} title={u.username}>
+                            {u.username}
                         </option>
                     ))}
                 </select>

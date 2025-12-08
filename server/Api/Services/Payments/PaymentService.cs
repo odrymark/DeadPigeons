@@ -8,12 +8,12 @@ namespace Api.Services.Payments;
 
 public class PaymentService(PigeonsDbContext context, IUserService userService) : IPaymentService
 {
-    public async Task<IEnumerable<PaymentResDto>> GetPayments(Guid? id, string? username)
+    public async Task<IEnumerable<PaymentResDto>> GetPayments(Guid? id, Guid? userId)
     {
-        if (string.IsNullOrEmpty(username))
+        if (id != null)
         {
             return await context.Payments
-                .Where(p => p.userId == id)
+                .Where(p => p.userId == id.Value)
                 .Select(p => new PaymentResDto
                 {
                     id = p.id,
@@ -24,23 +24,26 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
                 })
                 .ToListAsync();
         }
+    
+        if (userId != null)
+        {
+            var user = await userService.GetUserById(userId.Value);
         
-        var user = await userService.GetUserByName(username);
-            
-        if (user == null)
-            throw new Exception("User not found");
-            
-        return await context.Payments
-            .Where(p => p.userId == user.id)
-            .Select(p => new PaymentResDto
-            {
-                id = p.id,
-                createdAt = p.createdAt,
-                amount = p.amount,
-                paymentNumber = p.paymentNumber,
-                isApproved = p.isApproved
-            })
-            .ToListAsync();
+            return await context.Payments
+                .Where(p => p.userId == user.id)
+                .Select(p => new PaymentResDto
+                {
+                    id = p.id,
+                    createdAt = p.createdAt,
+                    amount = p.amount,
+                    paymentNumber = p.paymentNumber,
+                    isApproved = p.isApproved
+                    
+                })
+                .ToListAsync();
+        }
+    
+        throw new Exception("No user data given");
     }
     
     public async Task CreateBuyPayment(int amount, Guid userId)
@@ -66,11 +69,11 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
             .SumAsync(p => p.amount) ?? 0;
     }
     
-    public async Task AddPayment(PaymentReqDto paymentReqDto, string username)
+    public async Task AddPayment(PaymentReqDto paymentReqDto, Guid id)
     {
         try
         {
-            var user = await userService.GetUserByName(username);
+            var user = await userService.GetUserById(id);
 
             var payment = new Payment
             {

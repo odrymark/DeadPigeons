@@ -27,23 +27,11 @@ public class PaymentTest : TestBase
     [Fact]
     public async Task GetPayments_ByUserId_Returns_Payments()
     {
-        var user = await CreateUserAsync();
-        var payment = await CreatePaymentAsync(user.id, 50, true);
-
-        var payments = await _service.GetPayments(user.id, null);
-
-        Assert.Single(payments);
-        Assert.Equal(50, payments.First().amount);
-    }
-
-    [Fact]
-    public async Task GetPayments_ByUsername_Returns_Payments()
-    {
         var user = await CreateUserAsync("bob");
-        _userService.GetUserByName("bob").Returns(user);
+        _userService.GetUserById(user.id).Returns(user);
         var payment = await CreatePaymentAsync(user.id, 100, true);
 
-        var payments = await _service.GetPayments(null, "bob");
+        var payments = await _service.GetPayments(null, user.id);
 
         Assert.Single(payments);
         Assert.Equal(100, payments.First().amount);
@@ -52,9 +40,10 @@ public class PaymentTest : TestBase
     [Fact]
     public async Task GetPayments_Throws_When_UserNotFound()
     {
-        _userService.GetUserByName("ghost").Returns<User>(_ => throw new Exception("User not found"));
+        var fakeUserId = Guid.NewGuid();
+        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
 
-        await Assert.ThrowsAsync<Exception>(() => _service.GetPayments(null, "ghost"));
+        await Assert.ThrowsAsync<Exception>(() => _service.GetPayments(null, fakeUserId));
     }
 
     // -------------------------
@@ -95,11 +84,11 @@ public class PaymentTest : TestBase
     public async Task AddPayment_CreatesPayment()
     {
         var user = await CreateUserAsync("alice");
-        _userService.GetUserByName("alice").Returns(user);
+        _userService.GetUserById(user.id).Returns(user);
 
         var dto = new PaymentReqDto { paymentNumber = "12345" };
 
-        await _service.AddPayment(dto, "alice");
+        await _service.AddPayment(dto, user.id);
 
         var payment = await Db.Payments.FirstAsync();
         Assert.Equal(user.id, payment.userId);
@@ -109,11 +98,12 @@ public class PaymentTest : TestBase
     [Fact]
     public async Task AddPayment_Throws_When_UserServiceFails()
     {
-        _userService.GetUserByName("fail").Returns<User>(_ => throw new Exception("User not found"));
+        var fakeUserId = Guid.NewGuid();
+        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
 
         var dto = new PaymentReqDto { paymentNumber = "123" };
 
-        await Assert.ThrowsAsync<Exception>(() => _service.AddPayment(dto, "fail"));
+        await Assert.ThrowsAsync<Exception>(() => _service.AddPayment(dto, fakeUserId));
     }
 
     // -------------------------

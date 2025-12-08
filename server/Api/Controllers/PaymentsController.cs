@@ -23,9 +23,10 @@ public class PaymentsController(IPaymentService service) : ControllerBase
     
     [HttpGet("getPaymentsAdmin")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetPaymentsAdmin(string username)
+    public async Task<ActionResult> GetPaymentsAdmin(string idStr)
     {
-        var payments = await service.GetPayments(null, username);
+        var userId = Guid.Parse(idStr);
+        var payments = await service.GetPayments(null, userId);
         return Ok(payments);
     }
     
@@ -33,9 +34,10 @@ public class PaymentsController(IPaymentService service) : ControllerBase
     [Authorize]
     public async Task<ActionResult> AddPayment([FromBody] PaymentReqDto paymentAddReqDto)
     {
-        var username = User.Identity!.Name!;
+        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var id = Guid.Parse(idStr!);
             
-        await service.AddPayment(paymentAddReqDto, username);
+        await service.AddPayment(paymentAddReqDto, id);
         return Ok();
     }
     
