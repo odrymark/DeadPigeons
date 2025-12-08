@@ -196,20 +196,20 @@ class ApiService {
         );
     }
 
-    async getBoards(userId?: string): Promise<BoardGet[]> {
+    async getBoards(idStr?: string): Promise<BoardGet[]> {
         return this._get(
-            (opts) => userId
-                ? this.api.boardsGetBoardsAdmin({ userId }, opts)
+            (opts) => idStr
+                ? this.api.boardsGetBoardsAdmin({ idStr }, opts)
                 : this.api.boardsGetBoards(opts),
             [],
             "Failed to retrieve boards"
         );
     }
 
-    async getPayments(userId?: string): Promise<PaymentGet[]> {
+    async getPayments(idStr?: string): Promise<PaymentGet[]> {
         return this._get(
-            (opts) => userId
-                ? this.api.paymentsGetPaymentsAdmin({ userId }, opts)
+            (opts) => idStr
+                ? this.api.paymentsGetPaymentsAdmin({ idStr }, opts)
                 : this.api.paymentsGetPayments(opts),
             [],
             "Failed to retrieve payments"
@@ -272,9 +272,9 @@ class ApiService {
         );
     }
 
-    async getUserInfo(userId: string): Promise<UserInfoGet | null> {
+    async getUserInfo(idStr: string): Promise<UserInfoGet | null> {
         return this._get(
-            (opts) => this.api.usersGetUserInfo({ userId }, opts),
+            (opts) => this.api.usersGetUserInfo({ idStr }, opts),
             null,
             "Failed to get user info"
         );
