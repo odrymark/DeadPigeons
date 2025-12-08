@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { apiService } from "../../api";
-import type { PaymentGet, PaymentApprovePost } from "../../api";
+import type { PaymentGet, PaymentApprovePost, UserInfoGet } from "../../api";
 
 export default function ApprovePay() {
-    const [users, setUsers] = useState<string[]>([]);
+    const [users, setUsers] = useState<UserInfoGet[]>([]);
     const [selectedUser, setSelectedUser] = useState<string>("");
     const [payments, setPayments] = useState<PaymentGet[]>([]);
     const [editingAmountId, setEditingAmountId] = useState<string | null>(null);
@@ -45,9 +45,11 @@ export default function ApprovePay() {
             return;
         }
 
+        const selectedUsername = users.find(u => u.id === selectedUser)?.username || '';
+
         const req: PaymentApprovePost = {
             id: payment.id,
-            username: selectedUser,
+            username: selectedUsername,
             paymentNumber: payment.paymentNumber,
             amount: payment.amount,
             isApproved: approved,
@@ -89,9 +91,9 @@ export default function ApprovePay() {
                     onChange={(e) => setSelectedUser(e.target.value)}
                 >
                     <option value="">Select a User</option>
-                    {users.map(username => (
-                        <option key={username} value={username}>
-                            {username}
+                    {users.map(user => (
+                        <option key={user.id} value={user.id}>
+                            {user.username}
                         </option>
                     ))}
                 </select>
