@@ -6,8 +6,9 @@ namespace Api.Services.Users;
 
 public interface IUserService
 {
-    Task<IEnumerable<string>> GetAllUsers();
-    Task<UserInfoResDto> GetUserInfo(string username);
+    Task<IEnumerable<UserInfoResDto>> GetAllUsers();
+    Task<UserInfoResDto> GetUserInfo(Guid id);
     Task AddUser(UserAddReqDto userAddReqDto);
     Task<User> GetUserByName(string username);
+    Task<User> GetUserById(Guid userId);
 }

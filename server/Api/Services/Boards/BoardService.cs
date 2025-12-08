@@ -66,12 +66,12 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         return boards;
     }
     
-    public async Task<IEnumerable<BoardResDto>> GetBoards(Guid? id, string? username)
+    public async Task<IEnumerable<BoardResDto>> GetBoards(Guid? id, Guid? userId)
     {
-        if (string.IsNullOrEmpty(username))
+        if (id != null)
         {
             return await context.Boards
-                .Where(b => b.userId == id)
+                .Where(b => b.userId == id.Value)
                 .Select(b => new BoardResDto
                 {
                     id = b.id,
@@ -82,20 +82,25 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
                 })
                 .ToListAsync();
         }
+    
+        if (userId != null)
+        {
+            var user = await userService.GetUserById(userId.Value);
         
-        var user = await userService.GetUserByName(username);
-            
-        return await context.Boards
-            .Where(b => b.userId == user.id)
-            .Select(b => new BoardResDto
-            {
-                id = b.id,
-                numbers = b.numbers,
-                createdAt = b.createdAt,
-                isWinner = b.isWinner,
-                repeats = b.repeats
-            })
-            .ToListAsync();
+            return await context.Boards
+                .Where(b => b.userId == user.id)
+                .Select(b => new BoardResDto
+                {
+                    id = b.id,
+                    numbers = b.numbers,
+                    createdAt = b.createdAt,
+                    isWinner = b.isWinner,
+                    repeats = b.repeats
+                })
+                .ToListAsync();
+        }
+    
+        throw new Exception("No user data given");
     }
     
     public async Task AddBoard(BoardReqDto boardReqDto, Guid userId, Game? newGame)

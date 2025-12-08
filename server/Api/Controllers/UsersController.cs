@@ -27,9 +27,10 @@ public class UsersController(IUserService service) : ControllerBase
     
     [HttpGet("getUserInfo")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetUserInfo(string username)
+    public async Task<ActionResult> GetUserInfo(string idStr)
     {
-        var res = await service.GetUserInfo(username);
+        var id = Guid.Parse(idStr);
+        var res = await service.GetUserInfo(id);
         return Ok(res);
     }
 }

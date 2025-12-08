@@ -12,12 +12,13 @@ export type UserLoginPost = {
 }
 
 export type UserInfoGet = {
+    id: string;
     username: string;
-    email: string;
-    phoneNumber: string;
-    createdAt: string;
-    lastLogin: string;
-    isActive: boolean;
+    email?: string;
+    phoneNumber?: string;
+    createdAt?: string;
+    lastLogin?: string;
+    isActive?: boolean;
 }
 
 export type BoardPost = {
@@ -195,20 +196,20 @@ class ApiService {
         );
     }
 
-    async getBoards(username?: string): Promise<BoardGet[]> {
+    async getBoards(userId?: string): Promise<BoardGet[]> {
         return this._get(
-            (opts) => username
-                ? this.api.boardsGetBoardsAdmin({ username }, opts)
+            (opts) => userId
+                ? this.api.boardsGetBoardsAdmin({ userId }, opts)
                 : this.api.boardsGetBoards(opts),
             [],
             "Failed to retrieve boards"
         );
     }
 
-    async getPayments(username?: string): Promise<PaymentGet[]> {
+    async getPayments(userId?: string): Promise<PaymentGet[]> {
         return this._get(
-            (opts) => username
-                ? this.api.paymentsGetPaymentsAdmin({ username }, opts)
+            (opts) => userId
+                ? this.api.paymentsGetPaymentsAdmin({ userId }, opts)
                 : this.api.paymentsGetPayments(opts),
             [],
             "Failed to retrieve payments"
@@ -263,7 +264,7 @@ class ApiService {
         );
     }
 
-    async getAllUsers(): Promise<string[]> {
+    async getAllUsers(): Promise<UserInfoGet[]> {
         return this._get(
             (opts) => this.api.usersGetAllUsers(opts),
             [],
@@ -271,9 +272,9 @@ class ApiService {
         );
     }
 
-    async getUserInfo(username: string): Promise<UserInfoGet | null> {
+    async getUserInfo(userId: string): Promise<UserInfoGet | null> {
         return this._get(
-            (opts) => this.api.usersGetUserInfo({ username }, opts),
+            (opts) => this.api.usersGetUserInfo({ userId }, opts),
             null,
             "Failed to get user info"
         );

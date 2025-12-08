@@ -126,27 +126,14 @@ public class BoardTest : TestBase
     [Fact]
     public async Task GetBoards_ByUserId_Returns()
     {
-        var user = await CreateUserAsync("testuser");
-        var game = await CreateGameAsync();
-
-        await CreateBoardAsync(user.id, game.id, numbers: new List<int> { 7, 8, 9 });
-
-        var result = await _boardService.GetBoards(user.id, null);
-
-        Assert.Single(result);
-    }
-
-    [Fact]
-    public async Task GetBoards_ByUsername_Returns()
-    {
         var user = await CreateUserAsync("bob");
         var game = await CreateGameAsync();
 
-        _userService.GetUserByName("bob").Returns(user);
+        _userService.GetUserById(user.id).Returns(user);
 
         await CreateBoardAsync(user.id, game.id, numbers: new List<int> { 1, 1, 1 });
 
-        var result = await _boardService.GetBoards(null, "bob");
+        var result = await _boardService.GetBoards(null, user.id);
 
         Assert.Single(result);
     }

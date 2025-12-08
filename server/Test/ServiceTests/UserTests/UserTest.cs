@@ -22,22 +22,22 @@ public class UserTest : TestBase
     }
 
     // -------------------------
-    // GetUserByName
+    // GetUserById
     // -------------------------
     [Fact]
-    public async Task GetUserByName_Returns_User_When_Found()
+    public async Task GetUserById_Returns_User_When_Found()
     {
         var user = await CreateUserAsync("alice");
 
-        var result = await _service.GetUserByName("alice");
+        var result = await _service.GetUserById(user.id);
 
         Assert.Equal("alice", result.username);
     }
 
     [Fact]
-    public async Task GetUserByName_Throws_When_NotFound()
+    public async Task GetUserById_Throws_When_NotFound()
     {
-        await Assert.ThrowsAsync<Exception>(() => _service.GetUserByName("ghost"));
+        await Assert.ThrowsAsync<Exception>(() => _service.GetUserById(Guid.NewGuid()));
     }
 
     // -------------------------
@@ -46,13 +46,14 @@ public class UserTest : TestBase
     [Fact]
     public async Task GetAllUsers_Returns_Usernames()
     {
-        await CreateUserAsync("bob");
-        await CreateUserAsync("carol");
+        var user1 = await CreateUserAsync("bob");
+        var user2 = await CreateUserAsync("carol");
 
         var result = await _service.GetAllUsers();
 
-        Assert.Contains("bob", result);
-        Assert.Contains("carol", result);
+        var usernames = result.Select(u => u.username).ToList();
+        Assert.Contains("bob", usernames);
+        Assert.Contains("carol", usernames);
     }
 
     // -------------------------
@@ -63,7 +64,7 @@ public class UserTest : TestBase
     {
         var user = await CreateUserAsync("dave");
 
-        var result = await _service.GetUserInfo("dave");
+        var result = await _service.GetUserInfo(user.id);
 
         Assert.Equal("dave", result.username);
         Assert.Equal("dave@example.com", result.email);
@@ -74,7 +75,7 @@ public class UserTest : TestBase
     [Fact]
     public async Task GetUserInfo_Throws_When_NotFound()
     {
-        await Assert.ThrowsAsync<Exception>(() => _service.GetUserInfo("ghost"));
+        await Assert.ThrowsAsync<Exception>(() => _service.GetUserInfo(Guid.NewGuid()));
     }
 
     // -------------------------

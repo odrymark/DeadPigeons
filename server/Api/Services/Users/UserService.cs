@@ -18,14 +18,30 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         
         return user;
     }
-    public async Task<IEnumerable<string>> GetAllUsers()
+
+    public async Task<User> GetUserById(Guid userId)
+    {
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.id == userId);
+        
+        if (user == null)
+            throw new Exception("User not found");
+        
+        return user;
+    }
+    
+    public async Task<IEnumerable<UserInfoResDto>> GetAllUsers()
     {
         try
         {
             var users = await context.Users
-                .Select(u => u.username)
+                .Select(u => new UserInfoResDto
+                {
+                    id = u.id.ToString(),
+                    username = u.username
+                })
                 .ToListAsync();
-            
+        
             return users;
         }
         catch (Exception ex)
@@ -34,18 +50,19 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         }
     }
 
-    public async Task<UserInfoResDto> GetUserInfo(string username)
+    public async Task<UserInfoResDto> GetUserInfo(Guid id)
     {
         try
         {
             var user = await context.Users
-                .Where(u => u.username == username)
+                .Where(u => u.id == id)
                 .FirstOrDefaultAsync();
             if (user == null)
                 throw new Exception("No user found");
 
             return new UserInfoResDto
             {
+                id = user.id.ToString(),
                 username = user.username,
                 createdAt = user.createdAt,
                 lastLogin = user.lastLogin,

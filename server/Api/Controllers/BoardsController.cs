@@ -23,9 +23,10 @@ public class BoardsController(IBoardService service) : ControllerBase
     
     [HttpGet("getBoardsAdmin")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> GetBoardsAdmin(string username)
+    public async Task<ActionResult> GetBoardsAdmin(string idStr)
     {
-        var boards = await service.GetBoards(null, username);
+        var userId = Guid.Parse(idStr);
+        var boards = await service.GetBoards(null, userId);
         return Ok(boards);
     }
 
