@@ -396,7 +396,7 @@ export class Api<
      */
     boardsGetBoardsAdmin: (
       query?: {
-        userId?: string;
+        idStr?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -568,7 +568,7 @@ export class Api<
      */
     paymentsGetPaymentsAdmin: (
       query?: {
-          userId?: string;
+          idStr?: string;
       },
       params: RequestParams = {},
     ) =>
@@ -664,7 +664,7 @@ export class Api<
      */
     usersGetUserInfo: (
       query?: {
-          userId?: string;
+          idStr?: string;
       },
       params: RequestParams = {},
     ) =>
