@@ -116,8 +116,15 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         user.username = userEditReqDto.username;
         user.email = userEditReqDto.email;
         user.phoneNumber = userEditReqDto.phoneNumber;
-        user.password = passwordService.HashPassword(userEditReqDto.password);
         user.isActive = userEditReqDto.isActive;
+
+        if (!string.IsNullOrEmpty(userEditReqDto.password))
+        {
+            if (userEditReqDto.password.Length < 8)
+                throw new Exception("Password must be at least 8 characters.");
+            
+            user.password = passwordService.HashPassword(userEditReqDto.password);
+        }
         
         await context.SaveChangesAsync();
     }

@@ -44,6 +44,7 @@ export default function EditUser() {
                 }
 
                 setUsername(user.username);
+                setPassword("");
                 setEmail(user.email!);
                 setPhone(user.phoneNumber!);
                 setIsActive(user.isActive!);
@@ -61,7 +62,7 @@ export default function EditUser() {
         e.preventDefault();
         setError("");
 
-        if (!selectedUserId || !username || !password || !email || !phone) {
+        if (!selectedUserId || !username || !email || !phone) {
             setError("All fields are required");
             return;
         }
@@ -72,7 +73,7 @@ export default function EditUser() {
             await apiService.editUser({
                 id: selectedUserId,
                 username,
-                password,
+                password: password || "",
                 email,
                 phoneNumber: phone,
                 isActive
