@@ -6,6 +6,7 @@ export default function EditUser() {
     const [selectedUserId, setSelectedUserId] = useState("");
 
     const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [isActive, setIsActive] = useState(false);
@@ -60,7 +61,7 @@ export default function EditUser() {
         e.preventDefault();
         setError("");
 
-        if (!selectedUserId || !username || !email || !phone) {
+        if (!selectedUserId || !username || !password || !email || !phone) {
             setError("All fields are required");
             return;
         }
@@ -71,7 +72,7 @@ export default function EditUser() {
             await apiService.editUser({
                 id: selectedUserId,
                 username,
-                password: "",
+                password,
                 email,
                 phoneNumber: phone,
                 isActive
@@ -118,6 +119,15 @@ export default function EditUser() {
                     className="input input-bordered w-full"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    disabled={!selectedUserId || loadingUser}
+                />
+
+                <input
+                    type="password"
+                    placeholder="New Password (leave blank to keep current)"
+                    className="input input-bordered w-full"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     disabled={!selectedUserId || loadingUser}
                 />
 
