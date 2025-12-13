@@ -78,6 +78,15 @@ export type UserAddPost = {
     phoneNumber: string;
 }
 
+export type UserEditPost = {
+    id: string;
+    username: string;
+    password: string;
+    email: string;
+    phoneNumber: string;
+    isActive: boolean;
+}
+
 export const defApi = new Api({
     baseUrl: 'https://dead-pigeons-backend.fly.dev'
 });
@@ -325,6 +334,14 @@ class ApiService {
             (opts) => this.api.boardsGetPrevBoardsForUser(opts),
             [],
             "Failed to get boards for user"
+        );
+    }
+
+    async editUser(user: UserEditPost): Promise<void> {
+        return this._action(
+            (opts) => this.api.usersEditUser(user, opts),
+            "Payment approved successfully!",
+            "Failed to approve payment"
         );
     }
 }

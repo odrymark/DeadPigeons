@@ -33,4 +33,12 @@ public class UsersController(IUserService service) : ControllerBase
         var res = await service.GetUserInfo(id);
         return Ok(res);
     }
+
+    [HttpPost("editUser")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> EditUser([FromBody] UserEditReqDto userReqDto)
+    {
+        await service.EditUser(userReqDto);
+        return Ok();
+    }
 }

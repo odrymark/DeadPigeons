@@ -55,10 +55,10 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         try
         {
             var user = await context.Users
-                .Where(u => u.id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(u => u.id == id);
+        
             if (user == null)
-                throw new Exception("No user found");
+                throw new Exception("User not found");
 
             return new UserInfoResDto
             {
@@ -101,6 +101,24 @@ public class UserService(PigeonsDbContext context, IPasswordService passwordServ
         };
 
         context.Users.Add(user);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task EditUser(UserEditReqDto userEditReqDto)
+    {
+        var id = Guid.Parse(userEditReqDto.id);
+        var user = await context.Users
+            .FirstOrDefaultAsync(u => u.id == id);
+        
+        if (user == null)
+            throw new Exception("User not found");
+        
+        user.username = userEditReqDto.username;
+        user.email = userEditReqDto.email;
+        user.phoneNumber = userEditReqDto.phoneNumber;
+        user.password = passwordService.HashPassword(userEditReqDto.password);
+        user.isActive = userEditReqDto.isActive;
+        
         await context.SaveChangesAsync();
     }
 }
