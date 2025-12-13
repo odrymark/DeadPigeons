@@ -151,4 +151,48 @@ public class UserTest : TestBase
 
         await Assert.ThrowsAsync<Exception>(() => _service.AddUser(dto));
     }
+    
+    // -------------------------
+    // EditUser
+    // -------------------------
+    [Fact]
+    public async Task EditUser_Updates_User_When_Found()
+    {
+        var originalUser = await CreateUserAsync("jason");
+        var editDto = new UserEditReqDto
+        {
+            id = originalUser.id.ToString(),
+            username = "jason_updated",
+            email = "jason.updated@example.com",
+            phoneNumber = "9999999999",
+            password = "newStrongPassword123",
+            isActive = true
+        };
+
+        await _service.EditUser(editDto);
+
+        var updatedUser = await Db.Users.FirstAsync(u => u.id == originalUser.id);
+
+        Assert.Equal("jason_updated", updatedUser.username);
+        Assert.Equal("jason.updated@example.com", updatedUser.email);
+        Assert.Equal("9999999999", updatedUser.phoneNumber);
+        Assert.True(updatedUser.isActive);
+        Assert.Equal("HASH_newStrongPassword123", updatedUser.password);
+    }
+
+    [Fact]
+    public async Task EditUser_Throws_When_User_Not_Found()
+    {
+        var editDto = new UserEditReqDto
+        {
+            id = Guid.NewGuid().ToString(),
+            username = "nonexistent",
+            email = "nope@example.com",
+            phoneNumber = "0000000000",
+            password = "irrelevant",
+            isActive = false
+        };
+
+        await Assert.ThrowsAsync<Exception>(() => _service.EditUser(editDto));
+    }
 }

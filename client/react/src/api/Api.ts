@@ -25,6 +25,15 @@ export interface BoardReqDTO {
   repeats?: number;
 }
 
+export interface UserEditReqDTO {
+    id: string;
+    username: string;
+    password: string;
+    email: string;
+    phoneNumber: string;
+    isActive: boolean;
+}
+
 export interface WinningNumsReqDTO {
   /**
    * @maxItems 3
@@ -640,6 +649,22 @@ export class Api<
         type: ContentType.Json,
         ...params,
       }),
+
+      /**
+       * No description
+       *
+       * @tags Users
+       * @name UsersEditUser
+       * @request POST:/api/users/editUser
+       */
+      usersEditUser: (data: UserEditPost, params: RequestParams = {}) =>
+          this.request<File, any>({
+              path: `/api/users/editUser`,
+              method: "POST",
+              body: data,
+              type: ContentType.Json,
+              ...params,
+          }),
 
     /**
      * No description

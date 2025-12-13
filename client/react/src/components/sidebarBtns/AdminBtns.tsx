@@ -38,6 +38,16 @@ export default function AdminBtns({ close }: { close?: () => void }) {
             <button
                 className="btn btn-primary w-full"
                 onClick={() => {
+                    navigate("/dashboard/editUser");
+                    close?.();
+                }}
+            >
+                Edit User
+            </button>
+
+            <button
+                className="btn btn-primary w-full"
+                onClick={() => {
                     navigate("/dashboard/approvePay");
                     close?.();
                 }}

@@ -11,4 +11,5 @@ public interface IUserService
     Task AddUser(UserAddReqDto userAddReqDto);
     Task<User> GetUserByName(string username);
     Task<User> GetUserById(Guid userId);
+    Task EditUser(UserEditReqDto userEditReqDto);
 }

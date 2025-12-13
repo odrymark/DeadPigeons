@@ -12,6 +12,7 @@ import AdminRoute from "./components/AdminRoute.tsx";
 import UserHistory from "./pages/admin/UserHistory.tsx";
 import ApprovePay from "./pages/admin/ApprovePay.tsx";
 import MainPage from "./pages/HomePage.tsx";
+import EditUser from "./pages/admin/EditUser.tsx";
 
 const routes : RouteObject[] = [
     {
@@ -83,6 +84,14 @@ const routes : RouteObject[] = [
                 element: (
                     <AdminRoute>
                         <ApprovePay/>
+                    </AdminRoute>
+                )
+            },
+            {
+                path: "editUser",
+                element: (
+                    <AdminRoute>
+                        <EditUser/>
                     </AdminRoute>
                 )
             }
