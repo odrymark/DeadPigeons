@@ -17,7 +17,7 @@ export default function Sidebar() {
     const [isLightTheme, setLightTheme] = useState(true);
     const [loading, setLoading] = useState(true);
 
-    const darkTheme = "dark";
+    const darkTheme = "night";
     const lightTheme = "light";
 
     useEffect(() => {
