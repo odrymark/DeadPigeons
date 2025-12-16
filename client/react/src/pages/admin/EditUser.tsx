@@ -15,7 +15,6 @@ export default function EditUser() {
     const [loading, setLoading] = useState(false);
     const [loadingUser, setLoadingUser] = useState(false);
 
-    // 🔹 Load users for dropdown (id + username only)
     useEffect(() => {
         const loadUsers = async () => {
             try {

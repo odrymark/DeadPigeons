@@ -1,6 +1,6 @@
 import {createBrowserRouter, type RouteObject, RouterProvider, Navigate} from "react-router-dom";
 import Login from "./pages/Login.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
+import Sidebar from "./pages/Sidebar.tsx";
 import PrevBoards from "./pages/user/PrevBoards.tsx";
 import BuyBoard from "./pages/user/BuyBoard.tsx";
 import PrevPayments from "./pages/user/PrevPayments.tsx";
@@ -25,7 +25,7 @@ const routes : RouteObject[] = [
     },
     {
         path: "/dashboard",
-        element: <Dashboard/>,
+        element: <Sidebar/>,
         children: [
             {
                 path: "/dashboard/",
