@@ -71,7 +71,7 @@ export default function UserHistory() {
     }, [selectedUser, selectedMode]);
 
     return (
-        <div className="bg-base-100 w-full flex flex-col p-6 box-border">
+        <div className="bg-base-300 w-full flex flex-col p-6 box-border">
             <div className="flex gap-4 max-w-3xl mx-auto mb-8">
                 <select
                     value={selectedUser}
