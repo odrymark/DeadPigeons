@@ -34,6 +34,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
 
         var boards = await context.Boards
             .Where(b => b.gameId == game.id && b.userId == userId)
+            .OrderByDescending(b => b.createdAt)
             .Select(b => new BoardResDto
             {
                 id = b.id,
@@ -53,6 +54,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
 
         var boards = await context.Boards
             .Where(b => b.gameId == lastGame.id && b.userId == userId)
+            .OrderByDescending(b => b.createdAt)
             .Select(b => new BoardResDto
             {
                 id = b.id,
@@ -72,6 +74,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         {
             return await context.Boards
                 .Where(b => b.userId == id.Value)
+                .OrderByDescending(b => b.createdAt)
                 .Select(b => new BoardResDto
                 {
                     id = b.id,
@@ -89,6 +92,7 @@ public class BoardService(PigeonsDbContext context, IPaymentService paymentServi
         
             return await context.Boards
                 .Where(b => b.userId == user.id)
+                .OrderByDescending(b => b.createdAt)
                 .Select(b => new BoardResDto
                 {
                     id = b.id,
