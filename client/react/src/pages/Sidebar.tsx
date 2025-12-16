@@ -18,7 +18,7 @@ export default function Sidebar() {
     const [loading, setLoading] = useState(true);
 
     const darkTheme = "dark";
-    const lightTheme = "emerald";
+    const lightTheme = "light";
 
     useEffect(() => {
         async function fetchUserData() {
