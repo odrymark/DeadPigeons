@@ -17,7 +17,7 @@ export default function Sidebar() {
     const [isLightTheme, setLightTheme] = useState(true);
     const [loading, setLoading] = useState(true);
 
-    const darkTheme = "forest";
+    const darkTheme = "dark";
     const lightTheme = "emerald";
 
     useEffect(() => {
@@ -81,7 +81,7 @@ export default function Sidebar() {
             <div
                 className={`fixed top-0 left-0 h-full w-64 bg-base-100 shadow-xl z-50 transform transition-transform duration-300 flex flex-col ${open ? "translate-x-0" : "-translate-x-full"}`}
             >
-                <div className={`shrink-0 p-4 ${open ? 'border-b' : ''}`}>
+                <div className="shrink-0 p-4 border-b border-base-300">
                     <div className="flex items-center justify-between">
                         <div className="flex flex-col gap-1">
                             <span className="text-lg font-bold">{user.username}</span>
@@ -130,7 +130,7 @@ export default function Sidebar() {
                     </div>
                 </div>
 
-                <div className={`shrink-0 p-4 ${open ? 'border-t' : ''}`}>
+                <div className="shrink-0 p-4 border-t border-base-300">
                     <button
                         className="btn btn-error w-full flex items-center justify-center gap-2"
                         onClick={async () => {
