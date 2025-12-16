@@ -6,8 +6,8 @@ interface Props {
 
 export default function PaymentsTable({ payments }: Props) {
     return (
-        <div className="overflow-x-auto max-w-3xl mx-auto w-full">
-            <table className="table table-zebra w-full shadow-md rounded-box">
+        <div className="bg-base-200 overflow-x-auto max-w-3xl mx-auto w-full">
+            <table className="table table-zebra bg-base-200 w-full shadow-md rounded-box">
                 <thead>
                 <tr>
                     <th className="text-left">Date</th>
@@ -55,7 +55,7 @@ export default function PaymentsTable({ payments }: Props) {
             </table>
 
             {payments.length === 0 && (
-                <div className="text-center py-8 text-base-content/60">
+                <div className="bg-base-200 text-center py-8 text-base-content/60">
                     No payments yet.
                 </div>
             )}
