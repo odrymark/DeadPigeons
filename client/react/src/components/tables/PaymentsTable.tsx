@@ -9,7 +9,7 @@ export default function PaymentsTable({ payments }: Props) {
         <div className="overflow-x-auto max-w-3xl mx-auto w-full">
             <table className="table table-zebra w-full shadow-md rounded-box">
                 <thead>
-                <tr className="bg-base-100">
+                <tr>
                     <th className="text-left">Date</th>
                     <th className="text-left">Status</th>
                     <th className="text-center">Amount</th>
