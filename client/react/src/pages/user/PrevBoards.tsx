@@ -1,21 +1,36 @@
-import {useEffect, useState} from "react";
-import {type BoardGet, apiService} from "../../api";
+import { useEffect, useState } from "react";
+import { type BoardGet, apiService } from "../../api";
 import BoardsTable from "../../components/tables/BoardsTable.tsx";
 
 export default function PrevBoards() {
     const [boards, setBoards] = useState<BoardGet[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchBoards() {
-            const data = await apiService.getBoards();
-            if (data) setBoards(data);
+            setLoading(true);
+            try {
+                const data = await apiService.getBoards();
+                setBoards(data);
+            }
+            finally {
+                setLoading(false);
+            }
         }
         fetchBoards();
     }, []);
 
+    if (loading) {
+        return (
+            <div className="w-full flex justify-center items-center py-20">
+                <span className="loading loading-dots loading-lg"></span>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-base-200 w-full flex flex-col p-6 box-border">
-            <BoardsTable boards={boards}/>
+            <BoardsTable boards={boards} />
         </div>
     );
 }

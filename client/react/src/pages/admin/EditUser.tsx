@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {apiService, type UserInfoGet} from "../../api";
+import { apiService, type UserInfoGet } from "../../api";
 
 export default function EditUser() {
     const [users, setUsers] = useState<UserInfoGet[]>([]);
@@ -108,8 +108,8 @@ export default function EditUser() {
                 </select>
 
                 {loadingUser && (
-                    <div className="text-sm text-base-content/70">
-                        Loading user info…
+                    <div className="flex justify-center py-4">
+                        <span className="loading loading-dots loading-lg"></span>
                     </div>
                 )}
 

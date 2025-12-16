@@ -7,7 +7,7 @@ interface Props {
 export default function PaymentsTable({ payments }: Props) {
     return (
         <div className="overflow-x-auto max-w-3xl mx-auto w-full">
-            <table className="table table-zebra w-full bg-base-100 shadow-md rounded-box">
+            <table className="table w-full bg-base-100 shadow-md rounded-box">
                 <thead>
                 <tr className="bg-base-200">
                     <th className="text-left">Date</th>

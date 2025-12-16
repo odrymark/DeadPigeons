@@ -1,37 +1,52 @@
 import { useNavigate } from "react-router-dom";
 import BoardsTable from "../components/tables/BoardsTable";
 import { useEffect, useState } from "react";
-import {type BoardGet, type CurrGameCloseGet, apiService} from "../api";
+import { type BoardGet, type CurrGameCloseGet, apiService } from "../api";
 
 export default function MainPage() {
     const navigate = useNavigate();
 
-    const [currGameClose, setCurrGameClose] = useState<CurrGameCloseGet| null>(null);
+    const [currGameClose, setCurrGameClose] = useState<CurrGameCloseGet | null>(null);
     const [lastGameNums, setLastGameNums] = useState<number[]>([]);
-
     const [currentBoards, setCurrentBoards] = useState<BoardGet[]>([]);
     const [previousBoards, setPreviousBoards] = useState<BoardGet[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        (async () => {
-            const [
-                close,
-                nums,
-                cBoards,
-                pBoards
-            ] = await Promise.all([
-                apiService.getCurrentGameClosing(),
-                apiService.getLastGameNums(),
-                apiService.getCurrentBoardsForUser(),
-                apiService.getPreviousBoardsForUser()
-            ]);
+        async function fetchData() {
+            setLoading(true);
+            try {
+                const [
+                    close,
+                    nums,
+                    cBoards,
+                    pBoards
+                ] = await Promise.all([
+                    apiService.getCurrentGameClosing(),
+                    apiService.getLastGameNums(),
+                    apiService.getCurrentBoardsForUser(),
+                    apiService.getPreviousBoardsForUser()
+                ]);
 
-            setCurrGameClose(close);
-            setLastGameNums(nums);
-            setCurrentBoards(cBoards);
-            setPreviousBoards(pBoards);
-        })();
+                setCurrGameClose(close ?? null);
+                setLastGameNums(nums ?? []);
+                setCurrentBoards(cBoards ?? []);
+                setPreviousBoards(pBoards ?? []);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchData();
     }, []);
+
+    if (loading) {
+        return (
+            <div className="w-full min-h-screen flex justify-center items-center">
+                <span className="loading loading-dots loading-lg"></span>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full min-h-screen p-6 flex justify-center">
@@ -45,7 +60,7 @@ export default function MainPage() {
                         <p className="text-lg font-semibold">
                             {currGameClose
                                 ? new Date(currGameClose.closeDate).toLocaleString()
-                                : "Loading..."}
+                                : "–"}
                         </p>
 
                         <button
@@ -78,7 +93,7 @@ export default function MainPage() {
                         <p className="text-lg font-semibold">
                             {lastGameNums.length > 0
                                 ? lastGameNums.join(", ")
-                                : "Loading..."}
+                                : "–"}
                         </p>
                     </div>
 
