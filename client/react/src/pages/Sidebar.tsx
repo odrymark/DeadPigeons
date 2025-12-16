@@ -15,20 +15,33 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [isLightTheme, setLightTheme] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     const darkTheme = "forest";
     const lightTheme = "emerald";
 
     useEffect(() => {
-        (async () => {
-            const u = await apiService.getCurrentUser();
-            if (u) setUser(u);
-            else navigate("/");
+        async function fetchUserData() {
+            setLoading(true);
+            try {
+                const u = await apiService.getCurrentUser();
+                if (u) {
+                    setUser(u);
 
-            const bal = await apiService.getBalance();
-            setBalance(bal);
-        })();
-    }, []);
+                    if (!u.isAdmin) {
+                        const bal = await apiService.getBalance();
+                        setBalance(bal);
+                    }
+                } else {
+                    navigate("/");
+                }
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchUserData();
+    }, [navigate, setUser, setBalance]);
 
     const toggleTheme = () => {
         const newTheme = isLightTheme ? darkTheme : lightTheme;
@@ -36,7 +49,17 @@ export default function Sidebar() {
         document.documentElement.dataset.theme = newTheme;
     };
 
-    if (!user) return <div>Loading...</div>;
+    if (loading) {
+        return (
+            <div className="min-h-screen w-screen flex justify-center items-center bg-base-200">
+                <span className="loading loading-dots loading-lg"></span>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-base-200 w-screen flex flex-col relative overflow-hidden">
@@ -54,6 +77,7 @@ export default function Sidebar() {
                 />
             )}
 
+            {/* Sidebar Drawer */}
             <div
                 className={`fixed top-0 left-0 h-full w-64 bg-base-100 shadow-xl z-50 transform transition-transform duration-300 flex flex-col ${open ? "translate-x-0" : "-translate-x-full"}`}
             >
