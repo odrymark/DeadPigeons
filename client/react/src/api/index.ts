@@ -340,8 +340,8 @@ class ApiService {
     async editUser(user: UserEditPost): Promise<void> {
         return this._action(
             (opts) => this.api.usersEditUser(user, opts),
-            "Payment approved successfully!",
-            "Failed to approve payment"
+            "User updated successfully!",
+            "Failed to update user"
         );
     }
 }

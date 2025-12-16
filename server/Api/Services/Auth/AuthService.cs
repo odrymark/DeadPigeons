@@ -13,10 +13,13 @@ public class AuthService(ITokenService tokenService, IPasswordService passwordSe
     {
         var user = await context.Users
             .FirstOrDefaultAsync(u => u.username == userLoginReqDto.username);
-
+        
         if (user == null || !passwordService.VerifyHashedPassword(user.password, userLoginReqDto.password))
             throw new Exception("Invalid login credentials");
-
+        
+        if (!user.isActive)
+            throw new Exception("User is inactive");
+        
         var token = tokenService.GenerateToken(user);
         var refresh = tokenService.GenerateRefreshToken();
 

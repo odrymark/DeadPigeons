@@ -8,7 +8,7 @@ export default function PaymentsTable({ payments }: Props) {
     return (
         <>
             {/* HEADER */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-lg shadow font-bold text-lg border-b">
+            <div className="grid grid-cols-1 sm:grid-cols-4 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-t-box shadow font-bold text-lg border-b">
                 <div>Date</div>
                 <div>Status</div>
                 <div>Amount</div>
@@ -16,31 +16,34 @@ export default function PaymentsTable({ payments }: Props) {
             </div>
 
             {/* LIST */}
-            <div className="mt-4 flex flex-col gap-4 max-w-3xl mx-auto w-full">
+            <ul className="list bg-base-100 rounded-b-box shadow-md max-w-3xl mx-auto w-full">
                 {payments.map((p) => (
-                    <div
-                        key={p.id}
-                        className="grid grid-cols-1 sm:grid-cols-4 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
-                    >
+                    <li key={p.id} className="list-row p-4">
                         <div>{new Date(p.createdAt).toLocaleDateString()}</div>
+
+                        {/* Status */}
                         <div
-                            className={
+                            className={`font-semibold text-center sm:text-left ${
                                 p.isApproved === null
-                                    ? "text-yellow-500 font-semibold"
+                                    ? "text-warning"
                                     : p.isApproved
-                                        ? "text-green-600 font-semibold"
-                                        : "text-red-600 font-semibold"
-                            }
+                                        ? "text-success"
+                                        : "text-error"
+                            }`}
                         >
                             {p.isApproved === null ? "Pending" : p.isApproved ? "Approved" : "Rejected"}
                         </div>
-                        <div className="font-bold">
-                            {p.isApproved === false || p.amount === null ? "" : `${p.amount} DKK`}
+
+                        <div className="font-bold text-center sm:text-left">
+                            {p.isApproved === false || p.amount === null ? "–" : `${p.amount} DKK`}
                         </div>
-                        <div>{p.paymentNumber}</div>
-                    </div>
+
+                        <div className="text-right sm:text-left">
+                            {p.paymentNumber}
+                        </div>
+                    </li>
                 ))}
-            </div>
+            </ul>
         </>
     );
 }

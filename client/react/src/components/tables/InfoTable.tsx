@@ -16,7 +16,7 @@ export default function InfoTable({ userInfo }: Props) {
     const dateFields: (keyof UserInfoGet)[] = ["createdAt", "lastLogin"];
 
     const formatValue = (key: keyof UserInfoGet, value: any) => {
-        if (dateFields.includes(key)) {
+        if (dateFields.includes(key) && value) {
             return new Date(value).toLocaleString();
         }
 
@@ -24,27 +24,32 @@ export default function InfoTable({ userInfo }: Props) {
             return value ? "Yes" : "No";
         }
 
+        if (value === null || value === undefined) {
+            return "–";
+        }
+
         return String(value);
     };
 
     const entries = Object.entries(userInfo) as [keyof UserInfoGet, any][];
 
-    return (
-        <>
-            <div className="mt-4 flex flex-col gap-4 max-w-3xl mx-auto w-full">
-                {entries.map(([key, value]) => (
-                    <div
-                        key={key}
-                        className="grid grid-cols-1 sm:grid-cols-2 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
-                    >
-                        <div className="font-semibold capitalize">
-                            {key.replace(/([A-Z])/g, " $1")}
-                        </div>
+    const filteredEntries = entries.filter(
+        ([key]) => !["password"].includes(key)
+    );
 
-                        <div>{formatValue(key, value)}</div>
+    return (
+        <ul className="list bg-base-100 rounded-box shadow-md max-w-3xl mx-auto w-full mt-4">
+            {filteredEntries.map(([key, value]) => (
+                <li key={key} className="list-row p-4">
+                    <div className="font-semibold capitalize w-48">
+                        {key.replace(/([A-Z])/g, " $1").trim()}
                     </div>
-                ))}
-            </div>
-        </>
+
+                    <div className="list-col-grow text-right sm:text-left">
+                        {formatValue(key, value)}
+                    </div>
+                </li>
+            ))}
+        </ul>
     );
 }
