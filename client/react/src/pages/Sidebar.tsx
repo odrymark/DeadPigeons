@@ -40,7 +40,6 @@ export default function Sidebar() {
 
     return (
         <div className="min-h-screen bg-base-200 w-screen flex flex-col relative overflow-hidden">
-            {/* Sidebar Toggle Button */}
             <button
                 className="btn btn-primary absolute top-4 left-4 z-50"
                 onClick={() => setOpen(true)}
@@ -52,14 +51,13 @@ export default function Sidebar() {
                 <div
                     className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40"
                     onClick={() => setOpen(false)}
-                ></div>
+                />
             )}
 
-            {/* Sidebar Drawer */}
             <div
-                className={`fixed top-0 left-0 h-full w-64 bg-base-100 shadow-xl z-50 transform transition-transform duration-300 flex flex-col p-4 gap-4 ${open ? "translate-x-0" : "-translate-x-full"}`}
+                className={`fixed top-0 left-0 h-full w-64 bg-base-100 shadow-xl z-50 transform transition-transform duration-300 flex flex-col ${open ? "translate-x-0" : "-translate-x-full"}`}
             >
-                <div className="flex items-center justify-between pb-4 border-b border-base-300">
+                <div className="flex items-center justify-between p-4 border-b border-base-300">
                     <div className="flex flex-col gap-1">
                         <span className="text-lg font-bold">{user.username}</span>
                         {user.isAdmin ? (
@@ -67,16 +65,6 @@ export default function Sidebar() {
                         ) : (
                             <span className="badge badge-secondary w-fit">Balance: {balance} DKK</span>
                         )}
-
-                        <button
-                            className="btn btn-error btn-sm mt-2 w-fit flex items-center gap-2"
-                            onClick={async () => {
-                                await apiService.logout();
-                                navigate("/login");
-                            }}
-                        >
-                            <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
-                        </button>
                     </div>
 
                     <label className="swap swap-rotate">
@@ -89,7 +77,7 @@ export default function Sidebar() {
                         />
 
                         <svg
-                            className="swap-off h-10 w-10 fill-current"
+                            className="swap-off h-7 w-7 fill-current"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
                         >
@@ -97,7 +85,7 @@ export default function Sidebar() {
                         </svg>
 
                         <svg
-                            className="swap-on h-10 w-10 fill-current"
+                            className="swap-on h-7 w-7 fill-current"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
                         >
@@ -106,21 +94,37 @@ export default function Sidebar() {
                     </label>
                 </div>
 
-                <button
-                    className="btn btn-primary w-full flex items-center gap-2"
-                    onClick={() => {
-                        navigate("/dashboard");
-                        setOpen(false);
-                    }}
-                >
-                    <img src={homeIcon} alt="Home" className="h-6 w-6" /> Home
-                </button>
+                <div className="px-4 mt-2">
+                    <button
+                        className="btn btn-error btn-sm w-full flex items-center justify-center gap-2"
+                        onClick={async () => {
+                            await apiService.logout();
+                            navigate("/login");
+                        }}
+                    >
+                        <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
+                    </button>
+                </div>
 
-                {user.isAdmin ? (
-                    <AdminBtns close={() => setOpen(false)} />
-                ) : (
-                    <UserBtns close={() => setOpen(false)} />
-                )}
+                <div className="px-4 mt-4">
+                    <button
+                        className="btn btn-primary w-full flex items-center gap-2"
+                        onClick={() => {
+                            navigate("/dashboard");
+                            setOpen(false);
+                        }}
+                    >
+                        <img src={homeIcon} alt="Home" className="h-6 w-6" /> Home
+                    </button>
+                </div>
+
+                <div className="flex-1 px-4 mt-4 overflow-y-auto">
+                    {user.isAdmin ? (
+                        <AdminBtns close={() => setOpen(false)} />
+                    ) : (
+                        <UserBtns close={() => setOpen(false)} />
+                    )}
+                </div>
             </div>
 
             <Outlet />
