@@ -94,18 +94,6 @@ export default function Sidebar() {
                     </label>
                 </div>
 
-                <div className="px-4 mt-2">
-                    <button
-                        className="btn btn-error btn-sm w-full flex items-center justify-center gap-2"
-                        onClick={async () => {
-                            await apiService.logout();
-                            navigate("/login");
-                        }}
-                    >
-                        <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
-                    </button>
-                </div>
-
                 <div className="px-4 mt-4">
                     <button
                         className="btn btn-primary w-full flex items-center gap-2"
@@ -118,12 +106,24 @@ export default function Sidebar() {
                     </button>
                 </div>
 
-                <div className="flex-1 px-4 mt-4 overflow-y-auto">
+                <div className="flex-1 px-4 mt-6 overflow-y-auto">
                     {user.isAdmin ? (
                         <AdminBtns close={() => setOpen(false)} />
                     ) : (
                         <UserBtns close={() => setOpen(false)} />
                     )}
+                </div>
+
+                <div className="p-4 border-t border-base-300">
+                    <button
+                        className="btn btn-error w-full flex items-center justify-center gap-2"
+                        onClick={async () => {
+                            await apiService.logout();
+                            navigate("/login");
+                        }}
+                    >
+                        <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
+                    </button>
                 </div>
             </div>
 
