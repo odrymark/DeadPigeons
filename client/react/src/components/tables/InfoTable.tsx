@@ -39,7 +39,7 @@ export default function InfoTable({ userInfo }: Props) {
         <div className="overflow-x-auto max-w-3xl mx-auto w-full mt-4">
             <table className="table table-zebra w-full shadow-md rounded-box">
                 <thead>
-                <tr className="bg-base-100">
+                <tr>
                     <th className="text-left w-1/3">Field</th>
                     <th className="text-left">Value</th>
                 </tr>
