@@ -7,7 +7,7 @@ interface Props {
 export default function InfoTable({ userInfo }: Props) {
     if (!userInfo) {
         return (
-            <div className="text-center text-base-content/60 mt-8">
+            <div className="bg-base-200 text-center text-base-content/60 mt-8">
                 No user selected.
             </div>
         );
@@ -36,8 +36,8 @@ export default function InfoTable({ userInfo }: Props) {
     const filteredEntries = entries.filter(([key]) => !["password"].includes(key));
 
     return (
-        <div className="overflow-x-auto max-w-3xl mx-auto w-full mt-4">
-            <table className="table table-zebra w-full shadow-md rounded-box">
+        <div className="bg-base-200 overflow-x-auto max-w-3xl mx-auto w-full mt-4">
+            <table className="table table-zebra bg-base-200 w-full shadow-md rounded-box">
                 <thead>
                 <tr>
                     <th className="text-left w-1/3">Field</th>
