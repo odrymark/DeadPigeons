@@ -28,7 +28,7 @@ export default function BoardsTable({ boards }: Props) {
     return (
         <div className="bg-base-200 overflow-x-auto max-w-3xl mx-auto w-full">
             <table className="table table-zebra bg-base-200 w-full shadow-md rounded-box">
-                <thead className="border-b-0">
+                <thead>
                 <tr>
                     <th className="text-left">Date</th>
                     <th className="text-left">Numbers</th>
