@@ -14,6 +14,7 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
         {
             return await context.Payments
                 .Where(p => p.userId == id.Value)
+                .OrderByDescending(p => p.createdAt)
                 .Select(p => new PaymentResDto
                 {
                     id = p.id,
@@ -31,6 +32,7 @@ public class PaymentService(PigeonsDbContext context, IUserService userService) 
         
             return await context.Payments
                 .Where(p => p.userId == user.id)
+                .OrderByDescending(p => p.createdAt)
                 .Select(p => new PaymentResDto
                 {
                     id = p.id,

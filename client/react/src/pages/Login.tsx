@@ -46,8 +46,6 @@ export default function Login() {
     return (
         <div className="hero min-h-screen bg-base-200">
             <div className="hero-content flex-col">
-                <h1 className="text-5xl font-bold text-center mb-10">Dead Pigeons</h1>
-
                 <div className="card w-full max-w-sm shadow-2xl bg-base-100">
                     <fieldset className="border border-base-300 rounded-box p-8">
                         <legend className="text-2xl font-semibold px-4">Login</legend>
