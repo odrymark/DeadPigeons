@@ -7,7 +7,7 @@ interface Props {
 export default function InfoTable({ userInfo }: Props) {
     if (!userInfo) {
         return (
-            <div className="text-center text-gray-500 mt-6">
+            <div className="text-center text-base-content/60 mt-8">
                 No user selected.
             </div>
         );
@@ -33,23 +33,28 @@ export default function InfoTable({ userInfo }: Props) {
 
     const entries = Object.entries(userInfo) as [keyof UserInfoGet, any][];
 
-    const filteredEntries = entries.filter(
-        ([key]) => !["password"].includes(key)
-    );
+    const filteredEntries = entries.filter(([key]) => !["password"].includes(key));
 
     return (
-        <ul className="list bg-base-100 rounded-box shadow-md max-w-3xl mx-auto w-full mt-4">
-            {filteredEntries.map(([key, value]) => (
-                <li key={key} className="list-row p-4">
-                    <div className="font-semibold capitalize w-48">
-                        {key.replace(/([A-Z])/g, " $1").trim()}
-                    </div>
-
-                    <div className="list-col-grow text-right sm:text-left">
-                        {formatValue(key, value)}
-                    </div>
-                </li>
-            ))}
-        </ul>
+        <div className="overflow-x-auto max-w-3xl mx-auto w-full mt-4">
+            <table className="table table-zebra w-full bg-base-100 shadow-md rounded-box">
+                <thead>
+                <tr className="bg-base-200">
+                    <th className="text-left w-1/3">Field</th>
+                    <th className="text-left">Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                {filteredEntries.map(([key, value]) => (
+                    <tr key={key} className="hover">
+                        <td className="font-semibold capitalize">
+                            {key.replace(/([A-Z])/g, " $1").trim()}
+                        </td>
+                        <td>{formatValue(key, value)}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
     );
 }
