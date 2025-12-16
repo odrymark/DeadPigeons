@@ -6,44 +6,59 @@ interface Props {
 
 export default function PaymentsTable({ payments }: Props) {
     return (
-        <>
-            {/* HEADER */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-t-box shadow font-bold text-lg border-b">
-                <div>Date</div>
-                <div>Status</div>
-                <div>Amount</div>
-                <div>Payment Number</div>
-            </div>
+        <div className="overflow-x-auto max-w-3xl mx-auto w-full">
+            <table className="table table-zebra w-full bg-base-100 shadow-md rounded-box">
+                <thead>
+                <tr className="bg-base-200">
+                    <th className="text-left">Date</th>
+                    <th className="text-left">Status</th>
+                    <th className="text-center">Amount</th>
+                    <th className="text-center">Payment Number</th>
+                </tr>
+                </thead>
 
-            {/* LIST */}
-            <ul className="list bg-base-100 rounded-b-box shadow-md max-w-3xl mx-auto w-full">
+                <tbody>
                 {payments.map((p) => (
-                    <li key={p.id} className="list-row p-4">
-                        <div>{new Date(p.createdAt).toLocaleDateString()}</div>
+                    <tr key={p.id} className="hover">
+                        <td>{new Date(p.createdAt).toLocaleDateString()}</td>
 
-                        {/* Status */}
-                        <div
-                            className={`font-semibold text-center sm:text-left ${
-                                p.isApproved === null
-                                    ? "text-warning"
-                                    : p.isApproved
-                                        ? "text-success"
-                                        : "text-error"
-                            }`}
-                        >
-                            {p.isApproved === null ? "Pending" : p.isApproved ? "Approved" : "Rejected"}
-                        </div>
+                        <td>
+                                <span
+                                    className={`font-semibold ${
+                                        p.isApproved === null
+                                            ? "text-warning"
+                                            : p.isApproved
+                                                ? "text-success"
+                                                : "text-error"
+                                    }`}
+                                >
+                                    {p.isApproved === null
+                                        ? "Pending"
+                                        : p.isApproved
+                                            ? "Approved"
+                                            : "Rejected"}
+                                </span>
+                        </td>
 
-                        <div className="font-bold text-center sm:text-left">
-                            {p.isApproved === false || p.amount === null ? "–" : `${p.amount} DKK`}
-                        </div>
+                        <td className="text-center font-bold">
+                            {p.isApproved === false || p.amount === null
+                                ? "–"
+                                : `${p.amount} DKK`}
+                        </td>
 
-                        <div className="text-right sm:text-left">
+                        <td className="text-center">
                             {p.paymentNumber}
-                        </div>
-                    </li>
+                        </td>
+                    </tr>
                 ))}
-            </ul>
-        </>
+                </tbody>
+            </table>
+
+            {payments.length === 0 && (
+                <div className="text-center py-8 text-base-content/60">
+                    No payments yet.
+                </div>
+            )}
+        </div>
     );
 }

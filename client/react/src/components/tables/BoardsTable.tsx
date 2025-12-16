@@ -26,59 +26,69 @@ export default function BoardsTable({ boards }: Props) {
     };
 
     return (
-        <>
-            {/* HEADER */}
-            <div className="grid grid-cols-1 sm:grid-cols-4 max-w-3xl mx-auto w-full bg-base-100 p-4 rounded-t-box shadow font-bold text-lg border-b">
-                <div>Date</div>
-                <div>Numbers</div>
-                <div>Status</div>
-                <div>Repeats</div>
-            </div>
+        <div className="overflow-x-auto max-w-3xl mx-auto w-full">
+            <table className="table table-zebra w-full bg-base-100 shadow-md rounded-box">
+                <thead>
+                <tr className="bg-base-200">
+                    <th className="text-left">Date</th>
+                    <th className="text-left">Numbers</th>
+                    <th className="text-center">Status</th>
+                    <th className="text-center">Repeats</th>
+                </tr>
+                </thead>
 
-            {/* LIST */}
-            <ul className="list bg-base-100 rounded-b-box shadow-md max-w-3xl mx-auto w-full">
+                <tbody>
                 {localBoards.map((b) => (
-                    <li key={b.id} className="list-row p-4">
-                        <div>{new Date(b.createdAt).toLocaleDateString()}</div>
+                    <tr key={b.id} className="hover">
+                        <td>{new Date(b.createdAt).toLocaleDateString()}</td>
 
-                        <div className="list-col-grow break-words text-center sm:text-left">
-                            {b.numbers.join(", ")}
-                        </div>
+                        <td className="break-words">{b.numbers.join(", ")}</td>
 
-                        <div
-                            className={`font-bold text-center sm:text-right ${
-                                b.isWinner === null
-                                    ? "text-warning"
-                                    : b.isWinner
-                                        ? "text-success"
-                                        : "text-error"
-                            }`}
-                        >
-                            {b.isWinner === null
-                                ? "In Game"
-                                : b.isWinner
-                                    ? "Win"
-                                    : "Loss"}
-                        </div>
+                        <td className="text-center">
+                                <span
+                                    className={`font-bold ${
+                                        b.isWinner === null
+                                            ? "text-warning"
+                                            : b.isWinner
+                                                ? "text-success"
+                                                : "text-error"
+                                    }`}
+                                >
+                                    {b.isWinner === null
+                                        ? "In Game"
+                                        : b.isWinner
+                                            ? "Win"
+                                            : "Loss"}
+                                </span>
+                        </td>
 
-                        <div className="flex items-center justify-center sm:justify-end gap-2">
-                            {b.repeats > 0 ? (
-                                <>
-                                    <span className="font-semibold">{b.repeats}x</span>
-                                    <button
-                                        className="btn btn-xs btn-error"
-                                        onClick={() => clearRepeats(b.id)}
-                                    >
-                                        ✕
-                                    </button>
-                                </>
-                            ) : (
-                                <span className="opacity-50">–</span>
-                            )}
-                        </div>
-                    </li>
+                        <td className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                                {b.repeats > 0 ? (
+                                    <>
+                                        <span className="font-semibold">{b.repeats}x</span>
+                                        <button
+                                            className="btn btn-xs btn-error"
+                                            onClick={() => clearRepeats(b.id)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </>
+                                ) : (
+                                    <span className="opacity-50">–</span>
+                                )}
+                            </div>
+                        </td>
+                    </tr>
                 ))}
-            </ul>
-        </>
+                </tbody>
+            </table>
+
+            {localBoards.length === 0 && (
+                <div className="text-center py-8 text-base-content/60">
+                    No boards yet.
+                </div>
+            )}
+        </div>
     );
 }
