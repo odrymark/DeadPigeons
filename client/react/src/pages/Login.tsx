@@ -22,7 +22,7 @@ export default function Login() {
     }, []);
 
     return (
-        <div className="hero min-h-screen min-w-screen bg-base-200">
+        <div className="hero min-h-screen min-w-screen">
             <div className="hero-content flex-col text-center w-full">
                 <h1 className="text-5xl font-bold mb-8">Dead Pigeons</h1>
 

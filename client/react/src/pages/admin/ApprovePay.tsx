@@ -100,7 +100,7 @@ export default function ApprovePay() {
             </div>
 
             {/* HEADER */}
-            <div className="grid grid-cols-4 max-w-3xl w-full bg-base-100 p-4 rounded-lg shadow font-bold text-lg border-b">
+            <div className="grid grid-cols-4 max-w-3xl w-full p-4 rounded-lg shadow font-bold text-lg border-b">
                 <div>Date</div>
                 <div>Amount</div>
                 <div>Payment Number</div>
@@ -112,7 +112,7 @@ export default function ApprovePay() {
                 {payments.map((p) => (
                     <div
                         key={p.id}
-                        className="grid grid-cols-4 bg-base-100 p-4 shadow rounded-lg items-center gap-2"
+                        className="grid grid-cols-4 p-4 shadow rounded-lg items-center gap-2"
                     >
                         <div>{new Date(p.createdAt).toLocaleDateString()}</div>
 

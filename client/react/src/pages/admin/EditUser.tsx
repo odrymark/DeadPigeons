@@ -89,7 +89,7 @@ export default function EditUser() {
             <h1 className="text-2xl font-bold mb-6">Edit User</h1>
 
             <form
-                className="flex flex-col gap-4 w-full max-w-md bg-base-100 p-6 rounded-lg shadow"
+                className="flex flex-col gap-4 w-full max-w-md p-6 rounded-lg shadow"
                 onSubmit={handleSubmit}
             >
                 {error && <div className="text-error font-semibold">{error}</div>}
