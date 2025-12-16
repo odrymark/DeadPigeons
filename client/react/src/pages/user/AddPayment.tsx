@@ -12,7 +12,7 @@ export default function AddPayment() {
     return (
         <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
             <form
-                className="flex flex-col gap-4 w-full max-w-[350px] bg-base-100 p-6 rounded-lg shadow"
+                className="flex flex-col gap-4 w-full max-w-[350px] p-6 rounded-lg shadow"
                 onSubmit={(e) => {
                     e.preventDefault();
                     handleSubmit();

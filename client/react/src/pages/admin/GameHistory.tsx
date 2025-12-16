@@ -101,7 +101,7 @@ export default function GameHistory() {
             </div>
 
             <div className="overflow-x-auto max-w-2xl mx-auto w-full">
-                <table className="table w-full bg-base-100 shadow-md rounded-box">
+                <table className="table w-full shadow-md rounded-box">
                     <thead>
                     <tr className="bg-base-200">
                         <th className="text-left">Username</th>
