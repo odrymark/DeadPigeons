@@ -1,26 +1,29 @@
 import { useState } from "react";
 import { apiService } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 export default function AddPayment() {
     const [paymentNumber, setPaymentNumber] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const toast = useToast();
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        setError("");
 
-        if (!paymentNumber.trim()) {
-            setError("Payment number is required");
+        const trimmed = paymentNumber.trim();
+        if (!trimmed) {
+            toast("Payment number is required", "error");
             return;
         }
 
+        setLoading(true);
         try {
-            setLoading(true);
-            await apiService.addPayment({ paymentNumber: paymentNumber.trim() });
+            await apiService.addPayment({ paymentNumber: trimmed });
             setPaymentNumber("");
-        } catch (err) {
-            setError("Failed to add payment. Please try again.");
+            toast("Payment added successfully!", "success");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }
@@ -33,12 +36,6 @@ export default function AddPayment() {
                     <h1 className="card-title text-2xl font-bold justify-center mb-6">
                         Add Payment
                     </h1>
-
-                    {error && (
-                        <div className="alert alert-error shadow-lg mb-4">
-                            <span>{error}</span>
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <fieldset className="fieldset border border-base-300 rounded-lg p-6">

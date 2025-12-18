@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiService, type UserInfoGet } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 export default function EditUser() {
     const [users, setUsers] = useState<UserInfoGet[]>([]);
@@ -11,9 +12,10 @@ export default function EditUser() {
     const [phone, setPhone] = useState("");
     const [isActive, setIsActive] = useState(false);
 
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [loadingUser, setLoadingUser] = useState(false);
+
+    const toast = useToast();
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -21,12 +23,12 @@ export default function EditUser() {
                 const result = await apiService.getAllUsers();
                 setUsers(result);
             } catch {
-                setError("Failed to load users");
+                toast("Failed to load users", "error");
             }
         };
 
         loadUsers();
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         if (!selectedUserId) {
@@ -41,11 +43,10 @@ export default function EditUser() {
         const loadUserInfo = async () => {
             try {
                 setLoadingUser(true);
-                setError("");
 
                 const user = await apiService.getUserInfo(selectedUserId);
                 if (!user) {
-                    setError("User not found");
+                    toast("User not found", "error");
                     return;
                 }
 
@@ -54,38 +55,40 @@ export default function EditUser() {
                 setEmail(user.email ?? "");
                 setPhone(user.phoneNumber ?? "");
                 setIsActive(user.isActive ?? false);
-            } catch {
-                setError("Failed to load user info");
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
             } finally {
                 setLoadingUser(false);
             }
         };
 
         loadUserInfo();
-    }, [selectedUserId]);
+    }, [selectedUserId, toast]);
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        setError("");
 
         if (!selectedUserId || !username || !email || !phone) {
-            setError("All fields are required");
+            toast("All fields are required", "error");
             return;
         }
 
+        setLoading(true);
         try {
-            setLoading(true);
-
             await apiService.editUser({
                 id: selectedUserId,
                 username,
                 password: password || "",
                 email,
                 phoneNumber: phone,
-                isActive
+                isActive,
             });
-        } catch {
-            setError("Failed to update user");
+
+            toast("User updated successfully!", "success");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }
@@ -98,12 +101,6 @@ export default function EditUser() {
                     <h1 className="card-title text-2xl font-bold justify-center mb-6">
                         Edit User
                     </h1>
-
-                    {error && (
-                        <div className="alert alert-error shadow-lg mb-4">
-                            <span>{error}</span>
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <fieldset className="fieldset border border-base-300 rounded-lg p-4">

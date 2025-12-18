@@ -40,8 +40,9 @@ export default function Login() {
             } else {
                 toast("Invalid username, password, or account is inactive.", "error");
             }
-        } catch (err) {
-            toast("Login failed. Please try again later.", "error");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }

@@ -9,6 +9,7 @@ import homeIcon from "../assets/home.png";
 import { balanceAtom } from "../atoms/balanceAtom.ts";
 import UserBtns from "../components/sidebarBtns/UserBtns.tsx";
 import AdminBtns from "../components/sidebarBtns/AdminBtns.tsx";
+import { useToast } from "../components/ToastProvider";
 
 export default function Sidebar() {
     const [user, setUser] = useAtom(userAtom);
@@ -17,6 +18,8 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const toast = useToast();
 
     const darkThemeName = "dark";
     const lightThemeName = "light";
@@ -38,20 +41,35 @@ export default function Sidebar() {
                         setBalance(bal);
                     }
                 } else {
-                    navigate("/");
+                    toast("Session expired. Please log in again.", "error");
+                    navigate("/login");
                 }
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
             } finally {
                 setLoading(false);
             }
         }
 
         fetchUserData();
-    }, [navigate, setUser, setBalance]);
+    }, [navigate, setUser, setBalance, toast]);
 
     const toggleTheme = () => {
         const newTheme = theme === lightThemeName ? darkThemeName : lightThemeName;
         setTheme(newTheme);
         document.documentElement.dataset.theme = newTheme;
+    };
+
+    const handleLogout = async () => {
+        try {
+            await apiService.logout();
+            toast("Logged out successfully", "success");
+            navigate("/login");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
+        }
     };
 
     if (loading) {
@@ -150,10 +168,7 @@ export default function Sidebar() {
                 <div className="shrink-0 p-4 border-t border-base-300">
                     <button
                         className="btn btn-error w-full flex items-center justify-center gap-2"
-                        onClick={async () => {
-                            await apiService.logout();
-                            navigate("/login");
-                        }}
+                        onClick={handleLogout}
                     >
                         <img src={logoutIcon} alt="Logout" className="h-5 w-5" /> Logout
                     </button>

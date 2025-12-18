@@ -1,34 +1,39 @@
 import { useState } from "react";
 import { apiService } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 export default function AddWinningNumbers() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
     const maxCount = 3;
 
+    const toast = useToast();
+
     const toggleNumber = (num: number) => {
         if (selectedNumbers.includes(num)) {
-            setSelectedNumbers(prev => prev.filter(n => n !== num));
+            setSelectedNumbers((prev) => prev.filter((n) => n !== num));
             return;
         }
 
         if (selectedNumbers.length < maxCount) {
-            setSelectedNumbers(prev => [...prev, num].sort((a, b) => a - b));
+            setSelectedNumbers((prev) => [...prev, num].sort((a, b) => a - b));
         }
     };
 
     const handleSubmit = async () => {
         if (selectedNumbers.length !== maxCount) {
-            alert("Please select exactly 3 numbers.");
+            toast("Please select exactly 3 numbers.", "error");
             return;
         }
 
+        setLoading(true);
         try {
-            setLoading(true);
             await apiService.addWinningNumbers(selectedNumbers);
+            toast("Winning numbers added successfully!", "success");
             setSelectedNumbers([]);
-        } catch (err) {
-            alert("Failed to save winning numbers. Please try again.");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }
@@ -52,21 +57,16 @@ export default function AddWinningNumbers() {
                         </legend>
 
                         <div className="grid grid-cols-4 gap-3 my-6">
-                            {gridNumbers.map(num => {
+                            {gridNumbers.map((num) => {
                                 const isSelected = selectedNumbers.includes(num);
                                 const isDisabled = !isSelected && selectedNumbers.length >= maxCount;
 
                                 return (
                                     <button
                                         key={num}
-                                        className={`
-                                            w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold transition-all
-                                            ${isSelected
-                                            ? "btn btn-primary text-white shadow-lg scale-105"
-                                            : "bg-base-200 hover:bg-base-300"
-                                        }
-                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                                        `}
+                                        className={`w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold transition-all
+                                            ${isSelected ? "btn btn-primary text-white shadow-lg scale-105" : "bg-base-200 hover:bg-base-300"}
+                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                                         onClick={() => toggleNumber(num)}
                                         disabled={isDisabled}
                                     >

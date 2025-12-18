@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { type BoardGet, apiService } from "../../api";
 import BoardsTable from "../../components/tables/BoardsTable.tsx";
+import { useToast } from "../../components/ToastProvider";
 
 export default function PrevBoards() {
     const [boards, setBoards] = useState<BoardGet[]>([]);
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     useEffect(() => {
         async function fetchBoards() {
@@ -12,13 +14,15 @@ export default function PrevBoards() {
             try {
                 const data = await apiService.getBoards();
                 setBoards(data);
-            }
-            finally {
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
+            } finally {
                 setLoading(false);
             }
         }
         fetchBoards();
-    }, []);
+    }, [toast]);
 
     if (loading) {
         return (
