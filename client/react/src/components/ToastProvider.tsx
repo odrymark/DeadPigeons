@@ -1,4 +1,4 @@
-import {createContext, type ReactNode, useContext, useState} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 type ToastType = "success" | "error" | "info";
@@ -7,6 +7,7 @@ interface Toast {
     id: number;
     message: string;
     type: ToastType;
+    dismissing?: boolean;
 }
 
 interface ToastContextType {
@@ -22,41 +23,51 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
     const addToast = (message: string, type: ToastType = "info") => {
         const id = idCounter++;
-        const newToast: Toast = { id, message, type };
+        setToasts((prev) => [...prev, { id, message, type }]);
 
-        setToasts((prev) => [...prev, newToast]);
+        setTimeout(() => dismissToast(id), 4000);
+    };
 
-        // Auto remove after 4 seconds
+    const dismissToast = (id: number) => {
+        setToasts((prev) =>
+            prev.map((t) => (t.id === id ? { ...t, dismissing: true } : t))
+        );
+
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== id));
-        }, 4000);
+        }, 400);
     };
 
     const removeToast = (id: number) => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
+        dismissToast(id);
     };
 
     return (
         <ToastContext.Provider value={{ addToast }}>
             {children}
             {createPortal(
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none">
+                <div className="fixed inset-x-0 bottom-8 flex flex-col items-center gap-3 pointer-events-none z-50">
                     {toasts.map((toast) => (
                         <div
                             key={toast.id}
                             className={`
-                alert 
+                alert pointer-events-auto shadow-2xl px-6 py-4 rounded-lg flex items-center gap-4
                 ${toast.type === "success" ? "alert-success" : ""}
                 ${toast.type === "error" ? "alert-error" : ""}
-                ${toast.type === "info" ? "alert-info" : ""}
-                shadow-2xl px-6 py-4 rounded-lg flex items-center gap-3
-                animate-fade-in-up pointer-events-auto
+                ${toast.type === "info" ? "alert-info" : "bg-base-200 border"}
+                ${toast.dismissing ? "animate-toast-out" : "animate-toast-in"}
               `}
                             onClick={() => removeToast(toast.id)}
                         >
                             <span className="font-medium text-white">{toast.message}</span>
-                            <button className="ml-auto text-xl text-white opacity-80 hover:opacity-100">
-                                &times;
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeToast(toast.id);
+                                }}
+                                className="ml-auto text-xl text-white opacity-80 hover:opacity-100"
+                            >
+                                ×
                             </button>
                         </div>
                     ))}
@@ -69,6 +80,8 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
 export const useToast = () => {
     const context = useContext(ToastContext);
-    if (!context) throw new Error("useToast must be used within ToastProvider");
+    if (!context) {
+        throw new Error("useToast must be used within ToastProvider");
+    }
     return context.addToast;
 };
