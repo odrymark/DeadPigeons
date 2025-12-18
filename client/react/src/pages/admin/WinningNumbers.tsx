@@ -13,7 +13,7 @@ export default function AddWinningNumbers() {
         }
 
         if (selectedNumbers.length < maxCount) {
-            setSelectedNumbers(prev => [...prev, num].sort((a, b) => a - b)); // optional: keep sorted
+            setSelectedNumbers(prev => [...prev, num].sort((a, b) => a - b));
         }
     };
 
@@ -48,7 +48,7 @@ export default function AddWinningNumbers() {
 
                     <fieldset className="fieldset border border-base-300 rounded-lg p-6">
                         <legend className="fieldset-legend text-lg font-semibold px-2">
-                            Select 3 Numbers (1–16)
+                            Select 3 Numbers
                         </legend>
 
                         <div className="grid grid-cols-4 gap-3 my-6">
