@@ -101,3 +101,7 @@
 .animate-toast-in {
     animation: toast-in 0.4s ease-out forwards;
 }
+
+.animate-toast-out {
+    animation: toast-out 0.4s ease-in forwards;
+}
