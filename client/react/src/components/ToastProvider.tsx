@@ -51,21 +51,21 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
                         <div
                             key={toast.id}
                             className={`
-                alert pointer-events-auto shadow-2xl px-6 py-4 rounded-lg flex items-center gap-4
+                alert pointer-events-auto shadow-2xl px-6 py-4 rounded-lg flex items-center gap-4 text-white
                 ${toast.type === "success" ? "alert-success" : ""}
                 ${toast.type === "error" ? "alert-error" : ""}
-                ${toast.type === "info" ? "alert-info" : "bg-base-200 border"}
+                ${toast.type === "info" ? "alert-info" : "alert-info"}
                 ${toast.dismissing ? "animate-toast-out" : "animate-toast-in"}
               `}
                             onClick={() => removeToast(toast.id)}
                         >
-                            <span className="font-medium text-white">{toast.message}</span>
+                            <span className="font-medium">{toast.message}</span>
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     removeToast(toast.id);
                                 }}
-                                className="ml-auto text-xl text-white opacity-80 hover:opacity-100"
+                                className="ml-auto text-xl opacity-80 hover:opacity-100"
                             >
                                 ×
                             </button>
