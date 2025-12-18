@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     type BoardGet,
     type PaymentGet,
@@ -8,6 +8,7 @@ import {
 import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
 import BoardsTable from "../../components/tables/BoardsTable.tsx";
 import InfoTable from "../../components/tables/InfoTable.tsx";
+import { useToast } from "../../components/ToastProvider";
 
 export default function UserHistory() {
     const [payments, setPayments] = useState<PaymentGet[]>([]);
@@ -19,19 +20,28 @@ export default function UserHistory() {
     const [loadingUsers, setLoadingUsers] = useState(true);
     const [loadingData, setLoadingData] = useState(false);
 
+    const toast = useToast();
+
     const modes = ["General", "Payments", "Boards"];
 
-    const loadUsers = useEffectEvent(async () => {
-        setLoadingUsers(true);
-        try {
-            const u = await apiService.getAllUsers();
-            setUsers(u);
-        } finally {
-            setLoadingUsers(false);
+    useEffect(() => {
+        async function loadUsers() {
+            setLoadingUsers(true);
+            try {
+                const u = await apiService.getAllUsers();
+                setUsers(u);
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
+            } finally {
+                setLoadingUsers(false);
+            }
         }
-    });
 
-    const loadDataForMode = useEffectEvent(async () => {
+        loadUsers();
+    }, [toast]);
+
+    useEffect(() => {
         if (!selectedUser) {
             setPayments([]);
             setBoards([]);
@@ -39,36 +49,38 @@ export default function UserHistory() {
             return;
         }
 
-        setLoadingData(true);
-        try {
-            if (selectedMode === "Payments") {
-                const data = await apiService.getPayments(selectedUser);
-                setPayments(data ?? []);
+        async function loadDataForMode() {
+            setLoadingData(true);
+            try {
+                if (selectedMode === "Payments") {
+                    const data = await apiService.getPayments(selectedUser);
+                    setPayments(data ?? []);
+                    setBoards([]);
+                    setUserInfo(null);
+                } else if (selectedMode === "Boards") {
+                    const data = await apiService.getBoards(selectedUser);
+                    setBoards(data ?? []);
+                    setPayments([]);
+                    setUserInfo(null);
+                } else if (selectedMode === "General") {
+                    const data = await apiService.getUserInfo(selectedUser);
+                    setUserInfo(data ?? null);
+                    setPayments([]);
+                    setBoards([]);
+                }
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
+                setPayments([]);
                 setBoards([]);
                 setUserInfo(null);
-            } else if (selectedMode === "Boards") {
-                const data = await apiService.getBoards(selectedUser);
-                setBoards(data ?? []);
-                setPayments([]);
-                setUserInfo(null);
-            } else if (selectedMode === "General") {
-                const data = await apiService.getUserInfo(selectedUser);
-                setUserInfo(data);
-                setPayments([]);
-                setBoards([]);
+            } finally {
+                setLoadingData(false);
             }
-        } finally {
-            setLoadingData(false);
         }
-    });
 
-    useEffect(() => {
-        loadUsers();
-    }, []);
-
-    useEffect(() => {
         loadDataForMode();
-    }, [selectedUser, selectedMode]);
+    }, [selectedUser, selectedMode, toast]);
 
     return (
         <div className="bg-base-200 w-full flex flex-col p-6 box-border">

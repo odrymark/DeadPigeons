@@ -1,25 +1,26 @@
 import { useState } from "react";
 import { apiService } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 export default function AddUser() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const toast = useToast();
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        setError("");
 
         if (!username || !password || !email || !phone) {
-            setError("All fields are required");
+            toast("All fields are required", "error");
             return;
         }
 
+        setLoading(true);
         try {
-            setLoading(true);
             await apiService.addUser({
                 username,
                 password,
@@ -27,12 +28,15 @@ export default function AddUser() {
                 phoneNumber: phone,
             });
 
+            toast("User added successfully!", "success");
+
             setUsername("");
             setPassword("");
             setEmail("");
             setPhone("");
-        } catch (err) {
-            setError("Failed to add user. Please try again.");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }
@@ -45,12 +49,6 @@ export default function AddUser() {
                     <h1 className="card-title text-2xl font-bold justify-center mb-6">
                         Add New User
                     </h1>
-
-                    {error && (
-                        <div className="alert alert-error shadow-lg mb-4">
-                            <span>{error}</span>
-                        </div>
-                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <fieldset className="fieldset border border-base-300 rounded-lg p-6">

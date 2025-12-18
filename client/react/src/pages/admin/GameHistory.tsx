@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { type GameGet, apiService } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 function getWeekNumber(date: Date): number {
     const d = new Date(date);
@@ -15,6 +16,8 @@ export default function GameHistory() {
     const [income, setIncome] = useState<number>(0);
     const [loading, setLoading] = useState(true);
 
+    const toast = useToast();
+
     useEffect(() => {
         async function fetchGames() {
             setLoading(true);
@@ -24,12 +27,16 @@ export default function GameHistory() {
                     setGames(data);
                     setCurrentIndex(0);
                 }
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
             } finally {
                 setLoading(false);
             }
         }
+
         fetchGames();
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         if (games.length > 0) {

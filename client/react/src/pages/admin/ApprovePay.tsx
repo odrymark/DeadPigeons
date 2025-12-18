@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { apiService } from "../../api";
 import type { PaymentGet, PaymentApprovePost, UserInfoGet } from "../../api";
+import { useToast } from "../../components/ToastProvider";
 
 export default function ApprovePay() {
     const [users, setUsers] = useState<UserInfoGet[]>([]);
@@ -12,17 +13,22 @@ export default function ApprovePay() {
     const [loadingUsers, setLoadingUsers] = useState(true);
     const [loadingPayments, setLoadingPayments] = useState(false);
 
+    const toast = useToast();
+
     useEffect(() => {
         (async () => {
             setLoadingUsers(true);
             try {
                 const u = await apiService.getAllUsers();
                 setUsers(u);
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
             } finally {
                 setLoadingUsers(false);
             }
         })();
-    }, []);
+    }, [toast]);
 
     useEffect(() => {
         if (!selectedUser) {
@@ -38,11 +44,14 @@ export default function ApprovePay() {
                     (p) => p.isApproved === undefined || p.isApproved === null
                 );
                 setPayments(pending);
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
             } finally {
                 setLoadingPayments(false);
             }
         })();
-    }, [selectedUser]);
+    }, [selectedUser, toast]);
 
     const startEditAmount = (payment: PaymentGet) => {
         setEditingAmountId(payment.id);
@@ -53,16 +62,14 @@ export default function ApprovePay() {
         const numAmount = Number(tempAmount);
 
         if (isNaN(numAmount) || numAmount <= 0) {
-            alert("Please enter a valid positive number for the amount.");
-            const current = payments.find(p => p.id === paymentId);
+            toast("Please enter a valid positive number for the amount.", "error");
+            const current = payments.find((p) => p.id === paymentId);
             setTempAmount(current?.amount?.toString() ?? "");
             return false;
         }
 
-        setPayments(prev =>
-            prev.map(p =>
-                p.id === paymentId ? { ...p, amount: numAmount } : p
-            )
+        setPayments((prev) =>
+            prev.map((p) => (p.id === paymentId ? { ...p, amount: numAmount } : p))
         );
 
         setEditingAmountId(null);
@@ -77,7 +84,7 @@ export default function ApprovePay() {
             if (!valid && approved) {
                 return;
             }
-            const updated = payments.find(p => p.id === payment.id);
+            const updated = payments.find((p) => p.id === payment.id);
             if (updated) currentPayment = updated;
         }
 
@@ -87,7 +94,7 @@ export default function ApprovePay() {
                 currentPayment.amount === null ||
                 currentPayment.amount <= 0
             ) {
-                alert("Please enter a valid positive amount before approving.");
+                toast("Please enter a valid positive amount before approving.", "error");
                 return;
             }
         }
@@ -99,14 +106,23 @@ export default function ApprovePay() {
             id: currentPayment.id,
             username: selectedUsername,
             paymentNumber: currentPayment.paymentNumber,
-
             amount: currentPayment.amount ?? 0,
             isApproved: approved,
         };
 
-        await apiService.approvePayment(req);
+        try {
+            await apiService.approvePayment(req);
 
-        setPayments((p) => p.filter((x) => x.id !== currentPayment.id));
+            toast(
+                approved ? "Payment approved successfully!" : "Payment rejected.",
+                approved ? "success" : "info"
+            );
+
+            setPayments((p) => p.filter((x) => x.id !== currentPayment.id));
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
+        }
     };
 
     return (
@@ -174,8 +190,8 @@ export default function ApprovePay() {
                                             className="font-bold cursor-pointer hover:underline"
                                             onClick={() => startEditAmount(p)}
                                         >
-                                                {p.amount ?? "—"}
-                                            </span>
+                                            {p.amount ?? "—"}
+                                        </span>
                                     )}
                                 </td>
 

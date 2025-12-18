@@ -15,9 +15,9 @@ export default function InfoTable({ userInfo }: Props) {
 
     const dateFields: (keyof UserInfoGet)[] = ["createdAt", "lastLogin"];
 
-    const formatValue = (key: keyof UserInfoGet, value: any) => {
+    const formatValue = (key: keyof UserInfoGet, value: UserInfoGet[keyof UserInfoGet]) => {
         if (dateFields.includes(key) && value) {
-            return new Date(value).toLocaleString();
+            return new Date(value as string).toLocaleString();
         }
 
         if (typeof value === "boolean") {
@@ -31,9 +31,7 @@ export default function InfoTable({ userInfo }: Props) {
         return String(value);
     };
 
-    const entries = Object.entries(userInfo) as [keyof UserInfoGet, any][];
-
-    const filteredEntries = entries.filter(([key]) => !["password"].includes(key));
+    const entries = Object.entries(userInfo) as [keyof UserInfoGet, UserInfoGet[keyof UserInfoGet]][];
 
     return (
         <div className="bg-base-200 overflow-x-auto max-w-3xl mx-auto w-full mt-4">
@@ -45,10 +43,10 @@ export default function InfoTable({ userInfo }: Props) {
                 </tr>
                 </thead>
                 <tbody>
-                {filteredEntries.map(([key, value]) => (
-                    <tr key={key} className="hover">
+                {entries.map(([key, value]) => (
+                    <tr key={key as string} className="hover">
                         <td className="font-semibold capitalize">
-                            {key.replace(/([A-Z])/g, " $1").trim()}
+                            {String(key).replace(/([A-Z])/g, " $1").trim()}
                         </td>
                         <td>{formatValue(key, value)}</td>
                     </tr>

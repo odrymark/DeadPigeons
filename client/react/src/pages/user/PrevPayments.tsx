@@ -1,24 +1,28 @@
-import {useEffect, useState} from "react";
-import {apiService, type PaymentGet} from "../../api";
+import { useEffect, useState } from "react";
+import { apiService, type PaymentGet } from "../../api";
 import PaymentsTable from "../../components/tables/PaymentsTable.tsx";
+import { useToast } from "../../components/ToastProvider";
 
 export default function PrevPayments() {
     const [payments, setPayments] = useState<PaymentGet[]>([]);
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     useEffect(() => {
-        async function fetchBoards() {
+        async function fetchPayments() {
             setLoading(true);
             try {
                 const data = await apiService.getPayments();
                 setPayments(data);
-            }
-            finally {
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
+            } finally {
                 setLoading(false);
             }
         }
-        fetchBoards();
-    }, []);
+        fetchPayments();
+    }, [toast]);
 
     if (loading) {
         return (

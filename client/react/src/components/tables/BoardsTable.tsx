@@ -1,5 +1,6 @@
 import { type BoardGet, apiService } from "../../api";
 import { useState, useEffect } from "react";
+import { useToast } from "../ToastProvider";
 
 interface Props {
     boards: BoardGet[];
@@ -7,22 +8,30 @@ interface Props {
 
 export default function BoardsTable({ boards }: Props) {
     const [localBoards, setLocalBoards] = useState<BoardGet[]>(boards);
+    const toast = useToast();
 
     useEffect(() => {
         setLocalBoards(boards);
     }, [boards]);
 
     const clearRepeats = async (id: string) => {
-        const ok = confirm("Are you sure you want to clear repeats for this board?");
-        if (!ok) return;
+        const confirmed = window.confirm("Are you sure you want to clear repeats for this board?");
+        if (!confirmed) return;
 
-        await apiService.endRepeat(id);
+        try {
+            await apiService.endRepeat(id);
 
-        setLocalBoards((prev) =>
-            prev.map((board) =>
-                board.id === id ? { ...board, repeats: 0 } : board
-            )
-        );
+            setLocalBoards((prev) =>
+                prev.map((board) =>
+                    board.id === id ? { ...board, repeats: 0 } : board
+                )
+            );
+
+            toast("Repeats cleared successfully!", "success");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
+        }
     };
 
     return (
@@ -42,7 +51,7 @@ export default function BoardsTable({ boards }: Props) {
                     <tr key={b.id} className="hover">
                         <td>{new Date(b.createdAt).toLocaleDateString()}</td>
 
-                        <td className="break-words">{b.numbers.join(", ")}</td>
+                        <td className="wrap-break-word">{b.numbers.join(", ")}</td>
 
                         <td className="text-center">
                                 <span
@@ -86,7 +95,7 @@ export default function BoardsTable({ boards }: Props) {
 
             {localBoards.length === 0 && (
                 <div className="bg-base-200 text-center py-8 text-base-content/60">
-                    No boards yet.
+                    No boards found.
                 </div>
             )}
         </div>

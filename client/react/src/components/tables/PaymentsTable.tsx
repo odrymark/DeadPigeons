@@ -56,7 +56,7 @@ export default function PaymentsTable({ payments }: Props) {
 
             {payments.length === 0 && (
                 <div className="bg-base-200 text-center py-8 text-base-content/60">
-                    No payments yet.
+                    No payments found.
                 </div>
             )}
         </div>

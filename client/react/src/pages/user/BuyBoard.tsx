@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { apiService } from "../../api";
 import { useState } from "react";
 import { balanceAtom } from "../../atoms/balanceAtom.ts";
+import { useToast } from "../../components/ToastProvider";
 
 export default function BuyBoard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -12,6 +13,8 @@ export default function BuyBoard() {
     const [repeatCount, setRepeatCount] = useState(1);
 
     const [loading, setLoading] = useState(false);
+
+    const toast = useToast();
 
     const toggleNumber = (num: number) => {
         if (selectedNumbers.includes(num)) {
@@ -26,17 +29,17 @@ export default function BuyBoard() {
 
     const handleSubmit = async () => {
         if (selectedNumbers.length !== fieldsCount) {
-            alert(`Please select exactly ${fieldsCount} numbers`);
+            toast(`Please select exactly ${fieldsCount} numbers`, "error");
             return;
         }
 
         if (repeatEnabled && repeatCount < 1) {
-            alert("Repeat count must be at least 1");
+            toast("Repeat count must be at least 1", "error");
             return;
         }
 
+        setLoading(true);
         try {
-            setLoading(true);
             await apiService.addBoard({
                 numbers: selectedNumbers,
                 repeats: repeatEnabled ? repeatCount : 0,
@@ -45,11 +48,19 @@ export default function BuyBoard() {
             const balance = await apiService.getBalance();
             setBalance(balance);
 
+            toast(
+                repeatEnabled
+                    ? `Board purchased successfully for ${repeatCount} week(s)!`
+                    : "Board purchased successfully!",
+                "success"
+            );
+
             setSelectedNumbers([]);
             setRepeatEnabled(false);
             setRepeatCount(1);
-        } catch (err) {
-            alert("Failed to submit board. Please try again.");
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Something went wrong";
+            toast(message, "error");
         } finally {
             setLoading(false);
         }
@@ -80,14 +91,9 @@ export default function BuyBoard() {
                                 return (
                                     <button
                                         key={num}
-                                        className={`
-                                            w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold transition-all
-                                            ${isSelected
-                                            ? "btn btn-primary text-white shadow-lg scale-105"
-                                            : "bg-base-200 hover:bg-base-300"
-                                        }
-                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                                        `}
+                                        className={`w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold transition-all
+                                            ${isSelected ? "btn btn-primary text-white shadow-lg scale-105" : "bg-base-200 hover:bg-base-300"}
+                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                                         onClick={() => toggleNumber(num)}
                                         disabled={isDisabled}
                                     >

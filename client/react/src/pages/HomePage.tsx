@@ -2,9 +2,11 @@ import { useNavigate } from "react-router-dom";
 import BoardsTable from "../components/tables/BoardsTable";
 import { useEffect, useState } from "react";
 import { type BoardGet, type CurrGameCloseGet, apiService } from "../api";
+import { useToast } from "../components/ToastProvider";
 
 export default function MainPage() {
     const navigate = useNavigate();
+    const toast = useToast();
 
     const [currGameClose, setCurrGameClose] = useState<CurrGameCloseGet | null>(null);
     const [lastGameNums, setLastGameNums] = useState<number[]>([]);
@@ -32,13 +34,20 @@ export default function MainPage() {
                 setLastGameNums(nums ?? []);
                 setCurrentBoards(cBoards ?? []);
                 setPreviousBoards(pBoards ?? []);
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : "Something went wrong";
+                toast(message, "error");
+                setCurrGameClose(null);
+                setLastGameNums([]);
+                setCurrentBoards([]);
+                setPreviousBoards([]);
             } finally {
                 setLoading(false);
             }
         }
 
         fetchData();
-    }, []);
+    }, [toast]);
 
     if (loading) {
         return (
@@ -52,7 +61,6 @@ export default function MainPage() {
         <div className="w-full min-h-screen p-6 flex justify-center">
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-                {/* LEFT SIDE */}
                 <div className="flex flex-col justify-start space-y-8">
 
                     <div className="text-center space-y-3">
@@ -71,7 +79,6 @@ export default function MainPage() {
                         </button>
                     </div>
 
-                    {/* Current Boards */}
                     <div className="w-full">
                         <h2 className="text-xl font-bold mb-3 text-center lg:text-left">
                             Your currently playing boards:
@@ -83,7 +90,6 @@ export default function MainPage() {
                     </div>
                 </div>
 
-                {/* RIGHT SIDE */}
                 <div className="flex flex-col justify-start space-y-8">
 
                     <div className="text-center mt-6">
@@ -97,7 +103,6 @@ export default function MainPage() {
                         </p>
                     </div>
 
-                    {/* Previous Boards */}
                     <div className="w-full mt-11">
                         <h2 className="text-xl font-bold mb-3 text-center lg:text-left">
                             Your boards from last game:
