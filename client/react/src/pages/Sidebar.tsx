@@ -74,7 +74,7 @@ export default function Sidebar() {
                 className="btn btn-primary absolute top-4 left-4 z-50"
                 onClick={() => setOpen(true)}
             >
-                Menu
+                ☰
             </button>
 
             {open && (

@@ -29,7 +29,14 @@ export default function EditUser() {
     }, []);
 
     useEffect(() => {
-        if (!selectedUserId) return;
+        if (!selectedUserId) {
+            setUsername("");
+            setPassword("");
+            setEmail("");
+            setPhone("");
+            setIsActive(false);
+            return;
+        }
 
         const loadUserInfo = async () => {
             try {
@@ -44,9 +51,9 @@ export default function EditUser() {
 
                 setUsername(user.username);
                 setPassword("");
-                setEmail(user.email!);
-                setPhone(user.phoneNumber!);
-                setIsActive(user.isActive!);
+                setEmail(user.email ?? "");
+                setPhone(user.phoneNumber ?? "");
+                setIsActive(user.isActive ?? false);
             } catch {
                 setError("Failed to load user info");
             } finally {
@@ -57,7 +64,7 @@ export default function EditUser() {
         loadUserInfo();
     }, [selectedUserId]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setError("");
 
@@ -85,89 +92,143 @@ export default function EditUser() {
     };
 
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
-            <h1 className="text-2xl font-bold mb-6">Edit User</h1>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200 min-h-screen">
+            <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <h1 className="card-title text-2xl font-bold justify-center mb-6">
+                        Edit User
+                    </h1>
 
-            <form
-                className="flex flex-col gap-4 w-full max-w-md p-6 rounded-lg shadow"
-                onSubmit={handleSubmit}
-            >
-                {error && <div className="text-error font-semibold">{error}</div>}
+                    {error && (
+                        <div className="alert alert-error shadow-lg mb-4">
+                            <span>{error}</span>
+                        </div>
+                    )}
 
-                <select
-                    className="select select-bordered w-full"
-                    value={selectedUserId}
-                    onChange={(e) => setSelectedUserId(e.target.value)}
-                >
-                    <option value="">Select a user</option>
-                    {users.map(user => (
-                        <option key={user.id} value={user.id}>
-                            {user.username}
-                        </option>
-                    ))}
-                </select>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <fieldset className="fieldset border border-base-300 rounded-lg p-4">
+                            <legend className="fieldset-legend text-lg font-semibold px-2">
+                                Select User
+                            </legend>
 
-                {loadingUser && (
-                    <div className="flex justify-center py-4">
-                        <span className="loading loading-dots loading-lg"></span>
-                    </div>
-                )}
+                            <select
+                                className="select select-bordered w-full"
+                                value={selectedUserId}
+                                onChange={(e) => setSelectedUserId(e.target.value)}
+                                required
+                            >
+                                <option value="">Choose a user...</option>
+                                {users.map((user) => (
+                                    <option key={user.id} value={user.id}>
+                                        {user.username}
+                                    </option>
+                                ))}
+                            </select>
+                        </fieldset>
 
-                <input
-                    type="text"
-                    placeholder="Username"
-                    className="input input-bordered w-full"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    disabled={!selectedUserId || loadingUser}
-                />
+                        <fieldset
+                            className="fieldset border border-base-300 rounded-lg p-6"
+                            disabled={!selectedUserId || loadingUser}
+                        >
+                            <legend className="fieldset-legend text-lg font-semibold px-2">
+                                User Details
+                            </legend>
 
-                <input
-                    type="password"
-                    placeholder="New Password (leave blank to keep current)"
-                    className="input input-bordered w-full"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={!selectedUserId || loadingUser}
-                />
+                            {loadingUser && (
+                                <div className="flex justify-center py-8">
+                                    <span className="loading loading-dots loading-lg"></span>
+                                </div>
+                            )}
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    className="input input-bordered w-full"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={!selectedUserId || loadingUser}
-                />
+                            {!loadingUser && selectedUserId && (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="label">
+                                            <span className="label-text font-medium">Username</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="input input-bordered w-full"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            required
+                                        />
+                                    </div>
 
-                <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    className="input input-bordered w-full"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={!selectedUserId || loadingUser}
-                />
+                                    <div>
+                                        <label className="label">
+                                            <span className="label-text font-medium">
+                                                New Password <span className="text-sm font-normal opacity-70">(leave blank to keep current)</span>
+                                            </span>
+                                        </label>
+                                        <input
+                                            type="password"
+                                            className="input input-bordered w-full"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
 
-                <label className="flex items-center gap-3 cursor-pointer">
-                    <span className="font-medium">Active</span>
-                    <input
-                        type="checkbox"
-                        className="toggle toggle-primary"
-                        checked={isActive}
-                        onChange={(e) => setIsActive(e.target.checked)}
-                        disabled={!selectedUserId || loadingUser}
-                    />
-                </label>
+                                    <div>
+                                        <label className="label">
+                                            <span className="label-text font-medium">Email</span>
+                                        </label>
+                                        <input
+                                            type="email"
+                                            className="input input-bordered w-full"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            required
+                                        />
+                                    </div>
 
-                <button
-                    type="submit"
-                    className="btn btn-primary w-full mt-2"
-                    disabled={!selectedUserId || loading || loadingUser}
-                >
-                    {loading ? "Saving..." : "Save Changes"}
-                </button>
-            </form>
+                                    <div>
+                                        <label className="label">
+                                            <span className="label-text font-medium">Phone Number</span>
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            className="input input-bordered w-full"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            required
+                                        />
+                                    </div>
+
+                                    <label className="flex items-center gap-4 cursor-pointer py-2">
+                                        <span className="font-medium">Account Active</span>
+                                        <input
+                                            type="checkbox"
+                                            className="toggle toggle-primary toggle-lg"
+                                            checked={isActive}
+                                            onChange={(e) => setIsActive(e.target.checked)}
+                                        />
+                                    </label>
+                                </div>
+                            )}
+
+                            {!selectedUserId && !loadingUser && (
+                                <div className="text-center py-8 text-base-content/60">
+                                    Please select a user to edit their details.
+                                </div>
+                            )}
+                        </fieldset>
+
+                        <button
+                            type="submit"
+                            className="btn btn-primary w-full"
+                            disabled={!selectedUserId || loading || loadingUser}
+                        >
+                            {loading ? (
+                                <span className="loading loading-dots loading-lg"></span>
+                            ) : (
+                                "Save Changes"
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }

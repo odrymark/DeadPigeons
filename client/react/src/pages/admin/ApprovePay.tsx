@@ -44,46 +44,69 @@ export default function ApprovePay() {
         })();
     }, [selectedUser]);
 
-    const handleApproveButton = async (payment: PaymentGet, approved: boolean) => {
-        if (editingAmountId === payment.id) {
-            const updatedAmount = Number(tempAmount);
-            if (isNaN(updatedAmount) || updatedAmount <= 0) {
-                alert("Please enter a valid positive number for the amount.");
-                return;
-            }
+    const startEditAmount = (payment: PaymentGet) => {
+        setEditingAmountId(payment.id);
+        setTempAmount(payment.amount?.toString() ?? "");
+    };
 
-            setPayments((p) =>
-                p.map((row) =>
-                    row.id === payment.id ? { ...row, amount: updatedAmount } : row
-                )
-            );
-            setEditingAmountId(null);
+    const commitAmountEdit = (paymentId: string): boolean => {
+        const numAmount = Number(tempAmount);
+
+        if (isNaN(numAmount) || numAmount <= 0) {
+            alert("Please enter a valid positive number for the amount.");
+            const current = payments.find(p => p.id === paymentId);
+            setTempAmount(current?.amount?.toString() ?? "");
+            return false;
         }
 
-        if (payment.amount === undefined || payment.amount === null || payment.amount <= 0) {
-            alert("Please enter a valid amount before approving/rejecting.");
-            return;
+        setPayments(prev =>
+            prev.map(p =>
+                p.id === paymentId ? { ...p, amount: numAmount } : p
+            )
+        );
+
+        setEditingAmountId(null);
+        return true;
+    };
+
+    const handleApproveButton = async (payment: PaymentGet, approved: boolean) => {
+        let currentPayment = { ...payment };
+
+        if (editingAmountId === payment.id) {
+            const valid = commitAmountEdit(payment.id);
+            if (!valid && approved) {
+                return;
+            }
+            const updated = payments.find(p => p.id === payment.id);
+            if (updated) currentPayment = updated;
+        }
+
+        if (approved) {
+            if (
+                currentPayment.amount === undefined ||
+                currentPayment.amount === null ||
+                currentPayment.amount <= 0
+            ) {
+                alert("Please enter a valid positive amount before approving.");
+                return;
+            }
         }
 
         const selectedUsername =
             users.find((u) => u.id === selectedUser)?.username || "";
 
         const req: PaymentApprovePost = {
-            id: payment.id,
+            id: currentPayment.id,
             username: selectedUsername,
-            paymentNumber: payment.paymentNumber,
-            amount: payment.amount,
+            paymentNumber: currentPayment.paymentNumber,
+
+            amount: currentPayment.amount ?? 0,
             isApproved: approved,
         };
 
         await apiService.approvePayment(req);
 
-        setPayments((p) => p.filter((x) => x.id !== payment.id));
-    };
-
-    const startEditAmount = (payment: PaymentGet) => {
-        setEditingAmountId(payment.id);
-        setTempAmount(payment.amount?.toString() ?? "");
+        setPayments((p) => p.filter((x) => x.id !== currentPayment.id));
     };
 
     return (
@@ -135,10 +158,13 @@ export default function ApprovePay() {
                                             className="input input-bordered input-sm w-28"
                                             value={tempAmount}
                                             onChange={(e) => setTempAmount(e.target.value)}
-                                            onBlur={() => setEditingAmountId(null)}
+                                            onBlur={() => commitAmountEdit(p.id)}
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") {
+                                                    commitAmountEdit(p.id);
+                                                } else if (e.key === "Escape") {
                                                     setEditingAmountId(null);
+                                                    setTempAmount(p.amount?.toString() ?? "");
                                                 }
                                             }}
                                             autoFocus

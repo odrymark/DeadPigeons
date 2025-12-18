@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {apiService} from "../../api";
+import { useState } from "react";
+import { apiService } from "../../api";
 
 export default function AddUser() {
     const [username, setUsername] = useState("");
@@ -7,8 +7,9 @@ export default function AddUser() {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setError("");
 
@@ -17,60 +18,116 @@ export default function AddUser() {
             return;
         }
 
-        await apiService.addUser({username: username, password: password, email:email, phoneNumber: phone});
-        setUsername("");
-        setPassword("");
-        setEmail("");
-        setPhone("");
+        try {
+            setLoading(true);
+            await apiService.addUser({
+                username,
+                password,
+                email,
+                phoneNumber: phone,
+            });
 
+            setUsername("");
+            setPassword("");
+            setEmail("");
+            setPhone("");
+        } catch (err) {
+            setError("Failed to add user. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
-            <h1 className="text-2xl font-bold mb-6">Add New User</h1>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200 min-h-screen">
+            <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <h1 className="card-title text-2xl font-bold justify-center mb-6">
+                        Add New User
+                    </h1>
 
-            <form
-                className="flex flex-col gap-4 w-full max-w-md p-6 rounded-lg shadow"
-                onSubmit={handleSubmit}
-            >
-                {error && <div className="text-error font-semibold">{error}</div>}
+                    {error && (
+                        <div className="alert alert-error shadow-lg mb-4">
+                            <span>{error}</span>
+                        </div>
+                    )}
 
-                <input
-                    type="text"
-                    placeholder="Username"
-                    className="input input-bordered w-full"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <fieldset className="fieldset border border-base-300 rounded-lg p-6">
+                            <legend className="fieldset-legend text-lg font-semibold px-2">
+                                User Information
+                            </legend>
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    className="input input-bordered w-full"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-medium">Username</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input input-bordered w-full"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        required
+                                        autoFocus
+                                    />
+                                </div>
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    className="input input-bordered w-full"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-medium">Password</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        className="input input-bordered w-full"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    className="input input-bordered w-full"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                />
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-medium">Email</span>
+                                    </label>
+                                    <input
+                                        type="email"
+                                        className="input input-bordered w-full"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
 
-                <button type="submit" className="btn btn-primary w-full mt-2">
-                    Add User
-                </button>
-            </form>
+                                <div>
+                                    <label className="label">
+                                        <span className="label-text font-medium">Phone Number</span>
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        className="input input-bordered w-full"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <button
+                            type="submit"
+                            className="btn btn-primary w-full"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <span className="loading loading-dots loading-lg"></span>
+                            ) : (
+                                "Add User"
+                            )}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     );
 }
