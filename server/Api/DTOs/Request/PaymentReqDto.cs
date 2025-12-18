@@ -7,7 +7,7 @@ public class PaymentReqDto
     [RegularExpression(@"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", ErrorMessage = "Invalid GUID format.")]
     public string? id { get; set; }
     
-    [Range(1, int.MaxValue, ErrorMessage = "Amount must be a positive integer.")]
+    [Range(0, int.MaxValue, ErrorMessage = "Amount must be a positive integer or 0.")]
     public int? amount { get; set; }
     
     [Required]
