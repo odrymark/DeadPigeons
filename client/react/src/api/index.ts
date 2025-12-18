@@ -91,11 +91,15 @@ export const defApi = new Api({
     baseUrl: 'https://dead-pigeons-backend.fly.dev'
 });
 
-async function apiRequest<T>(requestFunc: (opts?: RequestInit) => Promise<Response>): Promise<T> {
+async function apiRequest<T>(
+    requestFunc: (opts?: RequestInit) => Promise<Response>
+): Promise<T> {
     try {
         const res = await requestFunc({ credentials: "include" });
 
-        if (!res.ok) throw res;
+        if (!res.ok) {
+            throw new Error(`HTTP error ${res.status}: ${res.statusText}`);
+        }
 
         const text = await res.text();
 
@@ -104,16 +108,18 @@ async function apiRequest<T>(requestFunc: (opts?: RequestInit) => Promise<Respon
         }
 
         return JSON.parse(text) as T;
-
-    } catch (error: any) {
-        if (error?.status === 401) {
+    } catch (error) {
+        if (error instanceof Response && error.status === 401) {
             console.log("Got 401, attempting token refresh...");
 
             try {
                 await handleRefreshToken();
 
                 const retryRes = await requestFunc({ credentials: "include" });
-                if (!retryRes.ok) throw retryRes;
+
+                if (!retryRes.ok) {
+                    throw new Error(`Retry failed with ${retryRes.status}`);
+                }
 
                 const retryText = await retryRes.text();
 
@@ -133,13 +139,17 @@ async function apiRequest<T>(requestFunc: (opts?: RequestInit) => Promise<Respon
     }
 }
 
-let refreshPromise: Promise<any> | null = null;
+let refreshPromise: Promise<unknown> | null = null;
 
-async function handleRefreshToken() : Promise<void> {
+async function handleRefreshToken(): Promise<void> {
     if (!refreshPromise) {
         refreshPromise = defApi.api
             .authRefresh({ credentials: "include" })
-            .catch(err => {
+            .then((response) => {
+                console.log("Token refreshed successfully");
+                return response;
+            })
+            .catch((err) => {
                 console.log("Refresh failed:", err);
                 throw err;
             })
@@ -148,7 +158,7 @@ async function handleRefreshToken() : Promise<void> {
             });
     }
 
-    return refreshPromise;
+    await refreshPromise;
 }
 
 class ApiService {
@@ -156,53 +166,37 @@ class ApiService {
 
     private async _get<T>(
         requestFunc: (opts?: RequestInit) => Promise<Response>,
-        defaultValue: T,
-        errorMsg: string
+        defaultValue: T
     ): Promise<T> {
         try {
             return await apiRequest<T>(requestFunc);
         } catch (error) {
-            console.log(`${errorMsg}: ${error}`);
+            console.log("GET request failed:", error);
             return defaultValue;
         }
     }
 
     private async _action(
-        requestFunc: (opts?: RequestInit) => Promise<Response>,
-        successMsg: string,
-        errorMsg: string
+        requestFunc: (opts?: RequestInit) => Promise<Response>
     ): Promise<void> {
         try {
             await apiRequest<unknown>(requestFunc);
-            if (successMsg) alert(successMsg);
         } catch (error) {
-            console.log(`${errorMsg}: ${error}`);
-            if (successMsg) alert(`${errorMsg}: ${error}`);
+            console.error("Action failed:", error);
+            throw error;
         }
     }
 
     async login(user: UserLoginPost): Promise<UserGet | null> {
-        return this._get(
-            (opts) => this.api.authLogin(user, opts),
-            null,
-            "Failed to login"
-        );
+        return this._get((opts) => this.api.authLogin(user, opts), null);
     }
 
     async logout(): Promise<void> {
-        return this._action(
-            (opts) => this.api.authLogout(opts),
-            "",
-            "Failed to logout"
-        );
+        return this._action((opts) => this.api.authLogout(opts));
     }
 
     async getCurrentUser(): Promise<UserGet | null> {
-        return this._get(
-            (opts) => this.api.authGetMe(opts),
-            null,
-            "Failed to authenticate user"
-        );
+        return this._get((opts) => this.api.authGetMe(opts), null);
     }
 
     async getBoards(idStr?: string): Promise<BoardGet[]> {
@@ -210,8 +204,7 @@ class ApiService {
             (opts) => idStr
                 ? this.api.boardsGetBoardsAdmin({ idStr }, opts)
                 : this.api.boardsGetBoards(opts),
-            [],
-            "Failed to retrieve boards"
+            []
         );
     }
 
@@ -220,129 +213,68 @@ class ApiService {
             (opts) => idStr
                 ? this.api.paymentsGetPaymentsAdmin({ idStr }, opts)
                 : this.api.paymentsGetPayments(opts),
-            [],
-            "Failed to retrieve payments"
+            []
         );
     }
 
     async getBalance(): Promise<number> {
-        return this._get(
-            (opts) => this.api.paymentsGetBalance(opts),
-            -1,
-            "Failed to retrieve balance"
-        );
+        return this._get((opts) => this.api.paymentsGetBalance(opts), -1);
     }
 
     async addBoard(board: BoardPost): Promise<void> {
-        return this._action(
-            (opts) => this.api.boardsAddBoard(board, opts),
-            "Board added successfully.",
-            "Failed to add board"
-        );
+        return this._action((opts) => this.api.boardsAddBoard(board, opts));
     }
 
     async endRepeat(id: string): Promise<void> {
-        return this._action(
-            (opts) => this.api.boardsEndRepeat(id, opts),
-            "Board updated successfully.",
-            "Failed to update board"
-        );
+        return this._action((opts) => this.api.boardsEndRepeat(id, opts));
     }
 
     async addUser(user: UserAddPost): Promise<void> {
-        return this._action(
-            (opts) => this.api.usersAddUser(user, opts),
-            "User added successfully.",
-            "Failed to add user"
-        );
+        return this._action((opts) => this.api.usersAddUser(user, opts));
     }
 
     async addWinningNumbers(numbers: number[]): Promise<void> {
-        return this._action(
-            (opts) => this.api.gamesAddWinningNumbers({ numbers }, opts),
-            "Winning numbers added successfully.",
-            "Failed to add the winning numbers"
-        );
+        return this._action((opts) => this.api.gamesAddWinningNumbers({ numbers }, opts));
     }
 
     async addPayment(payment: PaymentAddPost): Promise<void> {
-        return this._action(
-            (opts) => this.api.paymentsAddPayment(payment, opts),
-            "Payment added successfully!",
-            "Failed to add payment"
-        );
+        return this._action((opts) => this.api.paymentsAddPayment(payment, opts));
     }
 
     async getAllUsers(): Promise<UserInfoGet[]> {
-        return this._get(
-            (opts) => this.api.usersGetAllUsers(opts),
-            [],
-            "Failed to get users"
-        );
+        return this._get((opts) => this.api.usersGetAllUsers(opts), []);
     }
 
     async getUserInfo(idStr: string): Promise<UserInfoGet | null> {
-        return this._get(
-            (opts) => this.api.usersGetUserInfo({ idStr }, opts),
-            null,
-            "Failed to get user info"
-        );
+        return this._get((opts) => this.api.usersGetUserInfo({ idStr }, opts), null);
     }
 
     async getAllGames(): Promise<GameGet[] | null> {
-        return this._get(
-            (opts) => this.api.gamesGetAllGames(opts),
-            null,
-            "Failed to get all games"
-        );
+        return this._get((opts) => this.api.gamesGetAllGames(opts), null);
     }
 
     async approvePayment(payment: PaymentApprovePost): Promise<void> {
-        return this._action(
-            (opts) => this.api.paymentsApprovePayment(payment, opts),
-            "Payment approved successfully!",
-            "Failed to approve payment"
-        );
+        return this._action((opts) => this.api.paymentsApprovePayment(payment, opts));
     }
 
     async getCurrentGameClosing(): Promise<CurrGameCloseGet | null> {
-        return this._get(
-            (opts) => this.api.gamesGetCurrGameClosing(opts),
-            null,
-            "Failed to get current game closing"
-        );
+        return this._get((opts) => this.api.gamesGetCurrGameClosing(opts), null);
     }
 
     async getLastGameNums(): Promise<number[]> {
-        return this._get(
-            (opts) => this.api.gamesGetLastGameNums(opts),
-            [],
-            "Failed to get last game nums"
-        );
+        return this._get((opts) => this.api.gamesGetLastGameNums(opts), []);
     }
 
     async getCurrentBoardsForUser(): Promise<BoardGet[]> {
-        return this._get(
-            (opts) => this.api.boardsGetCurrBoardsForUser(opts),
-            [],
-            "Failed to get boards for user"
-        );
+        return this._get((opts) => this.api.boardsGetCurrBoardsForUser(opts), []);
     }
 
     async getPreviousBoardsForUser(): Promise<BoardGet[]> {
-        return this._get(
-            (opts) => this.api.boardsGetPrevBoardsForUser(opts),
-            [],
-            "Failed to get boards for user"
-        );
+        return this._get((opts) => this.api.boardsGetPrevBoardsForUser(opts), []);
     }
 
     async editUser(user: UserEditPost): Promise<void> {
-        return this._action(
-            (opts) => this.api.usersEditUser(user, opts),
-            "User updated successfully!",
-            "Failed to update user"
-        );
+        return this._action((opts) => this.api.usersEditUser(user, opts));
     }
 }
 

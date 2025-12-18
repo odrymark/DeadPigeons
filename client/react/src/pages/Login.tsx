@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiService } from "../api";
 import { useAtom } from "jotai";
 import { userAtom } from "../atoms/userAtom.ts";
+import { useToast } from "../components/ToastProvider";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [, setUser] = useAtom(userAtom);
+    const toast = useToast();
 
     useEffect(() => {
         (async () => {
@@ -23,21 +25,23 @@ export default function Login() {
 
     const handleLogin = async () => {
         if (!username || !password) {
-            alert("Please enter both username and password.");
+            toast("Please enter both username and password.", "error");
             return;
         }
 
         setLoading(true);
         try {
             const u = await apiService.login({ username, password });
+
             if (u) {
                 setUser(u);
+                toast("Login successful! Welcome back.", "success");
                 navigate("/dashboard");
             } else {
-                alert("Invalid username, password or the user is inactive.");
+                toast("Invalid username, password, or account is inactive.", "error");
             }
         } catch (err) {
-            alert("Login failed. Please try again.");
+            toast("Login failed. Please try again later.", "error");
         } finally {
             setLoading(false);
         }

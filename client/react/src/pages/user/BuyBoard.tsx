@@ -64,12 +64,12 @@ export default function BuyBoard() {
             <div className="card w-full max-w-lg bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h1 className="card-title text-2xl font-bold justify-center mb-6">
-                        Buy Lottery Board
+                        Buy Board
                     </h1>
 
                     <fieldset className="fieldset border border-base-300 rounded-lg p-6">
                         <legend className="fieldset-legend text-lg font-semibold px-2">
-                            Select Your Numbers (1–16)
+                            Select Your Numbers
                         </legend>
 
                         <div className="grid grid-cols-4 gap-4 my-8">
@@ -106,7 +106,7 @@ export default function BuyBoard() {
 
                         <div className="form-control mb-6">
                             <label className="label">
-                                <span className="label-text font-medium">Number of fields per board</span>
+                                <span className="label-text font-medium">Number of fields</span>
                             </label>
                             <select
                                 className="select select-bordered w-full"
