@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
-import {apiService} from "../../api";
-import {useState} from "react";
-import {balanceAtom} from "../../atoms/balanceAtom.ts";
+import { apiService } from "../../api";
+import { useState } from "react";
+import { balanceAtom } from "../../atoms/balanceAtom.ts";
 
 export default function BuyBoard() {
     const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
@@ -11,6 +11,8 @@ export default function BuyBoard() {
     const [repeatEnabled, setRepeatEnabled] = useState(false);
     const [repeatCount, setRepeatCount] = useState(1);
 
+    const [loading, setLoading] = useState(false);
+
     const toggleNumber = (num: number) => {
         if (selectedNumbers.includes(num)) {
             setSelectedNumbers((prev) => prev.filter((n) => n !== num));
@@ -18,7 +20,7 @@ export default function BuyBoard() {
         }
 
         if (selectedNumbers.length < fieldsCount) {
-            setSelectedNumbers((prev) => [...prev, num]);
+            setSelectedNumbers((prev) => [...prev, num].sort((a, b) => a - b));
         }
     };
 
@@ -28,93 +30,147 @@ export default function BuyBoard() {
             return;
         }
 
-        await apiService.addBoard({numbers: selectedNumbers, repeats: repeatEnabled ? repeatCount : 0});
+        if (repeatEnabled && repeatCount < 1) {
+            alert("Repeat count must be at least 1");
+            return;
+        }
 
-        const balance = await apiService.getBalance();
-        setBalance(balance);
+        try {
+            setLoading(true);
+            await apiService.addBoard({
+                numbers: selectedNumbers,
+                repeats: repeatEnabled ? repeatCount : 0,
+            });
 
-        setSelectedNumbers([]);
-        setRepeatEnabled(false);
-        setRepeatCount(1);
+            const balance = await apiService.getBalance();
+            setBalance(balance);
+
+            setSelectedNumbers([]);
+            setRepeatEnabled(false);
+            setRepeatCount(1);
+        } catch (err) {
+            alert("Failed to submit board. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const gridNumbers = Array.from({ length: 16 }, (_, i) => i + 1);
 
+    const isSubmitDisabled = selectedNumbers.length !== fieldsCount || loading;
+
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200">
-            <h1 className="text-2xl font-bold mb-4">Select Your Numbers</h1>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 bg-base-200 min-h-screen">
+            <div className="card w-full max-w-lg bg-base-100 shadow-xl">
+                <div className="card-body">
+                    <h1 className="card-title text-2xl font-bold justify-center mb-6">
+                        Buy Lottery Board
+                    </h1>
 
-            {/* Numbers */}
-            <div className="grid grid-cols-4 gap-2 mb-4">
-                {gridNumbers.map((num) => (
+                    <fieldset className="fieldset border border-base-300 rounded-lg p-6">
+                        <legend className="fieldset-legend text-lg font-semibold px-2">
+                            Select Your Numbers (1–16)
+                        </legend>
+
+                        <div className="grid grid-cols-4 gap-4 my-8">
+                            {gridNumbers.map((num) => {
+                                const isSelected = selectedNumbers.includes(num);
+                                const isDisabled = !isSelected && selectedNumbers.length >= fieldsCount;
+
+                                return (
+                                    <button
+                                        key={num}
+                                        className={`
+                                            w-16 h-16 rounded-xl flex items-center justify-center text-xl font-bold transition-all
+                                            ${isSelected
+                                            ? "btn btn-primary text-white shadow-lg scale-105"
+                                            : "bg-base-200 hover:bg-base-300"
+                                        }
+                                            ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                                        `}
+                                        onClick={() => toggleNumber(num)}
+                                        disabled={isDisabled}
+                                    >
+                                        {num}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="text-center text-sm text-base-content/70 mb-6">
+                            Selected: <span className="font-bold">
+                                {selectedNumbers.join(", ") || "None"}
+                            </span>{" "}
+                            ({selectedNumbers.length} / {fieldsCount})
+                        </div>
+
+                        <div className="form-control mb-6">
+                            <label className="label">
+                                <span className="label-text font-medium">Number of fields per board</span>
+                            </label>
+                            <select
+                                className="select select-bordered w-full"
+                                value={fieldsCount}
+                                onChange={(e) => {
+                                    const newCount = Number(e.target.value);
+                                    setFieldsCount(newCount);
+                                    if (selectedNumbers.length > newCount) {
+                                        setSelectedNumbers((prev) => prev.slice(0, newCount));
+                                    }
+                                }}
+                            >
+                                {[5, 6, 7, 8].map((n) => (
+                                    <option key={n} value={n}>
+                                        {n} fields
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-control mb-6">
+                            <label className="label cursor-pointer justify-start gap-4">
+                                <input
+                                    type="checkbox"
+                                    className="toggle toggle-primary toggle-lg"
+                                    checked={repeatEnabled}
+                                    onChange={(e) => setRepeatEnabled(e.target.checked)}
+                                />
+                                <span className="label-text font-medium">
+                                    Repeat board for multiple weeks
+                                </span>
+                            </label>
+
+                            {repeatEnabled && (
+                                <div className="mt-4">
+                                    <label className="label">
+                                        <span className="label-text font-medium">Number of weeks</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="100"
+                                        className="input input-bordered w-full text-center"
+                                        value={repeatCount}
+                                        onChange={(e) => setRepeatCount(Math.max(1, Number(e.target.value)))}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </fieldset>
+
                     <button
-                        key={num}
-                        className={`w-14 h-14 rounded-lg flex items-center justify-center font-bold text-lg border 
-              ${selectedNumbers.includes(num) ? "btn btn-primary text-white" : "bg-gray-300 text-black"}
-              ${!selectedNumbers.includes(num) && selectedNumbers.length >= fieldsCount ? "opacity-50 cursor-not-allowed" : ""}`}
-                        onClick={() => toggleNumber(num)}
-                        disabled={!selectedNumbers.includes(num) && selectedNumbers.length >= fieldsCount}
+                        className="btn btn-primary w-full text-lg"
+                        onClick={handleSubmit}
+                        disabled={isSubmitDisabled}
                     >
-                        {num}
+                        {loading ? (
+                            <span className="loading loading-dots loading-lg"></span>
+                        ) : (
+                            "Submit Board"
+                        )}
                     </button>
-                ))}
-            </div>
-
-            {/* Fields selector */}
-            <div className="mb-4">
-                <label className="mr-2 font-semibold">Select number of fields: </label>
-                <select
-                    value={fieldsCount}
-                    onChange={(e) => {
-                        const newCount = Number(e.target.value);
-                        setFieldsCount(newCount);
-
-                        if (selectedNumbers.length > newCount) {
-                            setSelectedNumbers((prev) => prev.slice(0, newCount));
-                        }
-                    }}
-                    className="select select-bordered"
-                >
-                    {Array.from({ length: 4 }, (_, i) => i + 5).map((n) => (
-                        <option key={n} value={n}>
-                            {n}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {/* Repeat Toggle */}
-            <div className="mb-4 flex items-center gap-3">
-                <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    checked={repeatEnabled}
-                    onChange={() => setRepeatEnabled(!repeatEnabled)}
-                />
-                <span className="font-semibold">Repeat for multiple weeks</span>
-            </div>
-
-            {/* Repeat Count Input*/}
-            {repeatEnabled && (
-                <div className="mb-4 flex flex-col items-center">
-                    <label className="font-semibold mb-1">Number of repeats:</label>
-                    <input
-                        type="number"
-                        min={1}
-                        className="input input-bordered w-32 text-center"
-                        value={repeatCount}
-                        onChange={(e) => setRepeatCount(Number(e.target.value))}
-                    />
                 </div>
-            )}
-
-            {/* Submit button */}
-            <button
-                className="btn btn-primary w-32 h-12 font-bold"
-                onClick={() => handleSubmit()}
-            >
-                Submit
-            </button>
+            </div>
         </div>
     );
 }

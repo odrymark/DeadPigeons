@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useNavigate, Outlet } from "react-router-dom";
 import { userAtom } from "../atoms/userAtom.ts";
-import { themeAtom } from "../atoms/themeAtom.ts"; // <-- new
+import { themeAtom } from "../atoms/themeAtom.ts";
 import { useEffect, useState } from "react";
 import { apiService } from "../api";
 import logoutIcon from "../assets/logout.png";
