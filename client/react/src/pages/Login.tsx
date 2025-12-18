@@ -34,7 +34,7 @@ export default function Login() {
                 setUser(u);
                 navigate("/dashboard");
             } else {
-                alert("Invalid username or password.");
+                alert("Invalid username, password or the user is inactive.");
             }
         } catch (err) {
             alert("Login failed. Please try again.");
