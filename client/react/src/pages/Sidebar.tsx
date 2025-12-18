@@ -18,7 +18,6 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-
     const toast = useToast();
 
     const darkThemeName = "dark";
@@ -41,19 +40,15 @@ export default function Sidebar() {
                         setBalance(bal);
                     }
                 } else {
-                    toast("Session expired. Please log in again.", "error");
-                    navigate("/login");
+                    navigate("/");
                 }
-            } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : "Something went wrong";
-                toast(message, "error");
             } finally {
                 setLoading(false);
             }
         }
 
         fetchUserData();
-    }, [navigate, setUser, setBalance, toast]);
+    }, [navigate, setUser, setBalance]);
 
     const toggleTheme = () => {
         const newTheme = theme === lightThemeName ? darkThemeName : lightThemeName;
