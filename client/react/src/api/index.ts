@@ -98,30 +98,35 @@ async function apiRequest<T>(
     const doRequest = async (): Promise<T> => {
         const res = await requestFunc({ credentials: "include" });
 
-        const contentType = res.headers.get("content-type") ?? "";
+        let rawText = "";
+        try {
+            rawText = await res.text();
+        } catch {
+            // ignore
+        }
+
+        let parsed: any = null;
+        if (rawText) {
+            try {
+                parsed = JSON.parse(rawText);
+            } catch {
+                // ignore
+            }
+        }
 
         if (!res.ok) {
-            let message = `HTTP error ${res.status}`;
-
-            if (contentType.includes("application/json")) {
-                try {
-                    const body = await res.json();
-                    message = body.detail ?? body.title ?? message;
-                } catch {
-                    // ignore
-                }
-            }
+            const message =
+                parsed?.detail ??
+                parsed?.title ??
+                rawText ??
+                `HTTP error ${res.status}`;
 
             const error = new Error(message);
             (error as any).status = res.status;
             throw error;
         }
 
-        if (contentType.includes("application/json")) {
-            return await res.json() as T;
-        }
-
-        return {} as T;
+        return parsed ?? ({} as T);
     };
 
     try {
