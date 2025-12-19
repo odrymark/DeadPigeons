@@ -108,6 +108,30 @@ public class GameTest : TestBase
         Assert.Equal(new List<int> { 1, 2, 3 }, result);
     }
 
+    [Fact]
+    public async Task GetLastGameNums_Returns_Empty_When_NoPreviousGame()
+    {
+        await CreateGameAsync(true);
+
+        var result = await _service.GetLastGameNums();
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetLastGameNums_Returns_Empty_When_LastGame_Has_NoNumbers()
+    {
+        var lastGame = await CreateGameAsync(false);
+        lastGame.numbers = new List<int>();
+        lastGame.createdAt = DateTime.UtcNow.AddDays(-1);
+        Db.Games.Update(lastGame);
+        await Db.SaveChangesAsync();
+
+        var result = await _service.GetLastGameNums();
+
+        Assert.Empty(result);
+    }
+
     // -------------------------
     // CreateNextGame Tests
     // -------------------------
@@ -115,6 +139,19 @@ public class GameTest : TestBase
     public void CreateNextGame_Adds_Game_To_Context()
     {
         var openUntil = DateTime.UtcNow.AddHours(3);
+
+        var game = _service.CreateNextGame(openUntil);
+
+        Assert.Equal(openUntil, game.openUntil);
+        Assert.Empty(game.numbers);
+        Assert.Equal(0, game.income);
+        Assert.Contains(game, Db.Games.Local);
+    }
+
+    [Fact]
+    public void CreateNextGame_Sets_Correct_Defaults_With_Past_CloseDate()
+    {
+        var openUntil = DateTime.UtcNow.AddDays(-1);
 
         var game = _service.CreateNextGame(openUntil);
 
@@ -157,5 +194,19 @@ public class GameTest : TestBase
         var result = await _service.GetAllGames();
 
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetAllGames_Returns_Empty_When_CompletedGames_Have_NoNumbers()
+    {
+        var g1 = await CreateGameAsync(false);
+        g1.numbers = new List<int>();
+        g1.createdAt = DateTime.UtcNow.AddDays(-1);
+        Db.Games.Update(g1);
+        await Db.SaveChangesAsync();
+
+        var result = await _service.GetAllGames();
+
+        Assert.Empty(result); 
     }
 }

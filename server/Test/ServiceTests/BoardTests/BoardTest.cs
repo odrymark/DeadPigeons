@@ -53,6 +53,16 @@ public class BoardTest : TestBase
         Assert.Single(result);
     }
 
+    [Fact]
+    public async Task GetBoardsForGame_Returns_Empty_When_NoBoards()
+    {
+        var game = await CreateGameAsync();
+
+        var result = await _boardService.GetBoardsForGame(game.id);
+
+        Assert.Empty(result);
+    }
+
     // ----------------------------------------------------
     // GetRepeatBoards
     // ----------------------------------------------------
@@ -70,6 +80,19 @@ public class BoardTest : TestBase
         var result = await _boardService.GetRepeatBoards();
 
         Assert.Single(result);
+    }
+
+    [Fact]
+    public async Task GetRepeatBoards_Returns_Empty_When_NoRepeaters()
+    {
+        var game = await CreateGameAsync();
+        var user = await CreateUserAsync();
+
+        await CreateBoardAsync(user.id, game.id, repeats: 0);
+
+        var result = await _boardService.GetRepeatBoards();
+
+        Assert.Empty(result);
     }
 
     // ----------------------------------------------------
@@ -100,6 +123,19 @@ public class BoardTest : TestBase
             _boardService.GetCurrGameUserBoards(Guid.NewGuid()));
     }
 
+    [Fact]
+    public async Task GetCurrGameUserBoards_Returns_Empty_When_NoBoards()
+    {
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
+
+        _gameService.GetActiveGame().Returns(game);
+
+        var result = await _boardService.GetCurrGameUserBoards(user.id);
+
+        Assert.Empty(result);
+    }
+
     // ----------------------------------------------------
     // GetPrevGameUserBoards Tests
     // ----------------------------------------------------
@@ -119,6 +155,29 @@ public class BoardTest : TestBase
         Assert.Single(result);
     }
 
+    [Fact]
+    public async Task GetPrevGameUserBoards_Returns_Empty_When_NoPreviousGame()
+    {
+        _gameService.GetLastGame().Returns((Game?)null);
+
+        var result = await _boardService.GetPrevGameUserBoards(Guid.NewGuid());
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetPrevGameUserBoards_Returns_Empty_When_NoBoardsForUser()
+    {
+        var user = await CreateUserAsync("testuser");
+        var game = await CreateGameAsync();
+
+        _gameService.GetLastGame().Returns(game);
+
+        var result = await _boardService.GetPrevGameUserBoards(user.id);
+
+        Assert.Empty(result);
+    }
+
     // ----------------------------------------------------
     // GetBoards Tests
     // ----------------------------------------------------
@@ -136,6 +195,28 @@ public class BoardTest : TestBase
         var result = await _boardService.GetBoards(null, user.id);
 
         Assert.Single(result);
+    }
+
+    [Fact]
+    public async Task GetBoards_Returns_Empty_When_UserNotFound()
+    {
+        _userService.GetUserById(Arg.Any<Guid>()).Returns((User?)null);
+
+        var result = await _boardService.GetBoards(null, Guid.NewGuid());
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetBoards_Returns_Empty_When_NoBoards()
+    {
+        var user = await CreateUserAsync("bob");
+
+        _userService.GetUserById(user.id).Returns(user);
+
+        var result = await _boardService.GetBoards(null, user.id);
+
+        Assert.Empty(result);
     }
 
     // ----------------------------------------------------
@@ -249,7 +330,7 @@ public class BoardTest : TestBase
 
         var board = await CreateBoardAsync(user.id, game.id, repeats: 5);
 
-        var adminUserId = Guid.NewGuid(); // different from user.id
+        var adminUserId = Guid.NewGuid();
 
         await _boardService.EndRepeat(board.id.ToString(), adminUserId, true);
 

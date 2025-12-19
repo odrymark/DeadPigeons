@@ -61,6 +61,15 @@ public class PaymentTest : TestBase
         Assert.True(payment.isApproved);
     }
 
+    [Fact]
+    public async Task CreateBuyPayment_Throws_When_UserNotFound()
+    {
+        var fakeUserId = Guid.NewGuid();
+        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
+
+        await Assert.ThrowsAsync<Exception>(() => _service.CreateBuyPayment(50, fakeUserId));
+    }
+
     // -------------------------
     // GetBalance Tests
     // -------------------------
@@ -75,6 +84,15 @@ public class PaymentTest : TestBase
         var balance = await _service.GetBalance(user.id);
 
         Assert.Equal(80, balance);
+    }
+
+    [Fact]
+    public async Task GetBalance_Throws_When_UserNotFound()
+    {
+        var fakeUserId = Guid.NewGuid();
+        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
+
+        await Assert.ThrowsAsync<Exception>(() => _service.GetBalance(fakeUserId));
     }
 
     // -------------------------
@@ -181,7 +199,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id);
 
-        var dto = new PaymentReqDto { id = payment.id.ToString() }; // isApproved not set
+        var dto = new PaymentReqDto { id = payment.id.ToString() };
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }

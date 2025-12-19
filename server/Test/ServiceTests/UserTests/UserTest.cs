@@ -56,6 +56,14 @@ public class UserTest : TestBase
         Assert.Contains("carol", usernames);
     }
 
+    [Fact]
+    public async Task GetAllUsers_Returns_Empty_When_NoUsers()
+    {
+        var result = await _service.GetAllUsers();
+
+        Assert.Empty(result);
+    }
+
     // -------------------------
     // GetUserInfo Tests
     // -------------------------
@@ -97,7 +105,7 @@ public class UserTest : TestBase
         var user = await Db.Users.FirstAsync(u => u.username == "eve");
 
         Assert.Equal("eve", user.username);
-        Assert.Equal("HASH_password", user.password); // hashed by mock
+        Assert.Equal("HASH_password", user.password);
         Assert.Equal("eve@test.com", user.email);
         Assert.Equal("5555555555", user.phoneNumber);
         Assert.False(user.isAdmin);
