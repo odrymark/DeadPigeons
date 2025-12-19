@@ -1,8 +1,8 @@
 The project uses:
-            .NET 9 for the backend
-            React for the frontend
-            PostgreSQL for the database
-            fly.io for deployment
+- .NET 9 for the backend
+- React for the frontend
+- PostgreSQL as the database
+- fly.io for deployment
 
 Deployment Links:
     Backend:   https://dead-pigeons-backend.fly.dev
