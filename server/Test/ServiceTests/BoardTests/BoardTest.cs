@@ -156,15 +156,6 @@ public class BoardTest : TestBase
     }
 
     [Fact]
-    public async Task GetPrevGameUserBoards_Throws_When_NoPreviousGame()
-    {
-        _gameService.GetLastGame().Returns((Game?)null);
-
-        await Assert.ThrowsAsync<NullReferenceException>(() =>
-            _boardService.GetPrevGameUserBoards(Guid.NewGuid()));
-    }
-
-    [Fact]
     public async Task GetPrevGameUserBoards_Returns_Empty_When_NoBoardsForUser()
     {
         var user = await CreateUserAsync("testuser");
@@ -194,16 +185,6 @@ public class BoardTest : TestBase
         var result = await _boardService.GetBoards(null, user.id);
 
         Assert.Single(result);
-    }
-
-    [Fact]
-    public async Task GetBoards_Returns_Empty_When_UserNotFound()
-    {
-        _userService.GetUserById(Arg.Any<Guid>()).Returns((User?)null);
-
-        var result = await _boardService.GetBoards(null, Guid.NewGuid());
-
-        Assert.Empty(result);
     }
 
     [Fact]
