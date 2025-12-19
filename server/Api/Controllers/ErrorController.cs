@@ -11,7 +11,7 @@ public class ErrorController : ControllerBase
     {
         var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        Console.WriteLine(exception);
+        Console.WriteLine(exception.Message);
 
         return Problem(
             title: "An unexpected error occurred.",
