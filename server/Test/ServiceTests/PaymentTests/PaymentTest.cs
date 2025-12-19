@@ -62,12 +62,15 @@ public class PaymentTest : TestBase
     }
 
     [Fact]
-    public async Task CreateBuyPayment_Throws_When_UserNotFound()
+    public async Task CreateBuyPayment_Throws_DbUpdateException_When_UserNotFound()
     {
         var fakeUserId = Guid.NewGuid();
-        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
+        
+        var ex = await Assert.ThrowsAsync<DbUpdateException>(() =>
+            _service.CreateBuyPayment(50, fakeUserId));
 
-        await Assert.ThrowsAsync<Exception>(() => _service.CreateBuyPayment(50, fakeUserId));
+        Assert.IsType<Npgsql.PostgresException>(ex.InnerException);
+        Assert.Contains("violates foreign key constraint", ex.InnerException?.Message ?? "");
     }
 
     // -------------------------

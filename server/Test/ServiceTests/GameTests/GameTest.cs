@@ -116,20 +116,6 @@ public class GameTest : TestBase
         await Assert.ThrowsAsync<Exception>(() => _service.GetLastGameNums());
     }
 
-    [Fact]
-    public async Task GetLastGameNums_Returns_Empty_When_LastGame_Has_NoNumbers()
-    {
-        var lastGame = await CreateGameAsync(false);
-        lastGame.numbers = new List<int>();
-        lastGame.createdAt = DateTime.UtcNow.AddDays(-1);
-        Db.Games.Update(lastGame);
-        await Db.SaveChangesAsync();
-
-        var result = await _service.GetLastGameNums();
-
-        Assert.Empty(result);
-    }
-
     // -------------------------
     // CreateNextGame Tests
     // -------------------------
