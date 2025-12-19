@@ -50,8 +50,7 @@ On these pages, users can:
 
 **Regular users cannot access admin-only pages.**
 
-
-
+---
 
 Currently, the project has one known issue with logging server-thrown errors on the client-side.
 
