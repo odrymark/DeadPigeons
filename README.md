@@ -5,14 +5,12 @@ The project uses:
             fly.io for deployment
 
 Deployment Links:
-
     Backend:   https://dead-pigeons-backend.fly.dev
     Frontend:  https://pigeons-web.fly.dev
 
 Test Users: 
 
     Username: Edd_Tester     Password: passwd_tester
-
     Username: Trevor_Parker  Password: trevpark456456
     
 Test Admin:
