@@ -5,8 +5,8 @@ The project uses:
 - fly.io for deployment
 
 Deployment Links:
-    Backend:   https://dead-pigeons-backend.fly.dev
-    Frontend:  https://pigeons-web.fly.dev
+- **Frontend**: [https://pigeons-web.fly.dev](https://pigeons-web.fly.dev)
+- **Backend API**: [https://dead-pigeons-backend.fly.dev](https://dead-pigeons-backend.fly.dev)
 
 Test Users: 
 
