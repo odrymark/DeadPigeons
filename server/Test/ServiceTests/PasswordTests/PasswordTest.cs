@@ -31,6 +31,14 @@ public class PasswordTest
         Assert.NotEqual(hash1, hash2);
     }
 
+    [Fact]
+    public void HashPassword_Handles_EmptyString()
+    {
+        var hash = _service.HashPassword("");
+
+        Assert.False(string.IsNullOrWhiteSpace(hash));
+    }
+
     // ----------------------------------------------------------
     // VerifyHashedPassword Tests
     // ----------------------------------------------------------
@@ -92,5 +100,14 @@ public class PasswordTest
         var h2 = _service.HashRefreshToken("same");
 
         Assert.Equal(h1, h2);
+    }
+
+    [Fact]
+    public void HashRefreshToken_Handles_EmptyString()
+    {
+        var hash = _service.HashRefreshToken("");
+
+        Assert.False(string.IsNullOrWhiteSpace(hash));
+        Assert.Equal(64, hash.Length);
     }
 }

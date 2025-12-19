@@ -61,6 +61,18 @@ public class PaymentTest : TestBase
         Assert.True(payment.isApproved);
     }
 
+    [Fact]
+    public async Task CreateBuyPayment_Throws_DbUpdateException_When_UserNotFound()
+    {
+        var fakeUserId = Guid.NewGuid();
+        
+        var ex = await Assert.ThrowsAsync<DbUpdateException>(() =>
+            _service.CreateBuyPayment(50, fakeUserId));
+
+        Assert.IsType<Npgsql.PostgresException>(ex.InnerException);
+        Assert.Contains("violates foreign key constraint", ex.InnerException?.Message ?? "");
+    }
+
     // -------------------------
     // GetBalance Tests
     // -------------------------
@@ -75,6 +87,17 @@ public class PaymentTest : TestBase
         var balance = await _service.GetBalance(user.id);
 
         Assert.Equal(80, balance);
+    }
+    
+    [Fact]
+    public async Task GetBalance_Returns_Zero_When_UserNotFound()
+    {
+        var fakeUserId = Guid.NewGuid();
+        _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
+
+        var balance = await _service.GetBalance(fakeUserId);
+
+        Assert.Equal(0, balance);
     }
 
     // -------------------------
@@ -181,7 +204,7 @@ public class PaymentTest : TestBase
         var user = await CreateUserAsync("bob");
         var payment = await CreatePaymentAsync(user.id);
 
-        var dto = new PaymentReqDto { id = payment.id.ToString() }; // isApproved not set
+        var dto = new PaymentReqDto { id = payment.id.ToString() };
 
         await Assert.ThrowsAsync<Exception>(() => _service.ApprovePayment(dto));
     }
