@@ -39,7 +39,7 @@ export default function UserHistory() {
         }
 
         loadUsers();
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         if (!selectedUser) {
@@ -80,7 +80,7 @@ export default function UserHistory() {
         }
 
         loadDataForMode();
-    }, [selectedUser, selectedMode, toast]);
+    }, [selectedUser, selectedMode]);
 
     return (
         <div className="bg-base-200 w-full flex flex-col p-6 box-border">

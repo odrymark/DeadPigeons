@@ -22,7 +22,7 @@ export default function PrevBoards() {
             }
         }
         fetchBoards();
-    }, [toast]);
+    }, []);
 
     if (loading) {
         return (

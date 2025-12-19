@@ -22,7 +22,7 @@ export default function PrevPayments() {
             }
         }
         fetchPayments();
-    }, [toast]);
+    }, []);
 
     if (loading) {
         return (
