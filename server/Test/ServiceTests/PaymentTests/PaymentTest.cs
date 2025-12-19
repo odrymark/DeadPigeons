@@ -22,7 +22,7 @@ public class PaymentTest : TestBase
     }
 
     // -------------------------
-    // GetPayments
+    // GetPayments Tests
     // -------------------------
     [Fact]
     public async Task GetPayments_ByUserId_Returns_Payments()
@@ -47,7 +47,7 @@ public class PaymentTest : TestBase
     }
 
     // -------------------------
-    // CreateBuyPayment
+    // CreateBuyPayment Tests
     // -------------------------
     [Fact]
     public async Task CreateBuyPayment_Creates_NegativePayment()
@@ -62,7 +62,7 @@ public class PaymentTest : TestBase
     }
 
     // -------------------------
-    // GetBalance
+    // GetBalance Tests
     // -------------------------
     [Fact]
     public async Task GetBalance_Returns_SumOfApprovedPayments()
@@ -74,11 +74,11 @@ public class PaymentTest : TestBase
 
         var balance = await _service.GetBalance(user.id);
 
-        Assert.Equal(80, balance); // Only approved payments count
+        Assert.Equal(80, balance);
     }
 
     // -------------------------
-    // AddPayment
+    // AddPayment Tests
     // -------------------------
     [Fact]
     public async Task AddPayment_CreatesPayment()
@@ -107,7 +107,7 @@ public class PaymentTest : TestBase
     }
 
     // -------------------------
-    // ApprovePayment
+    // ApprovePayment Tests
     // -------------------------
     [Fact]
     public async Task ApprovePayment_SetsApprovedAndAmount()

@@ -16,7 +16,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // GetActiveGame
+    // GetActiveGame Tests
     // -------------------------
     [Fact]
     public async Task GetActiveGame_Returns_Game_When_Exists()
@@ -37,7 +37,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // GetCurrGameClosing
+    // GetCurrGameClosing Tests
     // -------------------------
     [Fact]
     public async Task GetCurrGameClosing_Returns_CloseDate_When_ActiveGameExists()
@@ -56,7 +56,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // GetLastGame
+    // GetLastGame Tests
     // -------------------------
     [Fact]
     public async Task GetLastGame_Returns_Last_CompletedGame()
@@ -86,7 +86,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // GetLastGameNums
+    // GetLastGameNums Tests
     // -------------------------
     [Fact]
     public async Task GetLastGameNums_Returns_Numbers()
@@ -109,7 +109,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // CreateNextGame
+    // CreateNextGame Tests
     // -------------------------
     [Fact]
     public void CreateNextGame_Adds_Game_To_Context()
@@ -125,7 +125,7 @@ public class GameTest : TestBase
     }
 
     // -------------------------
-    // GetAllGames
+    // GetAllGames Tests
     // -------------------------
     [Fact]
     public async Task GetAllGames_Returns_CompletedGames()
