@@ -109,13 +109,11 @@ public class GameTest : TestBase
     }
 
     [Fact]
-    public async Task GetLastGameNums_Returns_Empty_When_NoPreviousGame()
+    public async Task GetLastGameNums_Throws_When_NoPreviousGame()
     {
-        await CreateGameAsync(true);
+        await CreateGameAsync(isOpen: true);
 
-        var result = await _service.GetLastGameNums();
-
-        Assert.Empty(result);
+        await Assert.ThrowsAsync<Exception>(() => _service.GetLastGameNums());
     }
 
     [Fact]

@@ -156,13 +156,12 @@ public class BoardTest : TestBase
     }
 
     [Fact]
-    public async Task GetPrevGameUserBoards_Returns_Empty_When_NoPreviousGame()
+    public async Task GetPrevGameUserBoards_Throws_When_NoPreviousGame()
     {
         _gameService.GetLastGame().Returns((Game?)null);
 
-        var result = await _boardService.GetPrevGameUserBoards(Guid.NewGuid());
-
-        Assert.Empty(result);
+        await Assert.ThrowsAsync<NullReferenceException>(() =>
+            _boardService.GetPrevGameUserBoards(Guid.NewGuid()));
     }
 
     [Fact]

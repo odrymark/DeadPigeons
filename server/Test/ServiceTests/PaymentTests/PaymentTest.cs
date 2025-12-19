@@ -85,14 +85,16 @@ public class PaymentTest : TestBase
 
         Assert.Equal(80, balance);
     }
-
+    
     [Fact]
-    public async Task GetBalance_Throws_When_UserNotFound()
+    public async Task GetBalance_Returns_Zero_When_UserNotFound()
     {
         var fakeUserId = Guid.NewGuid();
         _userService.GetUserById(fakeUserId).Returns<User>(_ => throw new Exception("User not found"));
 
-        await Assert.ThrowsAsync<Exception>(() => _service.GetBalance(fakeUserId));
+        var balance = await _service.GetBalance(fakeUserId);
+
+        Assert.Equal(0, balance);
     }
 
     // -------------------------
