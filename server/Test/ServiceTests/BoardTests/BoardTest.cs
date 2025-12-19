@@ -37,7 +37,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // GetBoardsForGame
+    // GetBoardsForGame Tests
     // ----------------------------------------------------
 
     [Fact]
@@ -73,7 +73,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // GetCurrGameUserBoards
+    // GetCurrGameUserBoards Tests
     // ----------------------------------------------------
 
     [Fact]
@@ -101,7 +101,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // GetPrevGameUserBoards
+    // GetPrevGameUserBoards Tests
     // ----------------------------------------------------
 
     [Fact]
@@ -120,7 +120,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // GetBoards
+    // GetBoards Tests
     // ----------------------------------------------------
 
     [Fact]
@@ -139,7 +139,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // AddBoard
+    // AddBoard Tests
     // ----------------------------------------------------
 
     [Fact]
@@ -205,7 +205,7 @@ public class BoardTest : TestBase
     }
 
     // ----------------------------------------------------
-    // EndRepeat
+    // EndRepeat Tests
     // ----------------------------------------------------
 
     [Fact]

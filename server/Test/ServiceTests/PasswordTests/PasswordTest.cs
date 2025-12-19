@@ -64,7 +64,7 @@ public class PasswordTest
     }
 
     // ----------------------------------------------------------
-    // HashRefreshToken Tests (SHA256)
+    // HashRefreshToken Tests
     // ----------------------------------------------------------
 
     [Fact]

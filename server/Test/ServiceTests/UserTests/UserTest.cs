@@ -22,7 +22,7 @@ public class UserTest : TestBase
     }
 
     // -------------------------
-    // GetUserById
+    // GetUserById Tests
     // -------------------------
     [Fact]
     public async Task GetUserById_Returns_User_When_Found()
@@ -41,7 +41,7 @@ public class UserTest : TestBase
     }
 
     // -------------------------
-    // GetAllUsers
+    // GetAllUsers Tests
     // -------------------------
     [Fact]
     public async Task GetAllUsers_Returns_Usernames()
@@ -57,7 +57,7 @@ public class UserTest : TestBase
     }
 
     // -------------------------
-    // GetUserInfo
+    // GetUserInfo Tests
     // -------------------------
     [Fact]
     public async Task GetUserInfo_Returns_UserInfo_When_Found()
@@ -79,7 +79,7 @@ public class UserTest : TestBase
     }
 
     // -------------------------
-    // AddUser
+    // AddUser Tests
     // -------------------------
     [Fact]
     public async Task AddUser_Creates_New_User()
@@ -153,7 +153,7 @@ public class UserTest : TestBase
     }
     
     // -------------------------
-    // EditUser
+    // EditUser Tests
     // -------------------------
     [Fact]
     public async Task EditUser_Updates_User_When_Found()

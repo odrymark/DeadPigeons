@@ -23,7 +23,7 @@ public class ManagerTest : TestBase
     }
 
     // -------------------------
-    // AddWinningNumbers - Happy Path
+    // AddWinningNumbers Tests
     // -------------------------
     [Fact]
     public async Task AddWinningNumbers_MarksWinningBoards_AndCreatesNextGame()
@@ -55,10 +55,7 @@ public class ManagerTest : TestBase
         Assert.Contains(board.user, activeGame.winners);
         Assert.Equal(dto.numbers, activeGame.numbers);
     }
-
-    // -------------------------
-    // AddWinningNumbers - No Active Game
-    // -------------------------
+    
     [Fact]
     public async Task AddWinningNumbers_Throws_When_NoActiveGame()
     {
@@ -68,10 +65,7 @@ public class ManagerTest : TestBase
 
         await Assert.ThrowsAsync<Exception>(() => _service.AddWinningNumbers(dto));
     }
-
-    // -------------------------
-    // AddWinningNumbers - Repeat Boards Handling
-    // -------------------------
+    
     [Fact]
     public async Task AddWinningNumbers_ReappliesRepeatBoards()
     {
@@ -96,10 +90,7 @@ public class ManagerTest : TestBase
 
         Assert.Equal(0, repeatBoard.repeats);
     }
-
-    // -------------------------
-    // AddWinningNumbers - Non-winning boards marked
-    // -------------------------
+    
     [Fact]
     public async Task AddWinningNumbers_SetsNonWinningBoardsToFalse()
     {
