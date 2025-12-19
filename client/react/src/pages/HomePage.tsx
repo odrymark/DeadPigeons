@@ -47,7 +47,7 @@ export default function MainPage() {
         }
 
         fetchData();
-    }, [toast]);
+    }, []);
 
     if (loading) {
         return (

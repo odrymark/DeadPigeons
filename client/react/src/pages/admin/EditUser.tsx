@@ -28,7 +28,7 @@ export default function EditUser() {
         };
 
         loadUsers();
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         if (!selectedUserId) {
@@ -64,7 +64,7 @@ export default function EditUser() {
         };
 
         loadUserInfo();
-    }, [selectedUserId, toast]);
+    }, [selectedUserId]);
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();

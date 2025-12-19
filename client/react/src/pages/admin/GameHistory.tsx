@@ -36,7 +36,7 @@ export default function GameHistory() {
         }
 
         fetchGames();
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         if (games.length > 0) {

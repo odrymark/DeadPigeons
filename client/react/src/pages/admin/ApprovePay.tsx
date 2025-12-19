@@ -28,7 +28,7 @@ export default function ApprovePay() {
                 setLoadingUsers(false);
             }
         })();
-    }, [toast]);
+    }, []);
 
     useEffect(() => {
         if (!selectedUser) {
@@ -51,7 +51,7 @@ export default function ApprovePay() {
                 setLoadingPayments(false);
             }
         })();
-    }, [selectedUser, toast]);
+    }, [selectedUser]);
 
     const startEditAmount = (payment: PaymentGet) => {
         setEditingAmountId(payment.id);
