@@ -94,48 +94,41 @@ export const defApi = new Api({
 async function apiRequest<T>(
     requestFunc: (opts?: RequestInit) => Promise<Response>
 ): Promise<T> {
-
-    const doRequest = async (): Promise<T> => {
+    const makeRequest = async (): Promise<Response> => {
         const res = await requestFunc({ credentials: "include" });
 
-        let rawText = "";
+        if (res.ok) return res;
+
+        let message = `HTTP error ${res.status}`;
+
         try {
-            rawText = await res.text();
+            const body = await res.clone().json();
+            if (body.detail) message = body.detail;
+            else if (body.title) message = body.title;
         } catch {
-            // ignore
+            // if not json ignore
         }
 
-        let parsed: any = null;
-        if (rawText) {
-            try {
-                parsed = JSON.parse(rawText);
-            } catch {
-                // ignore
-            }
-        }
-
-        if (!res.ok) {
-            const message =
-                parsed?.detail ??
-                parsed?.title ??
-                rawText ??
-                `HTTP error ${res.status}`;
-
-            const error = new Error(message);
-            (error as any).status = res.status;
-            throw error;
-        }
-
-        return parsed ?? ({} as T);
+        const error = new Error(message);
+        (error as Error & { status?: number }).status = res.status;
+        throw error;
     };
 
     try {
-        return await doRequest();
+        const res = await makeRequest();
+
+        const text = await res.text();
+        return text ? JSON.parse(text) as T : {} as T;
     } catch (error) {
-        if ((error as any).status === 401) {
+        if ((error as Error & { status?: number }).status === 401) {
+            console.log("Got 401, attempting token refresh...");
+
             try {
                 await handleRefreshToken();
-                return await doRequest();
+                const retryRes = await makeRequest();
+
+                const text = await retryRes.text();
+                return text ? JSON.parse(text) as T : {} as T;
             } catch {
                 throw new Error("Session expired. Please log in again.");
             }
