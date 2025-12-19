@@ -53,7 +53,7 @@ export default function AddPayment() {
                                     <input
                                         type="text"
                                         className="input input-bordered w-full"
-                                        placeholder="e.g. PAY-2025-001"
+                                        placeholder="1234567890"
                                         value={paymentNumber}
                                         onChange={(e) => setPaymentNumber(e.target.value)}
                                         required

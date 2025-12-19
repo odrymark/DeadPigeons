@@ -49,12 +49,13 @@ public class GameManager(IGameService gameService, IBoardService boardService, P
                 };
 
                 await boardService.AddBoard(req, old.userId, newGame);
-                old.repeats = 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+            
+            old.repeats = 0;
         }
 
         await context.SaveChangesAsync();
