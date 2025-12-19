@@ -18,24 +18,37 @@ Test Admin:
     Username: admin          Password: admpasswd444
     
 
-The system has one admin user.
-Only the admin can access certain pages: /login, /dashboard, /addUser, /winningNumbers, /gameHistory, /userHistory, /approvePay, and /editUser.
-On these pages, the admin is capable of:  logging in to their account
-                                          adding new users to the database
-                                          adding the current week's winning numbers
-                                          viewing previous games, including the week's income and winners
-                                          viewing all users' general information, previously played boards, and previous payments
-                                          approving pending payments added by users
-                                          editing users' data and setting their activity status
+### Admin User
+The system includes **one admin user**.
 
-The system has multiple regular users.
-Users can access these pages: /login, /dashboard, /buyBoard, /prevBoards, /prevPay, and /addPayment.
-On these pages, users are capable of:   logging in to their accounts
-                                        buying boards for the current game with their balance
-                                        viewing their own previous boards
-                                        viewing their own previous payments
-                                        adding payment numbers for the admin to validate
-Users are unable to access admin pages.
+**Admin-only pages**:  
+`/login` | `/dashboard` | `/addUser` | `/winningNumbers` | `/gameHistory` | `/userHistory` | `/approvePay` | `/editUser`
+
+On these pages, the admin can:  
+- Log in to their account  
+- Add new users to the database  
+- Add the current week's winning numbers  
+- View previous games, including weekly income and winners  
+- View all users' general information, previously played boards, and previous payments  
+- Approve pending payments added by users  
+- Edit users' data and set their activity status  
+
+---
+
+### Regular Users
+The system supports **multiple regular users**.
+
+**User-accessible pages**:  
+`/login` | `/dashboard` | `/buyBoard` | `/prevBoards` | `/prevPay` | `/addPayment`
+
+On these pages, users can:  
+- Log in to their accounts  
+- Buy boards for the current game using their balance  
+- View their own previous boards  
+- View their own previous payments  
+- Add payment numbers for admin validation  
+
+**Regular users cannot access admin-only pages.**
 
 
 Currently, the project has one known issue with logging server-thrown errors on the client-side.
