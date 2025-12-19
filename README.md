@@ -51,6 +51,8 @@ On these pages, users can:
 **Regular users cannot access admin-only pages.**
 
 
+
+
 Currently, the project has one known issue with logging server-thrown errors on the client-side.
 
 Note (not a bug): If a user cannot buy boards, it is likely because no new game has been created for more than a week. When a game is created, a closesAt value is set in the database, which is the following Saturday at 5 PM Danish local time.
