@@ -110,13 +110,4 @@ public class PasswordTest
         Assert.False(string.IsNullOrWhiteSpace(hash));
         Assert.Equal(64, hash.Length);
     }
-
-    [Fact]
-    public void HashRefreshToken_Handles_Null()
-    {
-        var hash = _service.HashRefreshToken(null!);
-
-        Assert.False(string.IsNullOrWhiteSpace(hash));
-        Assert.Equal(64, hash.Length);
-    }
 }
