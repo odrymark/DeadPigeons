@@ -2,6 +2,17 @@
 
 <img width="1913" height="953" alt="image" src="https://github.com/user-attachments/assets/82614b47-439b-46de-a86f-66a94159b77b" />
 
+---
+
+<img width="1914" height="954" alt="image" src="https://github.com/user-attachments/assets/a5c1a84b-27fe-4c29-af3e-a454429a0a0d" />
+
+---
+
+<img width="1920" height="958" alt="image" src="https://github.com/user-attachments/assets/d7f19bd8-eadb-4150-b682-00ec3cc180c9" />
+
+---
+
+
 
 The project uses:
 - .NET 9 for the backend
