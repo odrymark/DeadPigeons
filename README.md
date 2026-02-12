@@ -1,3 +1,6 @@
+<img width="1913" height="953" alt="image" src="https://github.com/user-attachments/assets/82614b47-439b-46de-a86f-66a94159b77b" />
+
+
 The project uses:
 - .NET 9 for the backend
 - React for the frontend
